@@ -99,9 +99,11 @@
     window.scrollTo(0, 0);
   }
 
-  fetch('data/catalog.json', { cache: 'no-cache' })
-    .then((r) => r.json())
-    .then((c) => { catalog = c; route(); window.addEventListener('hashchange', route); })
+  // 每個領域一個檔案（data/domains/<id>.json），由 data/domains.json 列出順序
+  const getJSON = (u) => fetch(u, { cache: 'no-cache' }).then((r) => { if (!r.ok) throw new Error(u); return r.json(); });
+  getJSON('data/domains.json')
+    .then((idx) => Promise.all(idx.domains.map((id) => getJSON(`data/domains/${id}.json`))))
+    .then((list) => { catalog = { domains: list }; route(); window.addEventListener('hashchange', route); })
     .catch(() => { app.innerHTML = '<p class="empty">讀取目錄失敗，請稍後再試。</p>'; });
 
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});

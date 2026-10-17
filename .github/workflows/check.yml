@@ -1,0 +1,9 @@
+# 每次 push 都檢查全站資料一致：id、中文短名全站唯一、來源指到的單元與主題存在。
+name: check
+on: [push, pull_request]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tools/sources.py check

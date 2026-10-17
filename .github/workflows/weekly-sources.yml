@@ -1,0 +1,38 @@
+# 每週檢查各領域的新文章：只比對 sitemap 與 data/sources/，不呼叫任何 AI，不耗 Claude 額度。
+# 掃描 data/feeds.json 裡所有有設定 feed 的領域；有新文章時以 status=new 寫進 data/sources/<領域>.json 並 commit，再開一個 issue 通知。
+name: weekly-sources
+
+on:
+  schedule:
+    - cron: "0 1 * * 1"   # 每週一 09:00（台灣時間）
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: 找新文章
+        run: python3 tools/sources.py scan | tee scan.txt
+      - name: 有新文章就 commit 並開 issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! grep -q '^- \[' scan.txt; then
+            echo "沒有新文章"; exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/sources
+          git commit -m "新文章 $(date +%F)"
+          git push
+          n=$(grep -c '^- ' scan.txt || true)
+          { echo "本週有 ${n} 篇新文章，已加進 data/sources/<領域>.json（status: new）。"; echo; grep '^- ' scan.txt; echo; echo "回對應領域的研究夥伴說「分類新文章」即可。"; } > body.md
+          gh issue create --title "新文章 $(date +%F)：${n} 篇" --body-file body.md

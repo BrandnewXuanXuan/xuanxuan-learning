@@ -1,0 +1,19 @@
+{
+ "claude": [
+  {
+   "name": "claude-blog",
+   "sitemap": "https://claude.com/sitemap.xml",
+   "match": "^https://claude\\.com/resources/articles/[^/]+$"
+  },
+  {
+   "name": "claude-dev",
+   "sitemap": "https://claude.dev/sitemap.xml",
+   "match": "^https://claude\\.dev/blog/[^/]+/?$"
+  },
+  {
+   "name": "engineering",
+   "sitemap": "https://www.anthropic.com/sitemap.xml",
+   "match": "^https://www\\.anthropic\\.com/engineering/[^/]+$"
+  }
+ ]
+}
