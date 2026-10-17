@@ -1,4 +1,4 @@
-# 軒軒的學習網頁：技術規範
+# 軒軒自修室：技術規範
 
 公開的靜態 PWA，由 GitHub Pages 發佈：`https://brandnewxuanxuan.github.io/xuanxuan-learning/`。
 本檔只放技術規範；色票、字體、元件與可視化教學規範在 [DESIGN.md](DESIGN.md)，做任何頁面前都要先讀。學習流程與各領域進度在使用者的 Obsidian 專案筆記，不寫在這裡。

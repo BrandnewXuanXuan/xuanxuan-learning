@@ -1,6 +1,6 @@
 {
-  "name": "軒軒的學習網頁",
-  "short_name": "學習",
+  "name": "軒軒自修室",
+  "short_name": "自修室",
   "description": "分領域、分主題的圖解學習筆記。",
   "lang": "zh-Hant-TW",
   "start_url": "./",

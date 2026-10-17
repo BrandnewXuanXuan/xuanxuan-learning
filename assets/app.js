@@ -30,7 +30,7 @@
     `<a class="dom${d.id === activeId ? ' on' : ''}" href="#/d/${d.id}">${icon(d.icon)}${esc(d.short || d.title)}</a>`).join('')}</nav>`;
 
   function home() {
-    setBar(null, '軒軒的學習網頁', `<a class="bar-link" href="#/log">${icon('trail')}學習軌跡</a>`);
+    setBar(null, '軒軒自修室', `<a class="bar-link" href="#/log">${icon('trail')}學習軌跡</a>`);
     const cards = catalog.domains.map((d, i) => {
       const t = tally(d.topics);
       const st = t.learned && t.learned === d.topics.length ? 'learned' : (t.open || t.learned) ? 'open' : 'idle';
@@ -45,7 +45,7 @@
   function domain(id) {
     const d = catalog.domains.find((x) => x.id === id);
     if (!d) return notFound();
-    setBar(catalog.domains.length > 1 ? '#/' : null, '軒軒的學習網頁', `<a class="bar-link" href="#/log">${icon('trail')}學習軌跡</a>`);
+    setBar(catalog.domains.length > 1 ? '#/' : null, '軒軒自修室', `<a class="bar-link" href="#/log">${icon('trail')}學習軌跡</a>`);
     const cards = d.topics.map((t, i) => {
       const st = topicState(t);
       const n = (t.lessons || []).filter((l) => l.status !== 'planned').length;
