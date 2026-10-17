@@ -1,0 +1,44 @@
+{
+  "domains": [
+    {
+      "id": "claude",
+      "title": "Claude 與 Claude Code",
+      "short": "Claude",
+      "icon": "book",
+      "summary": "把官方部落格與文件裡用得到的東西，變成看得懂、用得上的圖解。",
+      "topics": [
+        {
+          "id": "context",
+          "title": "context 與額度",
+          "summary": "每一次送出到底讀了什麼、為什麼越聊越貴、怎麼省。",
+          "icon": "context",
+          "color": "sage",
+          "lessons": [
+            {
+              "id": "context-budget",
+              "short": "帳單",
+              "title": "一次對話的帳單",
+              "summary": "context 怎麼被填滿、快取怎麼省、四個控制額度的動作。",
+              "file": "lessons/claude/context-budget.html",
+              "status": "ready",
+              "added": "2026-10-09",
+              "learnedAt": null,
+              "note": null,
+              "sources": [
+                { "title": "Manage costs effectively（Claude Code 文件）", "url": "https://code.claude.com/docs/en/costs" },
+                { "title": "How Claude remembers your project（Claude Code 文件）", "url": "https://code.claude.com/docs/en/memory" }
+              ]
+            }
+          ]
+        },
+        { "id": "memory", "title": "CLAUDE.md 與記憶", "summary": "哪些指示該常駐、哪些該按需載入。", "icon": "memory", "color": "slate", "lessons": [] },
+        { "id": "skills", "title": "Skills", "summary": "把做事方法包成按需載入的能力。", "icon": "skills", "color": "ochre", "lessons": [] },
+        { "id": "agents", "title": "Subagent 與角色", "summary": "分工、隔離 context、讓不同角色各司其職。", "icon": "agents", "color": "clay", "lessons": [] },
+        { "id": "mcp", "title": "MCP 與連接器", "summary": "讓 Claude 接上外部服務與工具。", "icon": "mcp", "color": "moss", "lessons": [] },
+        { "id": "hooks", "title": "Hooks 自動化", "summary": "在固定時機自動執行，不靠 Claude 記得。", "icon": "hooks", "color": "dusk", "lessons": [] },
+        { "id": "workflow", "title": "開發工作流", "summary": "規劃、驗證、雲端 session，讓開發少繞路。", "icon": "workflow", "color": "teal", "lessons": [] },
+        { "id": "artifacts", "title": "Artifact 與新功能", "summary": "官方新推出、值得跟上的功能。", "icon": "artifacts", "color": "stone", "lessons": [] }
+      ]
+    }
+  ]
+}

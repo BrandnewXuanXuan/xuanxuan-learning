@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>一次對話的帳單</title>
+<meta name="description" content="context 怎麼被填滿、快取怎麼省、四個控制額度的動作。">
+<meta name="theme-color" content="#f1f0eb">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="icon" href="../../icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+<style>
+  /* 3：context 視窗 */
+  .win { border: 1.5px dashed var(--rule); border-radius: 14px; padding: 10px; display: grid; gap: 6px; }
+  .win-title { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-3); margin: 0 2px 2px; }
+  .win-title svg { width: 15px; height: 15px; }
+  .slip { display: flex; align-items: center; gap: 10px; min-height: 38px; padding: 6px 10px; border-radius: 4px 10px 10px 10px; background: #f3f1ea; font-size: 13px; color: var(--ink-2); }
+  .slip svg { width: 18px; height: 18px; flex: none; color: var(--ink-3); }
+  .slip.dem { background: var(--c); color: #fff; box-shadow: 0 2px 0 rgba(0,0,0,.08); animation: drop .55s var(--ease) both; }
+  .slip.dem svg { color: #fff; }
+  .slip small { margin-left: auto; font-size: 11px; opacity: .8; white-space: nowrap; }
+</style>
+</head>
+<body class="lesson">
+<header class="bar"><div class="bar-in">
+  <a class="back" href="../../index.html#/t/claude/context" aria-label="回到主題"><svg class="i"><use href="../../assets/icons.svg#back"/></svg></a>
+  <span class="bar-title">context 與額度</span>
+</div></header>
+
+<main class="wrap">
+  <h1>一次對話的帳單</h1>
+  <p class="lead">為什麼同一句話，早上問很便宜，聊到晚上問就很貴？答案藏在每次送出時，Claude 實際讀了什麼。</p>
+  <div class="note"><svg><use href="../../assets/icons.svg#info"/></svg><span>圖裡的「格」是示意單位，用來比大小，不是實際的 token 數。</span></div>
+
+  <section id="s1">
+    <h2><span class="no">1</span>每次送出，整疊重寄一次</h2>
+    <p>Claude 不會「記得剛剛聊過什麼」。每次送出，Claude Code 都會把設定和<b>整段對話</b>疊在一起重新寄出；Claude 每用一次工具（讀檔、跑指令），拿到結果後又會再寄一次。</p>
+    <div class="fig">
+      <svg id="stackSvg" viewBox="0 0 360 262" role="img" aria-label="左邊是這次寄出的一疊內容，右邊是每次請求讀了多少"></svg>
+      <div class="ctl">
+        <button class="btn pri" data-act="ask"><svg><use href="../../assets/icons.svg#chat"/></svg>問一句</button>
+        <button class="btn" data-act="read"><svg><use href="../../assets/icons.svg#file"/></svg>讀大檔案</button>
+        <button class="btn" data-act="clear"><svg><use href="../../assets/icons.svg#eraser"/></svg>/clear</button>
+      </div>
+      <div class="read" id="stackOut">按「問一句」，看左邊越疊越高、右邊越長越高。</div>
+    </div>
+    <p>多按幾次就會發現：<b>右邊只會越來越高</b>。讀大檔案特別貴，因為檔案內容會一直留在對話裡，之後每一次都要跟著重讀。疊到虛線框（快滿了）時，Claude Code 會<b>自動壓縮</b>，把舊對話濃縮成一塊摘要；但壓縮本身要先讀完整疊，所以也是一次大請求。</p>
+    <div class="ask-hint">看不懂就回來說 <code>帳單 1</code></div>
+  </section>
+
+  <section id="s2">
+    <h2><span class="no">2</span>快取：重讀變便宜，但會過期</h2>
+    <p>重讀的部分如果還在<b>快取</b>裡，價格便宜很多，大約原價的一折。但快取有時效：訂閱方案大約一小時；改用額外購買的用量時，只剩五分鐘。</p>
+    <div class="fig">
+      <svg id="cacheSvg" viewBox="0 0 340 176" role="img" aria-label="離上一則訊息多久，與下一則訊息的成本"></svg>
+      <div class="range-lbl"><span>離上一則訊息過了多久</span><b id="gapTxt">10 分鐘</b></div>
+      <input id="gap" type="range" min="0" max="180" step="5" value="10" aria-label="離上一則訊息的時間">
+      <div class="read" id="cacheOut"></div>
+    </div>
+    <p>假設前面已經累積 30 格對話，下一則訊息本身 2 格（為了好比較，省略寫入快取的費用）。所以<b>休息很久之後，回到一個很長的 session 繼續問</b>，是最容易不知不覺吃掉額度的情況。這時開新 session，或從摘要接續，通常比較划算。</p>
+    <div class="ask-hint">看不懂就回來說 <code>帳單 2</code></div>
+  </section>
+
+  <section id="s3">
+    <h2><span class="no">3</span>誰常駐、誰用到才進來</h2>
+    <p>不是所有設定一開始就塞進去。點下面的按鈕，看哪些東西用到時才進來。</p>
+    <div class="fig">
+      <div class="win" id="win"><div class="win-title"><svg><use href="../../assets/icons.svg#context"/></svg>context 視窗</div></div>
+      <div class="ctl" id="winBtns">
+        <button class="btn" data-k="skill"><svg><use href="../../assets/icons.svg#skills"/></svg>用一個 skill</button>
+        <button class="btn" data-k="mcp"><svg><use href="../../assets/icons.svg#mcp"/></svg>用 MCP 工具</button>
+        <button class="btn" data-k="sub"><svg><use href="../../assets/icons.svg#memory"/></svg>碰子資料夾</button>
+      </div>
+      <div class="read" id="winOut">灰色紙條每次都在；彩色紙條是用到才放進來的。</div>
+    </div>
+    <p>由此可以推出兩個原則。第一，<b>CLAUDE.md 要短</b>：它每次都在，官方建議控制在 200 行以內，只有特定工作才需要的規則，就搬到 skill 或子資料夾。第二，在 CLAUDE.md 裡用 <code>@檔案</code> 匯入<b>不會省空間</b>，只是方便整理，啟動時一樣全部讀進來。</p>
+    <div class="ask-hint">看不懂就回來說 <code>帳單 3</code></div>
+  </section>
+
+  <section id="s4">
+    <h2><span class="no">4</span>四個控制額度的動作</h2>
+    <p>選一個情境，看該用哪一招。</p>
+    <div class="fig">
+      <div class="picks" id="picks">
+        <button class="pick" data-c="0"><svg><use href="../../assets/icons.svg#eraser"/></svg>做完一件事，要換完全無關的事</button>
+        <button class="pick" data-c="1"><svg><use href="../../assets/icons.svg#compress"/></svg>同一件事還沒做完，但對話已經很長</button>
+        <button class="pick" data-c="2"><svg><use href="../../assets/icons.svg#agents"/></svg>要讀一大堆 log 或文件，只需要結論</button>
+        <button class="pick" data-c="3"><svg><use href="../../assets/icons.svg#feather"/></svg>只是改個錯字、問個小問題</button>
+      </div>
+      <div class="answer" id="answer"><span class="badge"><svg><use href="../../assets/icons.svg#eraser"/></svg></span><div><h4></h4><p></p></div></div>
+    </div>
+    <div class="ask-hint">看不懂就回來說 <code>帳單 4</code></div>
+  </section>
+
+  <section id="s5">
+    <h2><span class="no">5</span>看自己的帳</h2>
+    <div class="tools">
+      <div class="tool" style="--c: var(--clay)"><span class="chip"><svg><use href="../../assets/icons.svg#gauge"/></svg></span><div><b>/usage</b>
+        <p>看用量條，以及最近的用量被誰吃掉：哪個 skill、subagent、MCP 伺服器各佔多少。佔超過一成的耗量行為（例如長 context、快取沒命中）會被特別標出來。</p></div></div>
+      <div class="tool" style="--c: var(--slate)"><span class="chip"><svg><use href="../../assets/icons.svg#lens"/></svg></span><div><b>/context</b>
+        <p>看這個 session 的空間現在被什麼佔掉。</p></div></div>
+      <div class="tool" style="--c: var(--ochre)"><span class="chip"><svg><use href="../../assets/icons.svg#spark"/></svg></span><div><b>/insights</b>
+        <p>分析你最近的使用習慣，產出一份報告。注意：跑這個本身也會用到額度。</p></div></div>
+    </div>
+    <div class="ask-hint">看不懂就回來說 <code>帳單 5</code></div>
+  </section>
+
+  <h2>原文</h2>
+  <ul class="srcs">
+    <li><a href="https://code.claude.com/docs/en/costs" target="_blank" rel="noopener">Manage costs effectively（Claude Code 文件）</a></li>
+    <li><a href="https://code.claude.com/docs/en/memory" target="_blank" rel="noopener">How Claude remembers your project（Claude Code 文件）</a></li>
+  </ul>
+
+  <div class="foot"><svg><use href="../../assets/icons.svg#chat"/></svg><span>學完了，回研究夥伴說「學完帳單」。一起回顧、寫成筆記之後，這張卡才會蓋上「學完」章。</span></div>
+</main>
+
+<script src="../../assets/iso.js"></script>
+<script>
+(() => {
+  const { mk, color, block, outline } = Iso;
+
+  /* ---------- 1 整疊重寄 ---------- */
+  const s1 = { svg: document.getElementById('stackSvg'), out: document.getElementById('stackOut'),
+    base: [['系統與工具', 'dusk', 4], ['CLAUDE.md', 'ochre', 3], ['skill／工具清單', 'slate', 1]],
+    talk: 0, tool: 0, summary: 0, bars: [], total: 0, LIMIT: 40, last: null };
+  const size = () => s1.base.reduce((a, b) => a + b[2], 0) + s1.talk + s1.tool + s1.summary;
+  const pushBar = (v, kind) => { s1.bars.push({ v, kind }); s1.total += v; if (s1.bars.length > 8) s1.bars.shift(); };
+
+  function drawStack() {
+    const svg = s1.svg; svg.replaceChildren();
+    const CX = 86, S = 60, BASE_Y = 226, PX = 3.7;
+    svg.append(mk('ellipse', { cx: CX, cy: BASE_Y + 14, rx: 70, ry: 13, fill: '#2a2b29', opacity: .07 }));
+    const layers = [...s1.base, ['摘要', 'stone', s1.summary], ['對話', 'clay', s1.talk], ['工具結果', 'sage', s1.tool]].filter((l) => l[2] > 0);
+    let y = BASE_Y; const labels = [];
+    layers.forEach(([name, c, u]) => {
+      const h = u * PX;
+      const g = block(CX, y, S, h - 1, color(c));
+      if (name === s1.last) g.style.animation = 'drop .55s cubic-bezier(.16,1,.3,1) both';
+      svg.append(g);
+      labels.push({ name, y: y - h / 2 + 4, c });
+      y -= h;
+    });
+    svg.append(outline(CX, BASE_Y, S, s1.LIMIT * PX, color('stamp')));
+    svg.append(mk('text', { x: CX, y: BASE_Y - s1.LIMIT * PX - 36, 'text-anchor': 'middle', class: 'cap', fill: color('stamp') }, '虛線：自動壓縮門檻'));
+    // 右側標籤：由下往上，保持最小間距
+    let minY = 1e9;
+    labels.forEach((l) => {
+      const ly = Math.min(l.y, minY - 14); minY = ly;
+      svg.append(mk('line', { x1: CX + S - 4, y1: l.y - 4, x2: 156, y2: ly - 4, stroke: '#cfccc1', 'stroke-width': 1 }));
+      svg.append(mk('circle', { cx: 159, cy: ly - 4, r: 3, fill: color(l.c) }));
+      svg.append(mk('text', { x: 166, y: ly, class: 'lbl' }, l.name));
+    });
+    // 每次請求的長條
+    const bx = 250, bw = 10, top = 46, maxH = BASE_Y + 14 - top;
+    svg.append(mk('line', { x1: 244, x2: 352, y1: BASE_Y + 14.5, y2: BASE_Y + 14.5, stroke: '#dcd9cf' }));
+    s1.bars.forEach((b, i) => {
+      const h = Math.min(b.v / 50, 1) * maxH;
+      const isLast = i === s1.bars.length - 1;
+      svg.append(mk('rect', { x: bx + i * (bw + 3), y: BASE_Y + 14 - h, width: bw, height: h, rx: 3,
+        fill: b.kind === 'compact' ? color('stamp') : isLast ? color('clay') : '#ddd3c6' }));
+    });
+    svg.append(mk('text', { x: 244, y: BASE_Y + 32, class: 'cap' }, '每次請求讀了多少'));
+    svg.append(mk('text', { x: CX, y: BASE_Y + 32, 'text-anchor': 'middle', class: 'cap' }, `這次寄出 ${size()} 格`));
+  }
+
+  function act(kind) {
+    let msg = '';
+    if (kind === 'clear') {
+      Object.assign(s1, { talk: 0, tool: 0, summary: 0, bars: [], total: 0, last: null });
+      s1.out.innerHTML = '<b>/clear</b>：對話清空，只剩常駐設定。這個動作本身不花額度。';
+      return drawStack();
+    }
+    if (kind === 'ask') {
+      s1.talk += 1; pushBar(size()); s1.talk += 1; s1.last = '對話';
+      msg = `問了一句：這次讀了 <b>${s1.bars.at(-1).v} 格</b>，你的新問題只佔 1 格。`;
+    } else {
+      s1.talk += 1; pushBar(size()); s1.tool += 8; pushBar(size()); s1.talk += 1; s1.last = '工具結果';
+      msg = `讀檔案用了工具，所以寄了<b>兩次</b>：先寄問題，拿到檔案後整疊再寄一次（${s1.bars.at(-1).v} 格）。檔案從此留在對話裡。`;
+    }
+    if (size() > s1.LIMIT) {
+      pushBar(size(), 'compact');
+      Object.assign(s1, { talk: 0, tool: 0, summary: 5, last: '摘要' });
+      msg = '疊過虛線，<b>自動壓縮</b>了：先讀完整疊（紅色長條），再把對話換成一塊摘要。';
+    }
+    s1.out.innerHTML = msg + `<br>這個 session 累計讀了 <b>${s1.total} 格</b>。`;
+    drawStack();
+  }
+  document.querySelectorAll('[data-act]').forEach((b) => b.addEventListener('click', () => act(b.dataset.act)));
+  drawStack();
+
+  /* ---------- 2 快取 ---------- */
+  const c2 = { svg: document.getElementById('cacheSvg'), gap: document.getElementById('gap'), txt: document.getElementById('gapTxt'), out: document.getElementById('cacheOut') };
+  const HIST = 30, NEW = 2, TTL = 60;
+  function drawCache() {
+    const m = +c2.gap.value, svg = c2.svg; svg.replaceChildren();
+    const X = (v) => 14 + (v / 180) * 312;
+    svg.append(mk('rect', { x: X(0), y: 22, width: X(180) - X(0), height: 14, rx: 7, fill: '#efece4' }));
+    svg.append(mk('rect', { x: X(0), y: 22, width: X(TTL) - X(0), height: 14, rx: 7, fill: color('sage'), opacity: .35 }));
+    svg.append(mk('text', { x: X(TTL / 2), y: 14, 'text-anchor': 'middle', class: 'lbl' }, '快取還在'));
+    svg.append(mk('text', { x: X(120), y: 14, 'text-anchor': 'middle', class: 'lbl', fill: color('stamp') }, '過期了'));
+    [0, 60, 120, 180].forEach((v) => svg.append(mk('text', { x: X(v), y: 54, 'text-anchor': v === 0 ? 'start' : v === 180 ? 'end' : 'middle', class: 'cap' }, v ? `${v / 60} 小時` : '剛剛')));
+    const hit = m <= TTL;
+    const g = mk('g', { transform: `translate(${X(m)} 29)` });
+    g.append(mk('circle', { r: 11, fill: '#fff', stroke: hit ? color('sage') : color('stamp'), 'stroke-width': 2.5 }));
+    const ic = Iso.icon('clock', -8, -8, 16); ic.style.color = hit ? color('sage') : color('stamp'); g.append(ic);
+    svg.append(g);
+    const full = HIST + NEW, now = hit ? HIST * 0.1 + NEW : full;
+    const W = (v) => (v / full) * 214;
+    [['沒有快取時', full, '#d9d4c8', 92], ['這一則實際', now, hit ? color('sage') : color('stamp'), 130]].forEach(([t, v, f, y]) => {
+      svg.append(mk('text', { x: 14, y: y + 12, class: 'lbl' }, t));
+      svg.append(mk('rect', { x: 96, y, width: 214, height: 16, rx: 8, fill: '#f3f1ea' }));
+      svg.append(mk('rect', { x: 96, y, width: Math.max(W(v), 16), height: 16, rx: 8, fill: f }));
+      svg.append(mk('text', { x: 316, y: y + 12.5, 'text-anchor': 'start', class: 'cap' }, `${Math.round(v)}`));
+    });
+    c2.txt.textContent = m < 60 ? `${m} 分鐘` : `${Math.floor(m / 60)} 小時${m % 60 ? ` ${m % 60} 分` : ''}`;
+    c2.out.innerHTML = hit
+      ? '快取<b>還在</b>：前面 30 格舊對話用一折計算，這一則只要約 5 格。'
+      : '快取<b>過期</b>了：30 格舊對話全部用原價重讀。這一句可能比前面十句加起來還貴。';
+  }
+  c2.gap.addEventListener('input', drawCache);
+  drawCache();
+
+  /* ---------- 3 常駐與按需 ---------- */
+  const win = document.getElementById('win'), winOut = document.getElementById('winOut'), on = {};
+  const RES = [['info', '系統提示與內建工具'], ['memory', 'CLAUDE.md（上層資料夾的，啟動就讀）'], ['context', '自動記憶 MEMORY.md 前 200 行'], ['skills', '每個 skill 的名稱與一句描述'], ['mcp', '每個 MCP 工具的名稱']];
+  const DEM = {
+    skill: ['skills', '這個 skill 的完整說明', 'ochre', '平常只有一句描述，用到時才把整份說明讀進來。'],
+    mcp: ['mcp', '這個 MCP 工具的完整定義', 'moss', 'MCP 工具預設延後載入：平常只放名稱，要用才讀完整定義。'],
+    sub: ['memory', '子資料夾的 CLAUDE.md', 'slate', '子資料夾的 CLAUDE.md 不在啟動時讀，碰到那個資料夾的檔案時才載入。']
+  };
+  function drawWin() {
+    win.querySelectorAll('.slip').forEach((n) => n.remove());
+    RES.forEach(([ic, t]) => win.insertAdjacentHTML('beforeend', `<div class="slip"><svg><use href="../../assets/icons.svg#${ic}"/></svg>${t}<small>常駐</small></div>`));
+    Object.keys(DEM).filter((k) => on[k]).forEach((k) => {
+      const [ic, t, c] = DEM[k];
+      win.insertAdjacentHTML('beforeend', `<div class="slip dem" style="--c: var(--${c})"><svg><use href="../../assets/icons.svg#${ic}"/></svg>${t}<small>用到才進來</small></div>`);
+    });
+  }
+  document.querySelectorAll('#winBtns .btn').forEach((b) => b.addEventListener('click', () => {
+    const k = b.dataset.k; on[k] = !on[k]; b.classList.toggle('on', on[k]);
+    winOut.innerHTML = on[k] ? DEM[k][3] : '換話題、開新 session 之後，這張紙條就不會再出現。';
+    drawWin();
+  }));
+  drawWin();
+
+  /* ---------- 4 情境選擇 ---------- */
+  const ANS = [
+    ['eraser', '/clear', '換到無關的工作就清空。舊對話留著，只會讓之後每一句都多讀一堆用不到的東西；/clear 本身不花額度。清空前可以先 /rename 取名，之後用 /resume 找回來。'],
+    ['compress', '/compact 加上指示', '還要延續就壓縮，並告訴它要保留什麼，例如「/compact 保留程式碼修改與測試結果」。但壓縮要讀完整段對話，本身是一次大請求，不要動不動就按。'],
+    ['agents', '交給 subagent', '讓 subagent 去讀，冗長的內容留在它自己的 context，只把摘要帶回主對話。注意：subagent 自己的請求一樣算你的額度，簡單任務可以讓它用小一點的模型。'],
+    ['feather', '降 effort 或換小模型', '簡單的事不需要深度思考。用 /effort 調低思考力度，或用 /model 換成 Sonnet、Haiku。思考過程按輸出計費，量可能比答案本身還大。']
+  ];
+  const ans = document.getElementById('answer');
+  document.querySelectorAll('#picks .pick').forEach((b) => b.addEventListener('click', () => {
+    document.querySelectorAll('#picks .pick').forEach((x) => x.classList.toggle('on', x === b));
+    const [ic, t, p] = ANS[+b.dataset.c];
+    ans.querySelector('use').setAttribute('href', '../../assets/icons.svg#' + ic);
+    ans.querySelector('h4').textContent = t; ans.querySelector('p').textContent = p;
+    ans.classList.remove('show'); void ans.offsetWidth; ans.classList.add('show');
+  }));
+})();
+</script>
+<script src="../../assets/lesson.js" data-root="../../"></script>
+</body>
+</html>
