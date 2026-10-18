@@ -1,8 +1,8 @@
 // network-first：連線時一律取最新版，離線時用快取。殼頁檔案清單變動時把 VERSION 加一。
-const VERSION = 'v4';
+const VERSION = 'v5';
 const CACHE = `xx-learning-${VERSION}`;
 const SHELL = [
-  './', 'index.html', 'assets/style.css', 'assets/app.js', 'assets/lesson.js', 'assets/iso.js', 'assets/icons.svg',
+  './', 'index.html', 'assets/style.css', 'assets/app.js', 'assets/lesson.js', 'assets/iso.js', 'assets/kit.js', 'assets/icons.svg',
   'data/domains.json', 'data/domains/claude.json', 'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png'
 ];
 

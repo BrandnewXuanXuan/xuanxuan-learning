@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>開發少繞路的四個習慣</title>
+<meta name="description" content="先探索規劃再動手、讓 auto mode 把關、把工作丟到雲端、用 HTML 取代長篇 Markdown。">
+<meta name="theme-color" content="#f1f0eb">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="icon" href="../../icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css?v=20261018b">
+<style>
+.stream { display: grid; gap: 6px; }
+.act { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; background: #f6f4ee; font-size: 13px; animation: drop .35s var(--ease) both; }
+.act code { font-size: 12px; }
+.act .st { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; font-size: 12px; white-space: nowrap; padding: 3px 8px; border-radius: 99px; }
+.act .st svg { width: 14px; height: 14px; }
+.st.go { background: #e3ede7; color: #2f5d47; }
+.st.no { background: #f6dcd8; color: #8a2f25; }
+.st.ask { background: #f2e7c6; color: #6b5310; }
+.where { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.where > div { border-radius: 14px; padding: 10px; background: #f6f4ee; min-height: 120px; }
+.where h5 { margin: 0 0 8px; font: 500 12.5px var(--font); color: var(--ink-2); display: flex; align-items: center; gap: 6px; }
+.where h5 svg { width: 18px; height: 18px; }
+.task { display: block; width: 100%; margin-bottom: 6px; padding: 8px 10px; border: 0; border-radius: 4px 10px 10px 10px; background: var(--c); color: #fff; font: 500 12.5px var(--font); text-align: left; animation: drop .4s var(--ease) both; }
+.mdview { font: 12px/1.65 ui-monospace, "SF Mono", Menlo, monospace; color: var(--ink-2); background: #fffefb; border: 1px solid var(--rule); border-radius: 10px; padding: 10px 12px; max-height: 210px; overflow: hidden; position: relative; }
+.mdview::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 40px; background: linear-gradient(transparent, #fffefb); }
+.htmlview { background: #fffefb; border: 1px solid var(--rule); border-radius: 10px; padding: 12px; }
+.htmlview .opt { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.htmlview .opt div { border-radius: 10px; padding: 10px; color: #fff; font-size: 13px; }
+.htmlview .opt b { font: 16px var(--hand); display: block; }
+</style>
+</head>
+<body class="lesson">
+<header class="bar"><div class="bar-in">
+  <a class="back" href="../../index.html#/t/claude/workflow" aria-label="回到主題"><svg class="i"><use href="../../assets/icons.svg?v=20261018b#back"/></svg></a>
+  <span class="bar-title">開發工作流</span>
+</div></header>
+
+<main class="wrap">
+<h1>開發少繞路的四個習慣</h1>
+  <p class="lead">Claude Code 官方的最佳實踐，加上團隊在正式環境的用法，整理成四個習慣。每一個都是為了同一件事：<b>讓 Claude 少走冤枉路，你少花時間收拾。</b></p>
+
+  <section id="s1">
+    <h2><span class="no">1</span>先探索、規劃，再動手</h2>
+    <p>大一點的工作，先用 plan mode（規劃模式）讓 Claude 探索、提出做法，你確認後再實作；小改動直接做就好。選看看：</p>
+    <div class="fig">
+      <div class="ctl" id="size">
+        <button class="btn" data-k="small"><svg><use href="../../assets/icons.svg?v=20261018b#feather"/></svg>小改動</button>
+        <button class="btn" data-k="big"><svg><use href="../../assets/icons.svg?v=20261018b#folder"/></svg>新功能</button>
+      </div>
+      <div class="flow" id="flow" style="margin-top:12px"></div>
+      <div class="read" id="out1"></div>
+    </div>
+    <p>最關鍵的一步是<b>給它驗證的方法</b>：測試、建置、截圖比對。能自己檢查，它才知道什麼時候算做完，你不在旁邊盯著時也收得了尾。另外記得：context 越滿表現越差，換工作就 <code>/clear</code>，大量探索交給分身。</p>
+    <div class="ask-hint">看不懂就回來說 <code>工作流 1</code></div>
+  </section>
+
+  <section id="s2">
+    <h2><span class="no">2</span>auto mode：讓分類器幫你把關</h2>
+    <p>Auto mode 現在是 Claude Code 的預設：不再每個指令都問你，而是由一個<b>分類器</b>逐一判斷，只擋下看起來有風險的動作。內部評估中，它抓到的危險動作比開發者手動點「允許」時還多；Claude 被打斷前能連續工作的時間，大約是以前的 9 倍。按下面看一串動作怎麼被處理：</p>
+    <div class="fig">
+      <div class="stream" id="stream"></div>
+      <div class="ctl"><button class="btn pri" id="runS"><svg><use href="../../assets/icons.svg?v=20261018b#play"/></svg>跑一串動作</button></div>
+    </div>
+    <p>團隊的做法：日常開發交給 auto mode，但在設定裡<b>直接禁止</b>最危險的指令（例如遞迴刪除）；碰到<b>正式環境</b>、<b>別人的工作</b>（例如替別人審 PR），就改回逐一確認。也有人設定成：<b>代表自己對外發言</b>（發 Slack、寄信）一律不自動放行。</p>
+    <div class="ask-hint">看不懂就回來說 <code>工作流 2</code></div>
+  </section>
+
+  <section id="s3">
+    <h2><span class="no">3</span>雲端 session：一件事一台機器</h2>
+    <p><code>claude --cloud "要做的事"</code> 會把工作丟到雲端的獨立機器上跑，每件事各自一條分支，彼此不會搶資源、改到同一批檔案。點工作看該放哪裡：</p>
+    <div class="fig">
+      <div class="where">
+        <div><h5><svg><use href="../../assets/icons.svg?v=20261018b#cloud"/></svg>雲端</h5><div id="cloudCol"></div></div>
+        <div><h5><svg><use href="../../assets/icons.svg?v=20261018b#code"/></svg>你的電腦</h5><div id="localCol"></div></div>
+      </div>
+      <div class="ctl" id="taskBtns" style="margin-top:8px"></div>
+      <div class="read" id="out3">點下面的工作，它會飛到適合的那一邊。</div>
+    </div>
+    <p>要注意：私人 repo 除了登入 GitHub，還要裝 Claude 的 GitHub App，這是兩件不同的事。平行的雲端 session 彼此不知道對方改了什麼，合併時要留意衝突。</p>
+    <div class="ask-hint">看不懂就回來說 <code>工作流 3</code></div>
+  </section>
+
+  <section id="s4">
+    <h2><span class="no">4</span>超過一百行，改用 HTML</h2>
+    <p>Claude Code 團隊發現：Markdown 超過一百行就很難讀。改請 Claude「做成一個 HTML 檔」，就能放表格、圖、可以操作的滑桿，傳個連結就能分享。切換看看同一份「方案比較」：</p>
+    <div class="fig">
+      <div class="ctl" id="fmt">
+        <button class="btn" data-k="md">Markdown</button>
+        <button class="btn" data-k="html">HTML</button>
+      </div>
+      <div id="view" style="margin-top:10px"></div>
+    </div>
+    <p>適合做成 HTML 的：比較好幾個方案、審查程式變更、解釋一段程式、設計原型、報告與圖解，還有臨時的編輯介面，調整完按一下就能把結果複製回對話。你正在看的這個網站，就是同一個想法。</p>
+    <div class="ask-hint">看不懂就回來說 <code>工作流 4</code></div>
+  </section>
+
+  <h2>原文</h2>
+  <ul class="srcs">
+    <li><a href="https://code.claude.com/docs/en/best-practices" target="_blank" rel="noopener">Claude Code best practices（官方文件）</a></li>
+    <li><a href="https://claude.com/resources/articles/auto-mode-in-production" target="_blank" rel="noopener">Running auto mode in production</a></li>
+    <li><a href="https://claude.dev/blog/claude-code-in-the-cloud/" target="_blank" rel="noopener">Claude Code in the cloud: a field guide to cloud sessions</a></li>
+    <li><a href="https://claude.dev/blog/using-claude-code-the-unreasonable-effectiveness-of-html/" target="_blank" rel="noopener">Using Claude Code: The unreasonable effectiveness of HTML</a></li>
+  </ul>
+
+  <div class="foot"><svg><use href="../../assets/icons.svg?v=20261018b#chat"/></svg><span>學完了，回研究夥伴說「學完工作流」。一起回顧、寫成筆記之後，這張卡才會蓋上「學完」章。</span></div>
+</main>
+
+<script src="../../assets/iso.js?v=20261018b"></script>
+<script src="../../assets/kit.js?v=20261018b"></script>
+<script>
+(() => {
+const FLOW = {
+  small: [[['code', '直接改', 'var(--sage)'], ['shield', '驗證', 'var(--ochre)']], '小改動不用規劃，改完驗證就好。規劃反而浪費時間。'],
+  big: [[['lens', '探索', 'var(--slate)'], ['pencil', '規劃', 'var(--dusk)'], ['code', '實作', 'var(--sage)'], ['shield', '驗證', 'var(--ochre)'], ['check', '提交', 'var(--clay)']], '先讓它在規劃模式讀程式、提出做法，你點頭了才實作。方向錯在規劃階段就修正，不用整個重做。']
+};
+Kit.tabs(document.getElementById('s1'), (k) => {
+  const [steps, t] = FLOW[k];
+  document.getElementById('flow').innerHTML = steps.map(([ic, n, c], i) => `${i ? '<span class="arrow">→</span>' : ''}<span class="node" style="--c:${c};animation:drop .4s cubic-bezier(.16,1,.3,1) ${i * 80}ms both">${Kit.icon(ic)}${n}</span>`).join('');
+  document.getElementById('out1').innerHTML = t;
+}, 'big');
+
+const ACTS = [['讀取 src/ 底下的檔案', 'go'], ['<code>npm test</code>', 'go'], ['修改 lessons/ 的頁面', 'go'], ['<code>rm -rf data/</code>', 'no', '設定裡直接禁止'], ['<code>git push</code> 到正式環境', 'ask', '正式環境，改回逐一確認'], ['寄信給客戶', 'ask', '對外發言，不自動放行'], ['在 build/ 裡建立暫存檔', 'go']];
+const LBL = { go: ['check', '自動放行'], no: ['cross', '擋下'], ask: ['chat', '問你'] };
+const stream = document.getElementById('stream');
+function drawStream(n) {
+  stream.innerHTML = ACTS.slice(0, n).map(([t, s, why], i) => `<div class="act" style="animation-delay:${i * 40}ms">${t}<span class="st ${s}">${Kit.icon(LBL[s][0])}${why || LBL[s][1]}</span></div>`).join('') || '<div class="act" style="color:var(--ink-3)">還沒有動作。</div>';
+}
+drawStream(0);
+let st = null;
+document.getElementById('runS').addEventListener('click', () => { clearInterval(st); let n = 0; st = setInterval(() => { drawStream(++n); if (n >= ACTS.length) clearInterval(st); }, 450); });
+
+const TASKS = [
+  ['同時清掉五個小 bug', 'cloud', '平行處理待辦：每件一台機器、一條分支，互不干擾。', 'sage'],
+  ['找出偶爾才失敗的測試', 'cloud', '要跑幾十次才能證明的工作，丟到雲端慢慢跑。原文的例子是連跑 40 次全過才算修好。', 'teal'],
+  ['人在外面，用手機追問進度', 'cloud', '雲端 session 可以從手機接著問。', 'slate'],
+  ['需要連 VPN 的內部服務', 'local', '只有你的電腦才連得到的東西（VPN、本機資料庫、GPU、實體設備），留在本機。', 'clay'],
+  ['調畫面，每改一下就要看', 'local', '需要幾秒內在自己瀏覽器看到變化的視覺調整，留在本機比較順。', 'ochre']
+];
+const placed = { cloud: [], local: [] };
+document.getElementById('taskBtns').innerHTML = TASKS.map(([t], i) => `<button class="btn" data-i="${i}" style="flex:1 1 45%;font-size:13px">${t}</button>`).join('');
+document.querySelectorAll('#taskBtns .btn').forEach((b) => b.addEventListener('click', () => {
+  const [t, where, why, c] = TASKS[+b.dataset.i];
+  if (!placed[where].includes(t)) placed[where].push(t);
+  b.disabled = true; b.style.opacity = .4;
+  ['cloud', 'local'].forEach((w) => { document.getElementById(w + 'Col').innerHTML = placed[w].map((x) => { const tk = TASKS.find((y) => y[0] === x); return `<span class="task" style="--c:var(--${tk[3]})">${x}</span>`; }).join(''); });
+  document.getElementById('out3').innerHTML = `<b>${where === 'cloud' ? '雲端' : '你的電腦'}</b>：${why}`;
+}));
+
+const MD = `## 方案比較\n\n### 方案 A：靜態網站\n- 優點：免費、簡單、不用維護主機\n- 優點：可以離線\n- 缺點：不能存資料\n- 缺點：要登入才能改內容……\n\n### 方案 B：有後端的網站\n- 優點：可以存資料\n- 優點：可以多人編輯\n- 缺點：要付主機費\n- 缺點：要處理登入與安全……\n\n### 結論\n綜合以上各點，考量到……`;
+Kit.tabs(document.getElementById('s4'), (k) => {
+  document.getElementById('view').innerHTML = k === 'md'
+    ? `<div class="mdview">${MD.replace(/\n/g, '<br>')}</div><div class="read">一路往下捲，要自己在腦中比較兩邊。這還只是開頭。</div>`
+    : `<div class="htmlview"><div class="opt"><div style="background:var(--sage)"><b>靜態網站</b>免費・可離線<br>不能存資料</div><div style="background:var(--slate)"><b>有後端</b>能存資料・多人編輯<br>要付費、顧安全</div></div><div class="read" style="padding:10px 0 0">兩欄並排，一眼看出差別。還可以加上圖表、滑桿，傳連結就能分享。</div></div>`;
+}, 'md');
+})();
+</script>
+<script src="../../assets/lesson.js" data-root="../../"></script>
+</body>
+</html>

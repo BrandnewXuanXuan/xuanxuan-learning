@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Skill 是一個會自己打開的工具箱</title>
+<meta name="description" content="三層載入、跟其他機制的分工、好 skill 的寫法，以及讓它自己驗證的迴圈。">
+<meta name="theme-color" content="#f1f0eb">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="icon" href="../../icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css?v=20261018b">
+<style>
+.box3 { display: grid; gap: 6px; }
+.tier { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 4px 12px 12px 12px; background: #f3f1ea; color: var(--ink-3); font-size: 13px; transition: background .35s, color .35s, transform .35s var(--ease); }
+.tier svg { width: 20px; height: 20px; flex: none; }
+.tier small { margin-left: auto; font-size: 11.5px; white-space: nowrap; }
+.tier.lit { background: var(--c); color: #fff; transform: translateX(4px); }
+.skillmd { background: #fffefb; border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; font: 12px/1.7 ui-monospace, "SF Mono", Menlo, monospace; }
+.skillmd button { display: block; width: 100%; text-align: left; border: 0; background: none; padding: 6px 12px; font: inherit; color: var(--ink-2); cursor: pointer; border-left: 3px solid transparent; }
+.skillmd button.on { background: #f7ece6; border-left-color: var(--clay); color: var(--ink); }
+.skillmd .k { color: var(--clay); }
+.loop { display: block; width: 100%; height: auto; }
+</style>
+</head>
+<body class="lesson">
+<header class="bar"><div class="bar-in">
+  <a class="back" href="../../index.html#/t/claude/skills" aria-label="回到主題"><svg class="i"><use href="../../assets/icons.svg?v=20261018b#back"/></svg></a>
+  <span class="bar-title">Skills</span>
+</div></header>
+
+<main class="wrap">
+<h1>Skill 是一個會自己打開的工具箱</h1>
+  <p class="lead">Skill 是一個資料夾，裡面有說明、腳本、範本。它最聰明的地方是<b>平常幾乎不佔空間</b>，Claude 判斷用得到時才打開。</p>
+
+  <section id="s1">
+    <h2><span class="no">1</span>三層，一層一層打開</h2>
+    <p>這叫<b>漸進式揭露</b>。點下面的時機，看哪幾層被讀進 context：</p>
+    <div class="fig">
+      <div class="box3" id="box3"></div>
+      <div class="ctl" id="when">
+        <button class="btn" data-k="idle"><svg><use href="../../assets/icons.svg?v=20261018b#clock"/></svg>平常</button>
+        <button class="btn" data-k="hit"><svg><use href="../../assets/icons.svg?v=20261018b#spark"/></svg>用得到時</button>
+        <button class="btn" data-k="deep"><svg><use href="../../assets/icons.svg?v=20261018b#lens"/></svg>需要細節</button>
+      </div>
+      <div class="read" id="out1"></div>
+    </div>
+    <div class="ask-hint">看不懂就回來說 <code>技能包 1</code></div>
+  </section>
+
+  <section id="s2">
+    <h2><span class="no">2</span>它跟其他東西的分工</h2>
+    <p>一句話分清楚：<b>Skill 教「怎麼做」</b>，Project 給「該知道什麼」，subagent 是「另開一個分身去做」，MCP 負責「拿得到資料」，prompt 只管「這一次」。點點看：</p>
+    <div class="fig">
+      <div class="ctl" id="cmp">
+        <button class="btn" data-k="skill">Skill</button>
+        <button class="btn" data-k="prompt">Prompt</button>
+        <button class="btn" data-k="project">Project</button>
+        <button class="btn" data-k="sub">Subagent</button>
+        <button class="btn" data-k="mcp">MCP</button>
+      </div>
+      <div class="kv" id="kv" style="margin-top:12px"></div>
+    </div>
+    <p>判斷要不要做成 skill：<b>同一段指示，你在不同對話裡講第二次了，就該做成 skill。</b></p>
+    <div class="ask-hint">看不懂就回來說 <code>技能包 2</code></div>
+  </section>
+
+  <section id="s3">
+    <h2><span class="no">3</span>好 skill 的寫法</h2>
+    <p>Anthropic 內部有幾百個 skill，歸納出幾個寫法上的重點。點 SKILL.md 的每個部分看看：</p>
+    <div class="fig">
+      <div class="skillmd" id="md">
+        <button data-i="0"><span class="k">description:</span> 發佈學習網站時使用。使用者說「發佈」…</button>
+        <button data-i="1"><span class="k">## 目標與限制</span>　公開網站，不得含個資…</button>
+        <button data-i="2"><span class="k">## 踩過的坑</span>　改了 assets 要換版本號…</button>
+        <button data-i="3"><span class="k">## 細節</span>　檢查清單 → references/checklist.md</button>
+        <button data-i="4"><span class="k">scripts/</span>check-privacy.sh</button>
+      </div>
+      <div class="detail" id="mdOut" style="margin-top:10px;padding:12px;border-radius:12px;background:#f7ece6;font-size:13.5px;min-height:70px">點一行。</div>
+    </div>
+    <p>還有一條：<b>一個 skill 只做一類事</b>。Anthropic 把內部 skill 分成九類（API 參考、產品驗證、資料分析、團隊流程、範本、程式審查、部署、排障、維運），橫跨好幾類的 skill 會讓 Claude 搞混。</p>
+    <div class="ask-hint">看不懂就回來說 <code>技能包 3</code></div>
+  </section>
+
+  <section id="s4">
+    <h2><span class="no">4</span>讓它自己檢查：驗證迴圈</h2>
+    <p>效果最明顯的一類 skill 是<b>驗證</b>：Claude 改完東西，自己跑測試、檢查或實際操作一遍，沒過就修，修到過為止。按「跑一次」看迴圈怎麼轉：</p>
+    <div class="fig">
+      <svg class="loop" id="loop" viewBox="0 0 340 200" role="img" aria-label="驗證迴圈"></svg>
+      <div class="ctl"><button class="btn pri" id="run"><svg><use href="../../assets/icons.svg?v=20261018b#play"/></svg>跑一次</button></div>
+      <div class="read" id="loopOut">修改 → 檢查 → 沒過就修 → 再檢查。</div>
+    </div>
+    <p>驗證 skill 可以三種方式掛上去：<b>單獨叫用</b>（需要時說「/verify」）、<b>嵌進別的 skill</b>（每次產出都會跑）、<b>串在後面</b>（一個 skill 做完接著叫下一個）。第一步可以先找出「你這週最常手動做的檢查」，把它寫成 skill。</p>
+    <div class="ask-hint">看不懂就回來說 <code>技能包 4</code></div>
+  </section>
+
+  <h2>原文</h2>
+  <ul class="srcs">
+    <li><a href="https://claude.com/resources/articles/skills-explained" target="_blank" rel="noopener">Skills explained: How Skills compares to prompts, Projects, MCP, and subagents</a></li>
+    <li><a href="https://claude.dev/blog/lessons-from-building-claude-code-how-we-use-skills/" target="_blank" rel="noopener">Lessons from building Claude Code: How we use skills</a></li>
+    <li><a href="https://claude.com/resources/articles/complete-guide-to-building-skills-for-claude" target="_blank" rel="noopener">A complete guide to building skills for Claude</a></li>
+    <li><a href="https://claude.com/resources/articles/building-verification-loops-in-claude-code-with-skills" target="_blank" rel="noopener">Building verification loops in Claude Code with skills</a></li>
+  </ul>
+
+  <div class="foot"><svg><use href="../../assets/icons.svg?v=20261018b#chat"/></svg><span>學完了，回研究夥伴說「學完技能包」。一起回顧、寫成筆記之後，這張卡才會蓋上「學完」章。</span></div>
+</main>
+
+<script src="../../assets/iso.js?v=20261018b"></script>
+<script src="../../assets/kit.js?v=20261018b"></script>
+<script>
+(() => {
+const { mk, color } = Iso;
+const TIERS = [['tag', 'info', '名稱與一句描述', '約 100 token，永遠在', 'var(--sage)'], ['md', 'file', 'SKILL.md 全文', '5k token 內，用到才讀', 'var(--ochre)'], ['ref', 'folder', '附檔、範本、腳本', '需要時才讀或執行', 'var(--clay)']];
+const LIT = { idle: 1, hit: 2, deep: 3 };
+const MSG = { idle: '平常只有「名稱和一句描述」在 context 裡，裝一百個 skill 也不太佔空間。', hit: 'Claude 讀了描述，判斷這次用得到，才打開 SKILL.md 全文。所以<b>描述寫得好不好</b>，決定它會不會在對的時機被用上。', deep: 'SKILL.md 指向的附檔、範本、腳本，要用到才讀，腳本甚至可以直接執行、不用讀進來。' };
+Kit.tabs(document.getElementById('s1'), (k) => {
+  document.getElementById('box3').innerHTML = TIERS.map(([id, ic, t, s, c], i) => `<div class="tier${i < LIT[k] ? ' lit' : ''}" style="--c:${c}">${Kit.icon(ic)}${t}<small>${s}</small></div>`).join('');
+  document.getElementById('out1').innerHTML = MSG[k];
+}, 'idle');
+
+const CMP = {
+  skill: [['教什麼', '怎麼做一件事（流程、做法、踩過的坑）'], ['存在多久', '跨對話一直都在'], ['何時載入', '用得到才打開'], ['能不能帶程式', '可以，腳本、範本都行']],
+  prompt: [['教什麼', '這一次要做什麼'], ['存在多久', '只有這個對話'], ['何時載入', '你說的當下'], ['適合', '一次性的要求、臨時的格式']],
+  project: [['教什麼', '該知道什麼（背景資料、知識庫）'], ['存在多久', '專案裡的所有對話'], ['何時載入', '一直在'], ['注意', 'claude.ai 的功能；同樣的指示重複寫進好幾個 Project，就該改成 skill']],
+  sub: [['教什麼', '另開一個分身去做，帶自己的提示和工具權限'], ['存在多久', '叫用時才存在'], ['何時載入', '被委派時'], ['注意', '只在 Claude Code 與 Agent SDK；分身也可以使用 skill']],
+  mcp: [['教什麼', '連上外部資料與工具（Drive、GitHub、資料庫）'], ['存在多久', '一直連著'], ['何時載入', '名稱常駐，用到才讀定義'], ['搭配', 'MCP 讓它拿得到資料，skill 讓它知道怎麼用這些資料']]
+};
+Kit.tabs(document.getElementById('s2'), (k) => {
+  document.getElementById('kv').innerHTML = CMP[k].map(([a, b]) => `<b>${a}</b><span>${b}</span>`).join('');
+}, 'skill');
+
+const MD = [
+  '<b>description 是寫給模型看的</b>：寫「什麼時候該用」，可以加觸發詞（例如「發佈」），不是寫給人看的功能摘要。它決定 skill 會不會被打開。',
+  '<b>寫目標和限制，不要規定每一步</b>：留給 Claude 依情境調整的空間。也<b>不要寫它本來就會的事</b>，只寫能改變它做法的資訊。',
+  '<b>「踩過的坑」是整份 skill 最有價值的部分</b>：每次出錯就補一條，越用越準。',
+  '<b>細節拆出去</b>：SKILL.md 只指路，詳細清單放 references/，需要時才讀。這就是第 1 段的第三層。',
+  '<b>腳本直接執行</b>：重複又精確的工作（例如隱私檢查）寫成腳本，Claude 執行它就好，不必每次重新推理，也不佔 context。'
+];
+const md = document.getElementById('md');
+md.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
+  md.querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b));
+  document.getElementById('mdOut').innerHTML = MD[+b.dataset.i];
+}));
+
+const loop = document.getElementById('loop');
+const P = [[70, 60, 'pencil', '修改', 'slate'], [270, 60, 'shield', '檢查', 'ochre'], [270, 150, 'cross', '沒過', 'stamp'], [70, 150, 'code', '修正', 'clay']];
+function drawLoop(active, passed) {
+  loop.replaceChildren();
+  loop.append(mk('path', { d: 'M100 60 H240 M270 88 V122 M240 150 H100 M70 122 V88', stroke: '#d6d2c6', 'stroke-width': 2.5, fill: 'none', 'stroke-dasharray': '6 5' }));
+  P.forEach(([x, y, ic, t, c], i) => {
+    const on = i === active;
+    loop.append(mk('rect', { x: x - 30, y: y - 26, width: 60, height: 52, rx: 12, fill: on ? color(c) : '#f6f4ee', style: 'transition: fill .3s' }));
+    const s = Iso.icon(ic, x - 11, y - 18, 22); s.style.color = on ? '#fff' : color(c); loop.append(s);
+    loop.append(mk('text', { x, y: y + 18, 'text-anchor': 'middle', class: 'lbl', fill: on ? '#fff' : '' }, t));
+  });
+  if (passed) {
+    loop.append(mk('rect', { x: 128, y: 86, width: 84, height: 30, rx: 15, fill: color('sage') }));
+    loop.append(mk('text', { x: 170, y: 106, 'text-anchor': 'middle', class: 'lbl', fill: '#fff', 'font-weight': 700 }, '通過，交差'));
+  }
+}
+drawLoop(-1);
+let timer = null;
+document.getElementById('run').addEventListener('click', () => {
+  clearInterval(timer);
+  const seq = [0, 1, 2, 3, 1, 2, 3, 1, 'ok'], out = document.getElementById('loopOut');
+  const words = ['Claude 改好了。', '自己跑檢查……', '有一項沒過。', '照錯誤訊息修正。', '再檢查一次……', '還有一項沒過。', '再修。', '再檢查……', '全部通過才回來找你。'];
+  let i = 0;
+  timer = setInterval(() => {
+    const s = seq[i]; drawLoop(s === 'ok' ? -1 : s, s === 'ok'); out.innerHTML = words[i];
+    if (++i >= seq.length) clearInterval(timer);
+  }, 650);
+});
+})();
+</script>
+<script src="../../assets/lesson.js" data-root="../../"></script>
+</body>
+</html>

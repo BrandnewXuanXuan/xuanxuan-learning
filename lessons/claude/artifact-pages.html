@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>把工作變成會更新的頁面</title>
+<meta name="description" content="Claude Code 的 artifact、會自己更新的儀表板、用程式畫的動畫解說，以及各自要什麼方案。">
+<meta name="theme-color" content="#f1f0eb">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="icon" href="../../icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css?v=20261018b">
+<style>
+.vers { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; min-height: 44px; }
+.ver { display: inline-flex; align-items: center; gap: 4px; padding: 6px 10px; border-radius: 99px; background: #f3f1ea; font: 500 12.5px var(--font); color: var(--ink-2); border: 0; cursor: pointer; animation: drop .35s var(--ease) both; }
+.ver.cur { background: var(--clay); color: #fff; }
+.urlbar { display: flex; align-items: center; gap: 6px; padding: 8px 10px; border-radius: 10px; background: #f6f4ee; font: 12px ui-monospace, "SF Mono", Menlo, monospace; color: var(--ink-2); margin-bottom: 8px; }
+.urlbar svg { width: 16px; height: 16px; color: var(--ink-3); }
+.page { border-radius: 12px; border: 1px solid var(--rule); background: #fffefb; padding: 12px; min-height: 96px; font-size: 13px; color: var(--ink-2); }
+.page b { font: 16px var(--hand); color: var(--ink); display: block; margin-bottom: 4px; }
+.kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.kpi { border: 0; border-radius: 12px; padding: 10px 8px; background: #f6f4ee; text-align: left; cursor: pointer; }
+.kpi span { font-size: 11.5px; color: var(--ink-2); display: block; }
+.kpi b { font: 22px var(--hand); color: var(--ink); }
+.kpi.on { background: var(--ink); }
+.kpi.on span, .kpi.on b { color: #fff; }
+.sql { margin-top: 10px; padding: 10px 12px; border-radius: 10px; background: #2a2b29; color: #ece8de; font: 12px/1.6 ui-monospace, "SF Mono", Menlo, monospace; white-space: pre-wrap; min-height: 60px; }
+.stamp-time { font-size: 11.5px; color: var(--ink-3); margin-top: 6px; }
+.stage { display: block; width: 100%; height: auto; background: #fffefb; border-radius: 12px; border: 1px solid var(--rule); }
+</style>
+</head>
+<body class="lesson">
+<header class="bar"><div class="bar-in">
+  <a class="back" href="../../index.html#/t/claude/artifacts" aria-label="回到主題"><svg class="i"><use href="../../assets/icons.svg?v=20261018b#back"/></svg></a>
+  <span class="bar-title">Artifact 與新功能</span>
+</div></header>
+
+<main class="wrap">
+<h1>把工作變成會更新的頁面</h1>
+  <p class="lead">Claude 越來越常直接交出一個<b>網頁</b>，而不是一大段文字：可以分享、會跟著更新、每個數字都查得到出處。這一課看三種新功能，最後說明各自要什麼方案。</p>
+
+  <section id="s1">
+    <h2><span class="no">1</span>Claude Code 的 artifact：同一個連結，一直更新</h2>
+    <p>Claude Code 可以把工作過程做成一個可分享的頁面，例如 PR 導讀、系統說明、上線檢查清單。資料直接來自這個 session 的程式碼、連接器和對話。每次發佈都是<b>同一個連結的新版本</b>，可以回到舊版。按「再發佈一次」：</p>
+    <div class="fig">
+      <div class="urlbar"><svg><use href="../../assets/icons.svg?v=20261018b#link"/></svg><span>…/artifact/release-checklist</span></div>
+      <div class="page" id="pg"></div>
+      <div class="vers" id="vers" style="margin-top:8px"></div>
+      <div class="ctl"><button class="btn pri" id="pub"><svg><use href="../../assets/icons.svg?v=20261018b#spark"/></svg>再發佈一次</button></div>
+    </div>
+    <p>它預設只有作者看得到，只能分享給<b>同一個組織、已登入</b>的成員，不能公開。所以給自己或公開分享的東西，做成像這個網站一樣的靜態網頁會更合適。</p>
+    <div class="ask-hint">看不懂就回來說 <code>成品頁 1</code></div>
+  </section>
+
+  <section id="s2">
+    <h2><span class="no">2</span>Dashboards：每個數字都查得到出處</h2>
+    <p>Claude Dashboards 會連上公司的資料平台（例如 BigQuery、Snowflake）或 CRM，用一句話描述要看什麼，就產生<b>會自己更新</b>的儀表板。最重要的設計是：<b>每個數字都可以點開，看它是用哪一段查詢算出來的</b>，圖表也會標示最後更新時間。點一個數字試試（內容是示意）：</p>
+    <div class="fig">
+      <div class="kpis" id="kpis"></div>
+      <div class="sql" id="sql">點一個數字，看它的查詢。</div>
+      <div class="stamp-time" id="upd"></div>
+    </div>
+    <div class="ask-hint">看不懂就回來說 <code>成品頁 2</code></div>
+  </section>
+
+  <section id="s3">
+    <h2><span class="no">3</span>Motion：用程式畫的動畫解說</h2>
+    <p>Claude Motion 把報告或想法做成動畫解說，可以匯出成 MP4 影片。它的動畫是<b>用程式畫出來的</b>（文字、圖表、形狀、圖片），不是用影片生成模型，所以沒有 AI 生成的人物畫面，而且<b>任何文字、數字、時間點都能改</b>。拖動滑桿改數字，動畫會重播：</p>
+    <div class="fig">
+      <svg class="stage" id="stage" viewBox="0 0 320 150" role="img" aria-label="動畫示意"></svg>
+      <div class="range-lbl"><span>改一個數字</span><b id="mv">62</b></div>
+      <input id="m" type="range" min="10" max="100" value="62" aria-label="動畫裡的數字">
+    </div>
+    <div class="ask-hint">看不懂就回來說 <code>成品頁 3</code></div>
+  </section>
+
+  <section id="s4">
+    <h2><span class="no">4</span>誰能用</h2>
+    <div class="fig"><div class="kv">
+      <b>Claude Code artifact</b><span>Team 與 Enterprise 方案的 beta；Claude Code 命令列與桌面版可用，頁面用任何瀏覽器都能開。</span>
+      <b>Dashboards</b><span>付費方案的 beta。</span>
+      <b>Motion</b><span>Team 與 Enterprise 方案的 beta。企業版的 Dashboards 和 Motion 預設關閉，要由管理員開啟。</span>
+      <b>Docs、Slides、Design</b><span>已正式推出，所有方案（包括免費版）都能用，支援多人共同編輯與匯出。</span>
+    </div></div>
+    <p class="note"><svg><use href="../../assets/icons.svg?v=20261018b#info"/></svg><span>這些是 2026 年 6 月到 10 月的公告，beta 功能的範圍變得很快，用之前以 Claude 裡實際看到的為準。</span></p>
+    <div class="ask-hint">看不懂就回來說 <code>成品頁 4</code></div>
+  </section>
+
+  <h2>原文</h2>
+  <ul class="srcs">
+    <li><a href="https://claude.com/resources/articles/artifacts-in-claude-code" target="_blank" rel="noopener">Claude Code now supports artifacts</a></li>
+    <li><a href="https://claude.com/resources/articles/dashboards-and-motion" target="_blank" rel="noopener">Build live dashboards and animate explainers with Claude</a></li>
+  </ul>
+
+  <div class="foot"><svg><use href="../../assets/icons.svg?v=20261018b#chat"/></svg><span>學完了，回研究夥伴說「學完成品頁」。一起回顧、寫成筆記之後，這張卡才會蓋上「學完」章。</span></div>
+</main>
+
+<script src="../../assets/iso.js?v=20261018b"></script>
+<script src="../../assets/kit.js?v=20261018b"></script>
+<script>
+(() => {
+const { mk, color } = Iso;
+const VERS = [['上線檢查清單', '3 項待確認：備份、環境變數、回滾計畫。'], ['上線檢查清單', '備份已完成。剩 2 項待確認。'], ['上線檢查清單', '環境變數已核對。剩回滾計畫。'], ['上線檢查清單', '全部完成，可以上線。']];
+let cur = 0, maxv = 0;
+function drawVer() {
+  document.getElementById('pg').innerHTML = `<b>${VERS[cur][0]}　v${cur + 1}</b>${VERS[cur][1]}`;
+  document.getElementById('vers').innerHTML = Array.from({ length: maxv + 1 }, (_, i) => `<button class="ver${i === cur ? ' cur' : ''}" data-i="${i}">v${i + 1}</button>`).join('');
+  document.querySelectorAll('#vers .ver').forEach((b) => b.addEventListener('click', () => { cur = +b.dataset.i; drawVer(); }));
+}
+document.getElementById('pub').addEventListener('click', () => { if (maxv < VERS.length - 1) maxv++; cur = maxv; drawVer(); });
+drawVer();
+
+const K = [['本週新用戶', '1,284', "SELECT COUNT(*)\nFROM users\nWHERE created_at >= DATE_TRUNC('week', NOW())"], ['留存率', '42%', 'SELECT AVG(returned_day7)\nFROM cohorts\nWHERE cohort_week = LAST_WEEK'], ['客訴', '17', "SELECT COUNT(*)\nFROM tickets\nWHERE type = 'complaint' AND open"]];
+const kp = document.getElementById('kpis');
+kp.innerHTML = K.map(([t, v], i) => `<button class="kpi" data-i="${i}"><span>${t}</span><b>${v}</b></button>`).join('');
+kp.querySelectorAll('.kpi').forEach((b) => b.addEventListener('click', () => {
+  kp.querySelectorAll('.kpi').forEach((x) => x.classList.toggle('on', x === b));
+  document.getElementById('sql').textContent = K[+b.dataset.i][2];
+}));
+document.getElementById('upd').textContent = '最後更新：3 分鐘前（示意）';
+
+const stage = document.getElementById('stage');
+function play(v) {
+  stage.replaceChildren();
+  stage.append(mk('text', { x: 20, y: 34, class: 'lbl', 'font-size': 13 }, '完成率'));
+  const big = mk('text', { x: 20, y: 80, 'font-size': 40, fill: color('clay'), style: 'font-family: Huninn, sans-serif' }, '0%'); stage.append(big);
+  stage.append(mk('rect', { x: 20, y: 104, width: 280, height: 14, rx: 7, fill: '#f0eee7' }));
+  const bar = mk('rect', { x: 20, y: 104, width: 0, height: 14, rx: 7, fill: color('sage') }); stage.append(bar);
+  const t0 = performance.now(), D = 900;
+  const step = (t) => { const k = Math.min(1, (t - t0) / D), e = 1 - Math.pow(1 - k, 3); big.textContent = Math.round(v * e) + '%'; bar.setAttribute('width', 280 * v / 100 * e); if (k < 1) requestAnimationFrame(step); };
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { big.textContent = v + '%'; bar.setAttribute('width', 280 * v / 100); } else requestAnimationFrame(step);
+}
+const m = document.getElementById('m');
+m.addEventListener('change', () => play(+m.value));
+m.addEventListener('input', () => { document.getElementById('mv').textContent = m.value; });
+play(+m.value);
+})();
+</script>
+<script src="../../assets/lesson.js" data-root="../../"></script>
+</body>
+</html>

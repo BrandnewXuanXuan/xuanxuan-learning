@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>兩個旋鈕：模型與 effort</title>
+<meta name="description" content="模型決定會什麼，effort 決定這次多用力。出錯時先診斷，再決定轉哪一個。">
+<meta name="theme-color" content="#f1f0eb">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="icon" href="../../icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css?v=20261018b">
+<style>
+.knobs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.knob { background: #f6f4ee; border-radius: 14px; padding: 10px; text-align: center; }
+.knob h4 { margin: 0 0 4px; font: 15px var(--hand); display: flex; justify-content: center; align-items: center; gap: 6px; }
+.knob h4 svg { width: 18px; height: 18px; color: var(--clay); }
+.knob svg.dialsvg { width: 110px; height: 110px; display: block; margin: 0 auto; }
+.knob .val { font: 16px var(--hand); color: var(--ink); }
+.knob .ctl { justify-content: center; padding: 6px 0 0; }
+.knob .btn { flex: 0 0 auto; min-height: 40px; padding: 0 14px; }
+.meter { margin-top: 12px; display: grid; gap: 8px; }
+.meter-row { display: grid; grid-template-columns: 92px 1fr; gap: 8px; align-items: center; font-size: 12.5px; color: var(--ink-2); }
+.pips { display: flex; gap: 3px; }
+.pips i { flex: 1; height: 12px; border-radius: 4px; background: #ebe8df; }
+.pips i.on { background: var(--c); animation: drop .3s var(--ease) both; }
+.lv { display: grid; gap: 8px; margin-top: 10px; }
+</style>
+</head>
+<body class="lesson">
+<header class="bar"><div class="bar-in">
+  <a class="back" href="../../index.html#/t/claude/models" aria-label="回到主題"><svg class="i"><use href="../../assets/icons.svg?v=20261018b#back"/></svg></a>
+  <span class="bar-title">模型與思考力度</span>
+</div></header>
+
+<main class="wrap">
+<h1>兩個旋鈕：模型與 effort</h1>
+  <p class="lead">用 Claude Code 時，你手上有兩個旋鈕：<b>模型</b>和 <b>effort</b>（思考力度）。它們管的是完全不同的事，搞混了就會轉錯。</p>
+
+  <section id="s1">
+    <h2><span class="no">1</span>一個管「會什麼」，一個管「多用力」</h2>
+    <p>模型是一組固定的權重，決定它<b>最多能做到多難</b>；你給的提示和 context 只能引導它，改變不了上限。effort 則決定<b>這一次投入多少</b>：讀幾個檔案、跑幾次驗證、多步驟的工作要推進多遠才回頭找你。轉轉看。</p>
+    <div class="fig">
+      <div class="knobs">
+        <div class="knob"><h4><svg><use href="../../assets/icons.svg?v=20261018b#target"/></svg>模型</h4><svg class="dialsvg" id="dm" viewBox="0 0 110 110"></svg><div class="val" id="vm"></div>
+          <div class="ctl"><button class="btn" data-d="m-1" aria-label="模型降一級">－</button><button class="btn" data-d="m1" aria-label="模型升一級">＋</button></div></div>
+        <div class="knob"><h4><svg><use href="../../assets/icons.svg?v=20261018b#dial"/></svg>effort</h4><svg class="dialsvg" id="de" viewBox="0 0 110 110"></svg><div class="val" id="ve"></div>
+          <div class="ctl"><button class="btn" data-d="e-1" aria-label="effort 降一級">－</button><button class="btn" data-d="e1" aria-label="effort 升一級">＋</button></div></div>
+      </div>
+      <div class="meter" id="meter"></div>
+      <div class="read" id="out1"></div>
+    </div>
+    <p class="note"><svg><use href="../../assets/icons.svg?v=20261018b#info"/></svg><span>格數只是示意兩個旋鈕各自影響什麼，不是實測數據。</span></p>
+    <div class="ask-hint">看不懂就回來說 <code>旋鈕 1</code></div>
+  </section>
+
+  <section id="s2">
+    <h2><span class="no">2</span>出錯時，先診斷再轉</h2>
+    <p>Claude 做得不好，第一反應常是「換強一點的模型」。但原因可能根本不在模型。選一個症狀：</p>
+    <div class="fig" id="pick2">
+      <div class="picks">
+        <button class="pick" data-c="0"><svg><use href="../../assets/icons.svg?v=20261018b#target"/></svg>資料都給齊了，它也很認真，還是做錯</button>
+        <button class="pick" data-c="1"><svg><use href="../../assets/icons.svg?v=20261018b#stop"/></svg>跳過檔案、沒跑測試、做到一半就說好了</button>
+        <button class="pick" data-c="2"><svg><use href="../../assets/icons.svg?v=20261018b#cross"/></svg>它誤會你要什麼，或不照專案的慣例做</button>
+      </div>
+      <div class="answer"></div>
+    </div>
+    <div class="ask-hint">看不懂就回來說 <code>旋鈕 2</code></div>
+  </section>
+
+  <section id="s3">
+    <h2><span class="no">3</span>effort 四檔，各用在哪</h2>
+    <p>多數時候用預設值就好；要調，就依「這類工作」設一個習慣，不要每個任務都去轉。點一檔看看：</p>
+    <div class="fig">
+      <div class="ctl" id="lvTabs">
+        <button class="btn" data-k="low">low</button>
+        <button class="btn" data-k="medium">medium</button>
+        <button class="btn" data-k="high">high</button>
+        <button class="btn" data-k="max">max</button>
+      </div>
+      <div class="lv" id="lv"></div>
+    </div>
+    <p>effort 調高，主要減少的是「漏掉邊界情況」這類錯；如果是「整個方法選錯」，調高幫助有限，要回頭檢查需求。所以官方建議的節奏是：</p>
+    <div class="fig"><div class="flow">
+      <span class="node" style="--c:var(--slate)"><svg><use href="../../assets/icons.svg?v=20261018b#chat"/></svg>先讓它問你需求</span><span class="arrow">→</span>
+      <span class="node" style="--c:var(--sage)"><svg><use href="../../assets/icons.svg?v=20261018b#dial"/></svg>low 快速做出來</span><span class="arrow">→</span>
+      <span class="node" style="--c:var(--ochre)"><svg><use href="../../assets/icons.svg?v=20261018b#eye"/></svg>你看過、來回修</span><span class="arrow">→</span>
+      <span class="node" style="--c:var(--clay)"><svg><use href="../../assets/icons.svg?v=20261018b#shield"/></svg>high 驗證與測試</span>
+    </div></div>
+    <div class="ask-hint">看不懂就回來說 <code>旋鈕 3</code></div>
+  </section>
+
+  <section id="s4">
+    <h2><span class="no">4</span>模型的四個等級</h2>
+    <p>官方建議：先從能用的最強模型開始，再用 effort 調成本。強的模型常常用更少的回合做完，算下來每個任務不一定比較貴。點積木看各等級適合什麼：</p>
+    <div class="fig">
+      <svg id="tiers" viewBox="0 0 340 190" role="img" aria-label="四個模型等級"></svg>
+      <div class="read" id="tierOut">點一塊積木。</div>
+    </div>
+    <p><b>顧問策略</b>：讓便宜的模型做主要工作，遇到關鍵處再請強模型看一眼計畫或結果。原文的例子是 Sonnet 5 做事、Fable 5 當顧問，成績接近全程用 Fable 5，價格只要 63%。這和「讓 Haiku 收集資料、Opus 設計版面」是同一種分工。</p>
+    <div class="ask-hint">看不懂就回來說 <code>旋鈕 4</code></div>
+  </section>
+
+  <h2>原文</h2>
+  <ul class="srcs">
+    <li><a href="https://claude.com/resources/articles/claude-model-and-effort-level-in-claude-code" target="_blank" rel="noopener">Claude Code effort level and model selection</a></li>
+    <li><a href="https://claude.com/resources/articles/claude-models-explained-choosing-the-best-model-for-your-use-case" target="_blank" rel="noopener">Claude models explained: choosing the best model for your use case</a></li>
+    <li><a href="https://claude.dev/blog/spending-your-effort/" target="_blank" rel="noopener">Using Claude Code: Spending your effort</a></li>
+  </ul>
+
+  <div class="foot"><svg><use href="../../assets/icons.svg?v=20261018b#chat"/></svg><span>學完了，回研究夥伴說「學完旋鈕」。一起回顧、寫成筆記之後，這張卡才會蓋上「學完」章。</span></div>
+</main>
+
+<script src="../../assets/iso.js?v=20261018b"></script>
+<script src="../../assets/kit.js?v=20261018b"></script>
+<script>
+(() => {
+const { mk, color, block } = Iso;
+const M = ['Haiku', 'Sonnet', 'Opus', 'Fable'], E = ['low', 'medium', 'high', 'max'];
+let mi = 1, ei = 1;
+function dial(svg, idx, n, c) {
+  svg.replaceChildren();
+  const cx = 55, cy = 58, r = 38, a0 = Math.PI * 0.8, a1 = Math.PI * 2.2;
+  for (let i = 0; i < n; i++) {
+    const a = a0 + (a1 - a0) * (i / (n - 1));
+    svg.append(mk('circle', { cx: cx + Math.cos(a) * (r + 10), cy: cy + Math.sin(a) * (r + 10), r: 3.5, fill: i <= idx ? c : '#dcd8cc' }));
+  }
+  svg.append(mk('circle', { cx, cy, r, fill: '#fffefb', stroke: '#e2e0d8', 'stroke-width': 2 }));
+  svg.append(mk('circle', { cx, cy, r: r - 8, fill: '#f6f4ee' }));
+  const a = a0 + (a1 - a0) * (idx / (n - 1));
+  const g = mk('line', { x1: cx, y1: cy, x2: cx + Math.cos(a) * (r - 12), y2: cy + Math.sin(a) * (r - 12), stroke: c, 'stroke-width': 5, 'stroke-linecap': 'round' });
+  svg.append(g, mk('circle', { cx, cy, r: 5, fill: c }));
+}
+function pips(n, on, c) { return `<div class="pips">${Array.from({ length: n }, (_, i) => `<i class="${i < on ? 'on' : ''}" style="--c:${c}"></i>`).join('')}</div>`; }
+function draw1() {
+  dial(document.getElementById('dm'), mi, 4, color('slate')); dial(document.getElementById('de'), ei, 4, color('clay'));
+  document.getElementById('vm').textContent = M[mi]; document.getElementById('ve').textContent = E[ei];
+  document.getElementById('meter').innerHTML = [
+    ['能解多難的題', mi * 2 + 2, 'var(--slate)'], ['讀多少檔、驗證幾次', ei * 2 + 2, 'var(--clay)'], ['這次花的額度', Math.min(8, mi + ei + 1), 'var(--ochre)']
+  ].map(([t, v, c]) => `<div class="meter-row"><span>${t}</span>${pips(8, v, c)}</div>`).join('');
+  document.getElementById('out1').innerHTML = `<b>${M[mi]}</b> 決定上限，<b>${E[ei]}</b> 決定這次多用力。effort 再高也超不過模型的上限；模型再強，effort 太低也會偷懶收工。`;
+}
+document.querySelectorAll('[data-d]').forEach((b) => b.addEventListener('click', () => {
+  const d = b.dataset.d, step = d.endsWith('-1') ? -1 : 1;
+  if (d[0] === 'm') mi = Math.max(0, Math.min(3, mi + step)); else ei = Math.max(0, Math.min(3, ei + step));
+  draw1();
+}));
+draw1();
+
+Kit.picks(document.getElementById('pick2'), [
+  ['target', '換更強的模型', '資料齊全、也很努力還是錯，代表題目超過這個模型的能力上限。調 effort 沒用，要換模型。'],
+  ['dial', '把 effort 調高', '這是投入不夠，不是能力不夠。調高 effort，它就會多讀幾個檔、多跑幾次驗證、做完才回報。'],
+  ['memory', '先改提示或 CLAUDE.md', '問題出在 context：它不知道你要什麼、不知道專案慣例。先把需求講清楚、把慣例寫進 CLAUDE.md 或 skill，再看要不要動旋鈕。']
+]);
+
+const LV = {
+  low: [['spark', '腦力激盪、畫草圖、小改動'], ['chat', '需要你頻繁來回互動的時候：回得快比想得深重要']],
+  medium: [['code', '一般的功能開發，日常大部分工作']],
+  high: [['shield', '重視驗證、邊界情況很多的工作'], ['folder', '例如接手不熟的舊專案修 bug']],
+  max: [['target', '希望它自己從頭做到尾的難題：端到端建置加驗證、找安全漏洞'], ['clock', '最花時間也最花額度，留給真的難的事']]
+};
+Kit.tabs(document.getElementById('s3'), (k) => {
+  document.getElementById('lv').innerHTML = LV[k].map(([ic, t], i) => `<div class="tip" style="animation-delay:${i * 60}ms">${Kit.icon(ic)}<span>${t}</span></div>`).join('');
+}, 'medium');
+
+const T = [
+  ['Haiku', 'sage', 1.2, '最便宜、最快。適合大量、重複、要求反應快的工作，例如整理資料、分類、當 subagent 跑雜事。'],
+  ['Sonnet', 'slate', 2.1, '通用主力。適合大部分日常工作，也適合同時開很多個 subagent。'],
+  ['Opus', 'ochre', 3.0, '推理密集的工作。需要想得深、做得對的設計與規劃。'],
+  ['Fable', 'clay', 4.0, '最強的一級，適合長時間、多步驟、以前沒人解過的題。另有一個限邀請機構使用的 Mythos。']
+];
+const tiers = document.getElementById('tiers');
+function drawTiers(sel) {
+  tiers.replaceChildren();
+  T.forEach(([n, c, h, txt], i) => {
+    const x = 50 + i * 80, y = 150, g = mk('g', { style: 'cursor:pointer', role: 'button', tabindex: 0, 'aria-label': n });
+    g.append(mk('ellipse', { cx: x, cy: y + 14, rx: 34, ry: 8, fill: '#2a2b29', opacity: .06 }));
+    const b = block(x, y, 30, h * 24, color(c)); if (i === sel) b.style.animation = 'drop .5s cubic-bezier(.16,1,.3,1) both';
+    g.append(b);
+    g.append(mk('text', { x, y: y + 34, 'text-anchor': 'middle', class: 'lbl', 'font-weight': i === sel ? 700 : 500 }, n));
+    if (i === sel) g.append(mk('circle', { cx: x, cy: y - h * 24 - 26, r: 5, fill: color('stamp') }));
+    const go = () => { drawTiers(i); document.getElementById('tierOut').innerHTML = `<b>${n}</b>：${txt}`; };
+    g.addEventListener('click', go); g.addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); });
+    tiers.append(g);
+  });
+}
+drawTiers(-1);
+})();
+</script>
+<script src="../../assets/lesson.js" data-root="../../"></script>
+</body>
+</html>

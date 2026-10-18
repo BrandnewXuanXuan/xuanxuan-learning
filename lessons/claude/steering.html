@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>指揮 Claude 的七種方式</title>
+<meta name="description" content="CLAUDE.md、rules、skills、subagents、hooks……各自什麼時候進場、適合放什麼。">
+<meta name="theme-color" content="#f1f0eb">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="icon" href="../../icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css?v=20261018b">
+<style>
+.lanes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.lane { background: #f6f4ee; border-radius: 12px; padding: 8px 6px; min-height: 150px; }
+.lane h5 { margin: 0 0 6px; font: 500 11.5px var(--font); color: var(--ink-3); display: flex; align-items: center; gap: 4px; justify-content: center; text-align: center; }
+.lane h5 svg { width: 14px; height: 14px; }
+.chip2 { display: flex; align-items: center; gap: 5px; width: 100%; margin: 0 0 5px; padding: 6px 6px; border: 0; border-radius: 4px 9px 9px 9px; background: var(--c); color: #fff; font: 500 11.5px var(--font); text-align: left; cursor: pointer; box-shadow: 0 2px 0 rgba(0,0,0,.08); }
+.chip2 svg { width: 14px; height: 14px; flex: none; }
+.chip2.on { outline: 2px solid var(--ink); outline-offset: 1px; }
+.chip2.half { opacity: .55; }
+.detail { margin-top: 10px; padding: 12px; border-radius: 12px; background: #f7ece6; font-size: 13.5px; line-height: 1.65; min-height: 74px; }
+.detail b { font: 16px var(--hand); display: block; margin-bottom: 2px; }
+.doc { background: #fffefb; border: 1px solid var(--rule); border-radius: 10px; padding: 10px 12px; font: 12px/1.75 ui-monospace, "SF Mono", Menlo, monospace; color: var(--ink-2); }
+.doc div { animation: drop .35s var(--ease) both; }
+.doc .h { color: var(--ink); font-weight: 600; }
+.doc .bad { color: var(--stamp); text-decoration: line-through; opacity: .7; }
+.doc .ptr { color: var(--clay); }
+.lines { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 12.5px; color: var(--ink-2); }
+.lines .track { flex: 1; height: 10px; border-radius: 5px; background: #f0eee7; overflow: hidden; }
+.lines .fill { height: 100%; background: var(--c); transform-origin: left; animation: grow .6s var(--ease) both; }
+@keyframes grow { from { transform: scaleX(0); } }
+</style>
+</head>
+<body class="lesson">
+<header class="bar"><div class="bar-in">
+  <a class="back" href="../../index.html#/t/claude/memory" aria-label="回到主題"><svg class="i"><use href="../../assets/icons.svg?v=20261018b#back"/></svg></a>
+  <span class="bar-title">CLAUDE.md 與記憶</span>
+</div></header>
+
+<main class="wrap">
+<h1>指揮 Claude 的七種方式</h1>
+  <p class="lead">想讓 Claude 照你的意思做事，不是只有寫進 CLAUDE.md 一條路。七種方式的差別，在於<b>什麼時候被讀進來</b>，以及<b>是「建議」還是「一定執行」</b>。</p>
+
+  <section id="s1">
+    <h2><span class="no">1</span>七種方式，什麼時候進場</h2>
+    <p>依照進場時機分成三欄。點任何一張看它適合放什麼。半透明的代表開場只先放「名字」，用到時才載入全文。</p>
+    <div class="fig">
+      <div class="lanes" id="lanes"></div>
+      <div class="detail" id="detail">點一張紙條。</div>
+    </div>
+    <div class="ask-hint">看不懂就回來說 <code>指揮台 1</code></div>
+  </section>
+
+  <section id="s2">
+    <h2><span class="no">2</span>這句話該放哪？</h2>
+    <p>判斷原則很簡單：<b>「每次都要」和「絕對不能」交給 hook 或權限</b>，因為寫在文字裡的只是建議，Claude 有可能忘；超過 30 行的流程放 skill；只跟某些檔案有關的，用 rules 加路徑限定。選一句看看：</p>
+    <div class="fig" id="pick2">
+      <div class="picks">
+        <button class="pick" data-c="0"><svg><use href="../../assets/icons.svg?v=20261018b#hooks"/></svg>「每次改完程式都要跑格式化」</button>
+        <button class="pick" data-c="1"><svg><use href="../../assets/icons.svg?v=20261018b#cross"/></svg>「絕對不可以刪 data/ 底下的檔案」</button>
+        <button class="pick" data-c="2"><svg><use href="../../assets/icons.svg?v=20261018b#flag"/></svg>「發佈網站的十二個步驟」</button>
+        <button class="pick" data-c="3"><svg><use href="../../assets/icons.svg?v=20261018b#folder"/></svg>「lessons/ 裡的頁面一律手機優先」</button>
+        <button class="pick" data-c="4"><svg><use href="../../assets/icons.svg?v=20261018b#code"/></svg>「這個專案用 python3 -m http.server 預覽」</button>
+        <button class="pick" data-c="5"><svg><use href="../../assets/icons.svg?v=20261018b#chat"/></svg>「我習慣用繁體中文回覆」</button>
+      </div>
+      <div class="answer"></div>
+    </div>
+    <div class="ask-hint">看不懂就回來說 <code>指揮台 2</code></div>
+  </section>
+
+  <section id="s3">
+    <h2><span class="no">3</span>新一代模型的 CLAUDE.md：越短越好</h2>
+    <p>5 世代的模型判斷力強很多，舊式「一條一條規定」反而會互相打架。Claude Code 自己的系統提示就刪掉了八成以上。切換看看同一份 CLAUDE.md 的兩種寫法：</p>
+    <div class="fig">
+      <div class="ctl" id="docTabs">
+        <button class="btn" data-k="old"><svg><use href="../../assets/icons.svg?v=20261018b#cross"/></svg>舊寫法</button>
+        <button class="btn" data-k="new"><svg><use href="../../assets/icons.svg?v=20261018b#check"/></svg>新寫法</button>
+      </div>
+      <div class="doc" id="doc"></div>
+      <div class="lines" id="lines"></div>
+      <div class="read" id="docOut"></div>
+    </div>
+    <p>新寫法的重點：說明這個 repo 是做什麼的；多寫<b>踩過的坑</b>（gotchas），不寫模型自己看得出來的事；細節拆到其他檔案，需要時才讀（漸進式揭露）；控制在 200 行內；<b>不放金鑰或連線字串</b>。個人偏好放使用者層級（<code>~/.claude/CLAUDE.md</code>），專案共用的放專案層級。</p>
+    <div class="ask-hint">看不懂就回來說 <code>指揮台 3</code></div>
+  </section>
+
+  <h2>原文</h2>
+  <ul class="srcs">
+    <li><a href="https://claude.com/resources/articles/steering-claude-code-skills-hooks-rules-subagents-and-more" target="_blank" rel="noopener">Steering Claude Code: when to use CLAUDE.md, skills, hooks, and subagents</a></li>
+    <li><a href="https://claude.com/resources/articles/using-claude-md-files" target="_blank" rel="noopener">Using CLAUDE.MD files: Customizing Claude Code for your codebase</a></li>
+    <li><a href="https://claude.dev/blog/the-new-rules-of-context-engineering-for-claude-5-generation-models/" target="_blank" rel="noopener">The new rules of context engineering for Claude 5 generation models</a></li>
+  </ul>
+
+  <div class="foot"><svg><use href="../../assets/icons.svg?v=20261018b#chat"/></svg><span>學完了，回研究夥伴說「學完指揮台」。一起回顧、寫成筆記之後，這張卡才會蓋上「學完」章。</span></div>
+</main>
+
+<script src="../../assets/iso.js?v=20261018b"></script>
+<script src="../../assets/kit.js?v=20261018b"></script>
+<script>
+(() => {
+const W = [
+  ['start', 'memory', 'CLAUDE.md（根目錄）', 'var(--slate)', 0, '開場就讀、全程都在。放建置與預覽指令、目錄結構、專案慣例。每一輪都會重讀，所以要短。'],
+  ['start', 'folder', 'rules（不限路徑）', 'var(--teal)', 0, '放在 .claude/rules/ 的規則檔，開場就讀。適合硬性限制，例如「API 一律用 Zod 驗證」。'],
+  ['start', 'chat', '輸出風格', 'var(--dusk)', 0, '語氣、格式、角色，會注入系統提示。其中 output style 會取代預設提示，要謹慎使用。'],
+  ['need', 'memory', '子資料夾 CLAUDE.md', 'var(--slate)', 0, '碰到那個資料夾的檔案時才讀進來。適合「只有這個資料夾才有」的慣例。'],
+  ['need', 'folder', 'rules（加 paths）', 'var(--teal)', 0, '規則檔加上 paths: 限定路徑，只有處理相符的檔案時才載入。'],
+  ['need', 'skills', 'Skills', 'var(--ochre)', 1, '開場只放名字和一句描述；用到時才讀全文。適合部署、發版、審查這類流程。'],
+  ['need', 'agents', 'Subagents', 'var(--clay)', 1, '開場只放名字和工具清單；叫用時才在自己的 context 裡做事，最後只回傳摘要。適合獨立的旁支任務。'],
+  ['event', 'hooks', 'Hooks', 'var(--stamp)', 0, '在固定事件觸發（例如每次用完工具、要結束一輪時），由程式執行，不靠 Claude 記得。適合「一定要做」或「一定不能做」的事。']
+];
+const LANES = [['start', 'play', '開場就讀'], ['need', 'eye', '用到才讀'], ['event', 'bell', '事件觸發']];
+const lanes = document.getElementById('lanes');
+lanes.innerHTML = LANES.map(([k, ic, t]) => `<div class="lane"><h5>${Kit.icon(ic)}${t}</h5>${W.map((w, i) => w[0] === k ? `<button class="chip2${w[4] ? ' half' : ''}" data-i="${i}" style="--c:${w[3]}">${Kit.icon(w[1])}${w[2]}</button>` : '').join('')}</div>`).join('');
+lanes.querySelectorAll('.chip2').forEach((b) => b.addEventListener('click', () => {
+  lanes.querySelectorAll('.chip2').forEach((x) => x.classList.toggle('on', x === b));
+  const w = W[+b.dataset.i];
+  document.getElementById('detail').innerHTML = `<b>${w[2]}</b>${w[5]}`;
+}));
+
+Kit.picks(document.getElementById('pick2'), [
+  ['hooks', 'Hook', '「每次都要」做的事交給 hook，例如每次編輯完自動跑格式化。寫在 CLAUDE.md 只是提醒，可能被忽略；hook 一定會執行。'],
+  ['shield', 'Hook 或權限規則', '「絕對不能」的事，光靠文字不可靠。用 hook 在動手前攔下，或在權限設定裡直接拒絕。'],
+  ['skills', 'Skill', '超過 30 行的流程放 skill：平常只佔一句描述，要發佈時才把十二個步驟讀進來。'],
+  ['folder', 'Rules（加路徑限定）', '只跟某些檔案有關的規則，放 .claude/rules/ 並用 paths: 限定在 lessons/，處理其他檔案時就不會佔空間。'],
+  ['memory', '專案的 CLAUDE.md', '這是專案的基本操作指令，每次都可能用到，又短，放在根目錄的 CLAUDE.md 最合適。'],
+  ['chat', '使用者層級的 CLAUDE.md', '這是你個人的偏好，跟專案無關。放在 ~/.claude/CLAUDE.md，所有專案都適用，也不會跟著專案公開出去。']
+]);
+
+const OLD = [['h', '# 規則'], ['bad', '- 註解一律用英文，句尾加句點'], ['bad', '- 函式不得超過 40 行'], ['bad', '- 變數用 camelCase'], ['bad', '- 回覆前先列出計畫'], ['bad', '- 不要用 var'], ['bad', '- 範例一：……（二十行）'], ['bad', '- 範例二：……（二十行）'], ['bad', '- 部署步驟 1～12：……'], ['', '- 預覽：python3 -m http.server'], ['bad', '- 每次修改都要跑格式化']];
+const NEW = [['h', '# 這是什麼'], ['', '個人學習網站，靜態 PWA，無建置步驟。'], ['h', '# 指令'], ['', '- 預覽：python3 -m http.server'], ['h', '# 踩過的坑'], ['', '- 網站在子路徑下，一律用相對路徑'], ['', '- 改了 assets 要換版本號，否則手機吃舊檔'], ['h', '# 細節'], ['ptr', '- 設計規範 → DESIGN.md'], ['ptr', '- 部署流程 → 發佈 skill']];
+Kit.tabs(document.getElementById('s3'), (k) => {
+  const L = k === 'old' ? OLD : NEW;
+  document.getElementById('doc').innerHTML = L.map(([c, t], i) => `<div class="${c}" style="animation-delay:${i * 35}ms">${t}</div>`).join('');
+  const n = k === 'old' ? 340 : 60;
+  document.getElementById('lines').innerHTML = `<span>約 ${n} 行</span><div class="track"><div class="fill" style="--c:${k === 'old' ? 'var(--stamp)' : 'var(--sage)'};width:${Math.min(n / 340 * 100, 100)}%"></div></div><span>200 行</span>`;
+  document.getElementById('docOut').innerHTML = k === 'old'
+    ? '劃掉的都不該在這裡：模型看得出來的慣例、會限制它判斷的範例、該交給 skill 的流程、該交給 hook 的強制規定。'
+    : '只留模型自己推不出來的東西，細節用「指路」的方式放到別的檔案。每一輪重讀的負擔小很多，規則也不會互相打架。';
+}, 'old');
+})();
+</script>
+<script src="../../assets/lesson.js" data-root="../../"></script>
+</body>
+</html>

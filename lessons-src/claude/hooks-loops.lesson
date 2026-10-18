@@ -1,0 +1,134 @@
+{"id":"hooks-loops","short":"開關","title":"不靠記得，靠開關","desc":"hooks 在固定時刻一定執行；mods 常駐在 session 裡；loops 讓 Claude 做到完成為止。","topic":"hooks","topicTitle":"Hooks 自動化","sources":[["Claude Code power user customization: How to configure hooks","https://claude.com/resources/articles/how-to-configure-hooks"],["Getting started with Claude Code mods","https://claude.dev/blog/getting-started-with-claude-code-mods/"],["Customize Claude Code with mods in TypeScript","https://claude.com/resources/articles/claude-code-mods"],["Loop engineering: Getting started with loops","https://claude.com/resources/articles/getting-started-with-loops"]]}
+===CSS===
+.track2 { display: block; width: 100%; height: auto; }
+.gate { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; margin: 6px 0; }
+.call { padding: 10px; border-radius: 10px; background: #f6f4ee; font: 12px/1.5 ui-monospace, "SF Mono", Menlo, monospace; color: var(--ink); min-height: 58px; display: flex; align-items: center; animation: drop .4s var(--ease) both; }
+.call.deny { background: #f6dcd8; color: #8a2f25; }
+.call.ok { background: #e3ede7; color: #2f5d47; }
+.gatebox { width: 54px; height: 54px; border-radius: 14px; background: var(--ink); color: #fff; display: grid; place-items: center; }
+.gatebox svg { width: 26px; height: 26px; }
+.wx { display: flex; align-items: center; gap: 14px; padding: 10px 6px; }
+.wx svg { width: 64px; height: 64px; flex: none; }
+.wx b { font: 20px var(--hand); display: block; }
+===BODY===
+  <h1>不靠記得，靠開關</h1>
+  <p class="lead">寫在 CLAUDE.md 裡的規則，Claude 有可能忘記。真正「一定要做」的事，要交給<b>開關</b>：在固定時刻由程式自動執行，不經過 Claude 的判斷。</p>
+
+  <section id="s1">
+    <h2><span class="no">1</span>hooks：一輪工作裡的固定時刻</h2>
+    <p>Hook 是一段你寫好的指令，設定在 settings 檔裡，到了指定時刻就自動跑。按「跑一輪」看這些時刻依序出現，或直接點任一個時刻。</p>
+    <div class="fig">
+      <svg class="track2" id="track" viewBox="0 0 340 150" role="img" aria-label="一輪工作中的 hook 時刻"></svg>
+      <div class="ctl"><button class="btn pri" id="runT">{{icon play}}跑一輪</button></div>
+      <div class="read" id="outT">點一個時刻看看。</div>
+    </div>
+    <p>Hook 從標準輸入收到事件的資料，再用輸出內容和結束代碼回覆 Claude Code：要放行、擋下，還是改掉參數。它用你的使用者權限在本機執行。</p>
+    {{hint 1}}
+  </section>
+
+  <section id="s2">
+    <h2><span class="no">2</span>mods：常駐在 session 裡的小外掛</h2>
+    <p>Mod 是用 JavaScript／TypeScript 寫的小模組，載入後<b>一直待在 session 裡</b>：可以記住狀態、畫自訂畫面、註冊新的斜線指令。設定檔裡的 hook 則是每次觸發才跑一次指令。Mod 對每個事件可以做三件事，選一種看一個 <code>rm -rf</code> 指令怎麼被處理：</p>
+    <div class="fig">
+      <div class="ctl" id="modes">
+        <button class="btn" data-k="watch">{{icon eye}}觀察</button>
+        <button class="btn" data-k="rewrite">{{icon pencil}}改寫</button>
+        <button class="btn" data-k="deny">{{icon cross}}擋下</button>
+      </div>
+      <div class="gate">
+        <div class="call">Bash: rm -rf build/</div>
+        <div class="gatebox" id="gateIc"></div>
+        <div class="call" id="after"></div>
+      </div>
+      <div class="read" id="outM"></div>
+    </div>
+    <p>官方的入門範例是「Token 天氣」：依照 context 用了多少，在輸入框上方顯示天氣。拖拉看看：</p>
+    <div class="fig">
+      <div class="wx"><svg id="wxIc" viewBox="0 0 64 64"></svg><div><b id="wxT"></b><span id="wxS" style="font-size:13px;color:var(--ink-2)"></span></div></div>
+      <input id="wx" type="range" min="0" max="100" value="18" aria-label="context 使用率">
+    </div>
+    <p class="note">{{icon shield}}<span>Mod 用跟 Claude Code 一樣的權限在你的電腦上執行，<b>安裝前要看過程式碼，只裝信得過的</b>。另外，攔指令的 mod 只看指令文字，換個寫法可能就繞過了；真正要「絕對禁止」，還是要用權限規則。</span></p>
+    {{hint 2}}
+  </section>
+
+  <section id="s3">
+    <h2><span class="no">3</span>loops：做到完成為止</h2>
+    <p>Loop 是讓 Claude <b>重複做一件事，直到符合停止條件</b>。依照「什麼時候再跑一次」分成四種。選一個情境：</p>
+    <div class="fig" id="pick3">
+      <div class="picks">
+        <button class="pick" data-c="0">{{icon chat}}跟它來回討論、一步一步改</button>
+        <button class="pick" data-c="1">{{icon target}}把網站的 Lighthouse 分數弄到 90 以上</button>
+        <button class="pick" data-c="2">{{icon clock}}每 5 分鐘看一下 PR 的審查留言並修正</button>
+        <button class="pick" data-c="3">{{icon bell}}每小時檢查有沒有新的回報，有就處理</button>
+      </div>
+      <div class="answer"></div>
+    </div>
+    <p>設計 loop 的關鍵是<b>停止條件</b>與<b>次數上限</b>，以及讓 Claude 能自己驗證「做完了沒」（上一個主題的驗證 skill 就派得上用場）。也要注意額度：<code>/loop</code> 在原本的 session 裡每跑一次都帶著整段對話，所以最好開一個新 session 專門跑。不加參數輸入 <code>/goal</code> 可以看已經跑了幾輪、用了多少 token。</p>
+    {{hint 3}}
+  </section>
+===JS===
+const { mk, color } = Iso;
+const EV = [
+  ['SessionStart', 'session 開始', 'flag', '注入專案背景，例如今天的待辦、最新的 git 狀態。'],
+  ['UserPromptSubmit', '你送出訊息', 'chat', '檢查或補充你的訊息，例如自動附上相關規範。'],
+  ['PreToolUse', '工具執行前', 'shield', '最常用的一個：在動手前檢查，可以放行、擋下、要求確認，或改參數。例如擋下危險指令、檢查要寫入的路徑。'],
+  ['PermissionRequest', '要問你權限前', 'key', '自動核准安全的操作（例如跑測試），或拒絕碰敏感檔案。'],
+  ['PostToolUse', '工具執行後', 'pencil', '例如每次編輯完自動跑格式化。'],
+  ['PreCompact', '壓縮前', 'compress', '壓縮前先把重要資訊存起來。'],
+  ['Stop', '這一輪要結束時', 'stop', '例如跑測試，沒過就擋下、不讓它收工。'],
+  ['SubagentStop', '分身要結束時', 'agents', '檢查分身交回來的成果。']
+];
+const track = document.getElementById('track');
+function drawTrack(sel) {
+  track.replaceChildren();
+  track.append(mk('path', { d: 'M24 46 H316 M24 112 H316', stroke: '#e2e0d8', 'stroke-width': 3, 'stroke-linecap': 'round' }));
+  track.append(mk('path', { d: 'M316 46 C340 46 340 112 316 112', stroke: '#e2e0d8', 'stroke-width': 3, fill: 'none' }));
+  EV.forEach(([id, zh, ic], i) => {
+    const row = i < 4 ? 0 : 1, col = row ? 3 - (i - 4) : i, x = 40 + col * 86, y = row ? 112 : 46, on = i === sel;
+    const g = mk('g', { style: 'cursor:pointer', role: 'button', tabindex: 0, 'aria-label': zh });
+    g.append(mk('circle', { cx: x, cy: y, r: on ? 19 : 16, fill: on ? color('clay') : '#fffefb', stroke: on ? color('clay') : '#d6d2c6', 'stroke-width': 2 }));
+    const s = Iso.icon(ic, x - 9, y - 9, 18); s.style.color = on ? '#fff' : color('ink-2') || '#63645c'; g.append(s);
+    g.append(mk('text', { x, y: row ? y + 32 : y - 26, 'text-anchor': 'middle', class: 'cap', 'font-size': 10.5, fill: on ? color('clay') : '' }, zh));
+    const go = () => { drawTrack(i); document.getElementById('outT').innerHTML = `<b>${zh}</b>（<code>${id}</code>）：${EV[i][3]}`; };
+    g.addEventListener('click', go); g.addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); });
+    track.append(g);
+  });
+}
+drawTrack(-1);
+let tt = null;
+document.getElementById('runT').addEventListener('click', () => {
+  clearInterval(tt); let i = 0;
+  tt = setInterval(() => { drawTrack(i); document.getElementById('outT').innerHTML = `<b>${EV[i][1]}</b>（<code>${EV[i][0]}</code>）：${EV[i][3]}`; if (++i >= EV.length) clearInterval(tt); }, 900);
+});
+
+const MODE = {
+  watch: ['eye', 'ok', 'Bash: rm -rf build/', '<b>觀察</b>：讓指令照常執行，自己在旁邊記錄或更新畫面，例如記下這次刪了什麼。'],
+  rewrite: ['pencil', 'ok', 'Bash: rm -rf build/ --dry-run', '<b>改寫</b>：把事件改掉再放行，例如先改成只預覽、不真的刪除。'],
+  deny: ['cross', 'deny', '擋下：這個指令會刪掉整個資料夾', '<b>擋下</b>：直接回覆拒絕，指令根本不會執行，Claude 會收到拒絕的理由。']
+};
+Kit.tabs(document.getElementById('s2'), (k) => {
+  const [ic, cls, txt, msg] = MODE[k];
+  document.getElementById('gateIc').innerHTML = Kit.icon(ic);
+  const a = document.getElementById('after'); a.className = 'call ' + cls; a.textContent = txt;
+  document.getElementById('outM').innerHTML = msg;
+}, 'watch');
+
+function wx(p) {
+  const svg = document.getElementById('wxIc'); svg.replaceChildren();
+  const cloud = (dx, dy, c) => svg.append(mk('path', { d: `M${18 + dx} ${42 + dy}h26a9 9 0 0 0 1-17.9A13 13 0 0 0 20 27a8 8 0 0 0-2 15z`, fill: c }));
+  let t, s;
+  if (p < 25) { t = '晴'; s = '低於 25%，空間很充足'; svg.append(mk('circle', { cx: 32, cy: 32, r: 12, fill: color('ochre') })); for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4; svg.append(mk('line', { x1: 32 + Math.cos(a) * 18, y1: 32 + Math.sin(a) * 18, x2: 32 + Math.cos(a) * 24, y2: 32 + Math.sin(a) * 24, stroke: color('ochre'), 'stroke-width': 3, 'stroke-linecap': 'round' })); } }
+  else if (p < 50) { t = '多雲'; s = '25–49%'; svg.append(mk('circle', { cx: 24, cy: 24, r: 9, fill: color('ochre') })); cloud(0, 4, '#b9c2cf'); }
+  else if (p < 75) { t = '陣雨'; s = '50–74%，該想想要不要壓縮'; cloud(0, -4, '#9aa7b8'); [22, 32, 42].forEach((x) => svg.append(mk('line', { x1: x, y1: 46, x2: x - 3, y2: 55, stroke: color('slate'), 'stroke-width': 3, 'stroke-linecap': 'round' }))); }
+  else if (p < 90) { t = '雷雨'; s = '75–89%'; cloud(0, -4, '#7f8898'); svg.append(mk('path', { d: 'M34 40 26 52h6l-3 9 9-13h-6l3-8z', fill: color('ochre') })); }
+  else { t = '快壓縮了'; s = '90% 以上，馬上就會自動壓縮'; cloud(0, -4, '#6f7684'); svg.append(mk('circle', { cx: 46, cy: 46, r: 10, fill: color('stamp') })); svg.append(mk('path', { d: 'M46 40v7M46 51v.5', stroke: '#fff', 'stroke-width': 3, 'stroke-linecap': 'round' })); }
+  document.getElementById('wxT').textContent = `${t}　${p}%`; document.getElementById('wxS').textContent = s;
+}
+const wxIn = document.getElementById('wx'); wxIn.addEventListener('input', () => wx(+wxIn.value)); wx(+wxIn.value);
+
+Kit.picks(document.getElementById('pick3'), [
+  ['chat', '一般對話（一輪一輪）', '你說一句、它做一輪。最常見，也是你掌控最多的方式。'],
+  ['target', '/goal', '有明確、可以驗證的完成條件，就用 /goal 定義「做完長什麼樣」，例如「/goal 首頁 Lighthouse 分數 90 以上，最多試 5 次」。它會一直做到條件達成。'],
+  ['clock', '/loop', '照時間重複跑：「/loop 5m 看 PR 留言並修正」。它在你的電腦上跑，電腦關了就停；要搬到雲端，用 /schedule 建一個例行任務。'],
+  ['bell', '主動式（/schedule 加 /goal）', '由排程或事件觸發，自己去找事做。例如每小時檢查新回報，再用 /goal 規定這一輪要把找到的每一件都處理完。']
+]);

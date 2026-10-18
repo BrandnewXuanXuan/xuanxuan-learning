@@ -1,7 +1,7 @@
 (() => {
   const app = document.getElementById('app');
   const bar = document.getElementById('bar');
-  const ICONS = 'assets/icons.svg';
+  const ICONS = 'assets/icons.svg' + (document.currentScript ? new URL(document.currentScript.src).search : '');
   const ROT = [-1.4, 1.1, .8, -1, -.6, 1.3, 1, -1.2];
   let catalog = null;
 

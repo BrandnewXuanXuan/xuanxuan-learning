@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>每一輪都是岔路口</title>
+<meta name="description" content="繼續、回溯、壓縮、清空、交給分身：每一輪結束後怎麼選，決定了 context 乾不乾淨。">
+<meta name="theme-color" content="#f1f0eb">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="icon" href="../../icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css?v=20261018b">
+<style>
+.road { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 10px; }
+.road .btn { flex-direction: column; gap: 2px; padding: 8px 2px; font-size: 12.5px; min-height: 58px; }
+.road .btn svg { width: 20px; height: 20px; }
+.side { margin-top: 8px; padding: 8px; border-radius: 12px; border: 1.5px dashed #c9c5b9; display: none; }
+.side.show { display: block; animation: drop .45s var(--ease) both; }
+.side-title { font-size: 12px; color: var(--ink-3); display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+.side-title svg { width: 15px; height: 15px; }
+.fade { display: flex; gap: 3px; flex-wrap: wrap; margin-top: 10px; }
+.fade i { width: 14px; height: 14px; border-radius: 4px; background: #e6e2d8; transition: background .3s, opacity .3s; }
+.fade i.sig { background: var(--clay); }
+.fade i.dim { opacity: .35; }
+</style>
+</head>
+<body class="lesson">
+<header class="bar"><div class="bar-in">
+  <a class="back" href="../../index.html#/t/claude/context" aria-label="回到主題"><svg class="i"><use href="../../assets/icons.svg?v=20261018b#back"/></svg></a>
+  <span class="bar-title">context 與額度</span>
+</div></header>
+
+<main class="wrap">
+<h1>每一輪都是岔路口</h1>
+  <p class="lead">Claude 每回完一輪，你都站在岔路口：繼續、回溯、壓縮、清空，或交給分身。選對了，context 一直乾淨；選錯了，舊垃圾會跟著你一路重讀。</p>
+
+  <section id="s1">
+    <h2><span class="no">1</span>五條路，各留下什麼</h2>
+    <p>假設你剛請 Claude 讀了幾個檔案、試了一個方法，結果失敗了。點下面五條路，看 context 會變成什麼樣子。</p>
+    <div class="fig">
+      <div class="ctx-row"><span>現在</span><div class="ctxbar" id="now"></div></div>
+      <div class="ctx-row"><span>選完後</span><div class="ctxbar" id="after"></div></div>
+      <div class="side" id="side"><div class="side-title"><svg><use href="../../assets/icons.svg?v=20261018b#agents"/></svg>分身自己的 context（用完就丟）</div><div class="ctxbar" id="sub"></div></div>
+      <div class="legend" id="legend"></div>
+      <div class="road" id="road">
+        <button class="btn" data-k="go"><svg><use href="../../assets/icons.svg?v=20261018b#play"/></svg>繼續</button>
+        <button class="btn" data-k="rewind"><svg><use href="../../assets/icons.svg?v=20261018b#rewind"/></svg>回溯</button>
+        <button class="btn" data-k="compact"><svg><use href="../../assets/icons.svg?v=20261018b#compress"/></svg>壓縮</button>
+        <button class="btn" data-k="clear"><svg><use href="../../assets/icons.svg?v=20261018b#eraser"/></svg>清空</button>
+        <button class="btn" data-k="sub"><svg><use href="../../assets/icons.svg?v=20261018b#agents"/></svg>分身</button>
+      </div>
+      <div class="read" id="out">點一條路試試看。</div>
+    </div>
+    <p>一句話記：<b>同一件事還需要就繼續；走錯路就回溯；太臃腫就壓縮並說明下一步；換新工作就清空；只要結論就交給分身。</b></p>
+    <div class="ask-hint">看不懂就回來說 <code>岔路 1</code></div>
+  </section>
+
+  <section id="s2">
+    <h2><span class="no">2</span>走錯路時，回溯比補一句好</h2>
+    <p>方法失敗時，多數人會接著說「這樣不行，改用 B」。但失敗的那段嘗試還留在 context 裡，之後每一輪都會跟著重讀，還可能把 Claude 帶偏。<b>回溯</b>（連按兩下 Esc，或輸入 <code>/rewind</code>）會回到讀完檔案、還沒動手的那一刻，你直接說「不要用 A，用 B」。</p>
+    <div class="fig">
+      <div class="ctl" id="fixTabs">
+        <button class="btn" data-k="patch"><svg><use href="../../assets/icons.svg?v=20261018b#chat"/></svg>補一句修正</button>
+        <button class="btn" data-k="rewind"><svg><use href="../../assets/icons.svg?v=20261018b#rewind"/></svg>回溯再說</button>
+      </div>
+      <div class="ctx-row"><span>之後</span><div class="ctxbar" id="fixBar"></div></div>
+      <div class="read" id="fixOut"></div>
+    </div>
+    <p>回溯之前，也可以請 Claude「從這裡總結一下」，寫一段交接給「回溯後的自己」，把學到的東西帶過去，失敗的過程留在原地。</p>
+    <div class="ask-hint">看不懂就回來說 <code>岔路 2</code></div>
+  </section>
+
+  <section id="s3">
+    <h2><span class="no">3</span>1M 的視窗也會「腐壞」</h2>
+    <p>Claude Code 的 context 視窗有 100 萬 token，但塞得越滿，注意力越分散，舊的無關內容會干擾現在的工作，這叫 <b>context rot</b>。拖動滑桿，看重要的資訊（橘色）在一堆內容裡變得多難找。</p>
+    <div class="fig">
+      <div class="range-lbl"><span>context 用掉多少</span><b id="rotTxt">20%</b></div>
+      <input id="rot" type="range" min="5" max="100" step="5" value="20" aria-label="context 使用量">
+      <div class="fade" id="dots" aria-hidden="true"></div>
+      <div class="read" id="rotOut"></div>
+    </div>
+    <p>還有一點很反直覺：<b>自動壓縮發生的時候，正是模型最不聰明的時候</b>，因為 context 已經很滿。它猜不到你下一步要做什麼，就可能把下一步需要的細節摘掉。所以在 1M 視窗下，與其等它自動壓縮，不如自己在告一段落時下 <code>/compact</code>，並寫明接下來要做什麼。</p>
+    <div class="ask-hint">看不懂就回來說 <code>岔路 3</code></div>
+  </section>
+
+  <section id="s4">
+    <h2><span class="no">4</span>交給分身前，問自己一句話</h2>
+    <p>判斷要不要交給 subagent，只要問：<b>「之後我還需要這些過程，還是只要結論？」</b>選一個情境看看。</p>
+    <div class="fig" id="pick4">
+      <div class="picks">
+        <button class="pick" data-c="0"><svg><use href="../../assets/icons.svg?v=20261018b#lens"/></svg>找出程式碼裡所有用到某個函式的地方</button>
+        <button class="pick" data-c="1"><svg><use href="../../assets/icons.svg?v=20261018b#pencil"/></svg>剛做完一個功能，接著幫它寫說明文件</button>
+        <button class="pick" data-c="2"><svg><use href="../../assets/icons.svg?v=20261018b#shield"/></svg>照規格檔驗證剛寫好的東西有沒有漏</button>
+        <button class="pick" data-c="3"><svg><use href="../../assets/icons.svg?v=20261018b#folder"/></svg>做完網站改版，接著要整理 Obsidian 筆記</button>
+      </div>
+      <div class="answer"></div>
+    </div>
+    <div class="ask-hint">看不懂就回來說 <code>岔路 4</code></div>
+  </section>
+
+  <h2>原文</h2>
+  <ul class="srcs">
+    <li><a href="https://claude.com/resources/articles/using-claude-code-session-management-and-1m-context" target="_blank" rel="noopener">Using Claude Code: session management and 1M context</a></li>
+    <li><a href="https://claude.com/resources/articles/maximizing-the-value-of-your-claude-code-sessions" target="_blank" rel="noopener">Maximizing the value of your Claude Code sessions</a></li>
+    <li><a href="https://code.claude.com/docs/en/best-practices" target="_blank" rel="noopener">Claude Code best practices（官方文件）</a></li>
+  </ul>
+
+  <div class="foot"><svg><use href="../../assets/icons.svg?v=20261018b#chat"/></svg><span>學完了，回研究夥伴說「學完岔路」。一起回顧、寫成筆記之後，這張卡才會蓋上「學完」章。</span></div>
+</main>
+
+<script src="../../assets/iso.js?v=20261018b"></script>
+<script src="../../assets/kit.js?v=20261018b"></script>
+<script>
+(() => {
+const C = { sys: ['var(--dusk)', '設定'], file: ['var(--slate)', '讀過的檔案'], fail: ['var(--stamp)', '失敗的嘗試'], talk: ['var(--clay)', '對話'], sum: ['var(--stone)', '摘要'], note: ['var(--ochre)', '你的交接'], rep: ['var(--sage)', '分身的報告'], tool: ['var(--teal)', '大量輸出'] };
+const bar = (el, parts) => { el.innerHTML = parts.map(([k, n, ghost]) => `<div class="seg${ghost ? ' ghost' : ''}" style="--c:${C[k][0]};flex:${n}">${n >= 5 ? C[k][1] : ''}</div>`).join(''); };
+const START = [['sys', 6], ['file', 10], ['fail', 8], ['talk', 6]];
+const ROAD = {
+  go: [[...START, ['talk', 3], ['fail', 6]], '<b>繼續</b>：適合同一件事還在進行、前面的內容都還有用。但這次失敗的嘗試也一起往下帶，又多試一次。'],
+  rewind: [[['sys', 6], ['file', 10], ['fail', 8, 1], ['talk', 2]], '<b>回溯</b>：回到讀完檔案那一刻，失敗的嘗試整段消失（虛線），檔案還在，不用重讀。走錯路時最乾淨。'],
+  compact: [[['sys', 6], ['sum', 6], ['talk', 2]], '<b>壓縮</b>：整段濃縮成摘要。可以加提示，例如「/compact 保留認證的重構，丟掉測試除錯的過程」。'],
+  clear: [[['sys', 6], ['note', 4]], '<b>清空</b>：只剩設定和你自己寫的交接（目標、限制、關鍵檔案、已排除的做法）。比較費工，但 context 最精準。換新工作時用。'],
+  sub: [[...START, ['rep', 3]], '<b>分身</b>：繁重的搜尋在分身自己的 context 裡做（下方虛線框），主對話只收到一份短報告。']
+};
+const used = new Set(); Object.values(ROAD).forEach(([p]) => p.forEach(([k]) => used.add(k))); START.forEach(([k]) => used.add(k));
+document.getElementById('legend').innerHTML = [...used].map((k) => `<span><i style="--c:${C[k][0]}"></i>${C[k][1]}</span>`).join('');
+bar(document.getElementById('now'), START);
+bar(document.getElementById('after'), START);
+const side = document.getElementById('side');
+document.querySelectorAll('#road .btn').forEach((b) => b.addEventListener('click', () => {
+  document.querySelectorAll('#road .btn').forEach((x) => x.classList.toggle('on', x === b));
+  const [parts, msg] = ROAD[b.dataset.k];
+  bar(document.getElementById('after'), parts);
+  side.classList.toggle('show', b.dataset.k === 'sub');
+  if (b.dataset.k === 'sub') bar(document.getElementById('sub'), [['sys', 6], ['tool', 30], ['rep', 3]]);
+  document.getElementById('out').innerHTML = msg;
+}));
+
+Kit.tabs(document.getElementById('s2'), (k) => {
+  const patch = k === 'patch';
+  bar(document.getElementById('fixBar'), patch ? [['sys', 6], ['file', 10], ['fail', 8], ['talk', 3], ['talk', 4]] : [['sys', 6], ['file', 10], ['fail', 8, 1], ['talk', 3]]);
+  document.getElementById('fixOut').innerHTML = patch
+    ? '失敗的嘗試（紅色）<b>永遠留著</b>：之後每一輪都重讀它，Claude 也可能被它影響。'
+    : '失敗的嘗試<b>不見了</b>，讀過的檔案還在。你的新指示直接接在乾淨的起點後面。';
+}, 'patch');
+
+const dots = document.getElementById('dots'), N = 100, SIG = [7, 31, 58, 83];
+dots.innerHTML = Array.from({ length: N }, () => '<i></i>').join('');
+function rot() {
+  const v = +document.getElementById('rot').value;
+  document.getElementById('rotTxt').textContent = v + '%';
+  const filled = Math.round(v), sigShown = SIG.filter((s) => s < filled);
+  [...dots.children].forEach((d, i) => {
+    d.className = i >= filled ? '' : SIG.includes(i) ? 'sig' : '';
+    d.style.background = i >= filled ? 'transparent' : '';
+    d.style.outline = i >= filled ? '1px dashed #d6d2c6' : '';
+    if (SIG.includes(i) && i < filled) d.classList.toggle('dim', v > 60);
+  });
+  const ratio = filled ? Math.round((sigShown.length / filled) * 1000) / 10 : 0;
+  document.getElementById('rotOut').innerHTML = v <= 40
+    ? `重要資訊占 <b>${ratio}%</b>，很好找。這時候繼續工作最順。`
+    : v <= 75
+      ? `重要資訊只占 <b>${ratio}%</b>，被越來越多舊內容包圍。告一段落就該考慮壓縮或清空。`
+      : `重要資訊只占 <b>${ratio}%</b>，而且開始模糊（變淡）。這就是 context rot，也是自動壓縮最容易摘錯的時候。`;
+}
+document.getElementById('rot').addEventListener('input', rot); rot();
+
+Kit.picks(document.getElementById('pick4'), [
+  ['agents', '交給分身', '搜尋會讀一大堆檔案，你要的只是「在哪些地方」這個結論。過程留在分身那邊就好。'],
+  ['play', '繼續', '寫文件需要剛剛實作的細節，留在同一個 session，Claude 不用重讀一次檔案，又快又省。'],
+  ['agents', '交給分身', '驗證需要乾淨的眼光，分身沒看過你們的討論，比較不會「自己改的自己說好」。只要它回報哪裡有問題。'],
+  ['eraser', '清空', '兩件事完全無關，網站的內容留著只會干擾筆記整理。可以先 /rename 取名，之後想回來再 /resume。']
+]);
+})();
+</script>
+<script src="../../assets/lesson.js" data-root="../../"></script>
+</body>
+</html>

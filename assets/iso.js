@@ -1,5 +1,6 @@
 // 單元頁共用的等角立體繪圖工具（規範見 DESIGN.md）
 window.Iso = (() => {
+  const Q = document.currentScript ? new URL(document.currentScript.src).search : '';
   const NS = 'http://www.w3.org/2000/svg';
   const mk = (t, a = {}, txt) => {
     const n = document.createElementNS(NS, t);
@@ -35,7 +36,7 @@ window.Iso = (() => {
   }
   function icon(id, x, y, size, cls) {
     const s = mk('svg', { x, y, width: size, height: size, class: cls || '' });
-    s.append(mk('use', { href: '../../assets/icons.svg#' + id }));
+    s.append(mk('use', { href: '../../assets/icons.svg' + Q + '#' + id }));
     return s;
   }
   return { mk, color, shade, block, outline, icon };

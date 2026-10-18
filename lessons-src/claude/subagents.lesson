@@ -1,0 +1,154 @@
+{"id":"subagents","short":"分身","title":"派分身去做，只帶結論回來","desc":"subagent 有自己的 context；什麼時候該派、怎麼自訂，以及用 workflow 一次指揮很多個。","topic":"agents","topicTitle":"Subagent 與角色","sources":[["How and when to use subagents in Claude Code","https://claude.com/resources/articles/subagents-in-claude-code"],["A harness for every task: dynamic workflows in Claude Code","https://claude.dev/blog/a-harness-for-every-task-dynamic-workflows-in-claude-code/"]]}
+===CSS===
+.desk { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.desk > div { background: #f6f4ee; border-radius: 12px; padding: 10px; }
+.desk h5 { margin: 0 0 6px; font: 500 12px var(--font); color: var(--ink-2); display: flex; gap: 5px; align-items: center; }
+.desk h5 svg { width: 15px; height: 15px; }
+.pile { display: flex; flex-direction: column-reverse; gap: 3px; min-height: 150px; justify-content: flex-start; }
+.pile i { display: block; height: 14px; border-radius: 3px 7px 7px 7px; background: var(--c); animation: drop .35s var(--ease) both; }
+.pile i.rep { height: 20px; display: flex; align-items: center; justify-content: center; font: 600 11px var(--font); color: #fff; font-style: normal; }
+.toggles { display: grid; gap: 6px; margin-top: 10px; }
+.tg { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 8px 12px; border: 0; border-radius: 12px; background: #f6f4ee; font-size: 13.5px; text-align: left; cursor: pointer; }
+.tg .sw { width: 34px; height: 20px; border-radius: 10px; background: #dcd8cc; position: relative; flex: none; transition: background .25s; }
+.tg .sw::after { content: ""; position: absolute; top: 3px; left: 3px; width: 14px; height: 14px; border-radius: 50%; background: #fff; transition: transform .25s var(--ease); }
+.tg.on .sw { background: var(--clay); }
+.tg.on .sw::after { transform: translateX(14px); }
+.verdict { display: flex; align-items: center; gap: 10px; margin-top: 10px; padding: 12px; border-radius: 12px; font-size: 14px; }
+.verdict svg { width: 24px; height: 24px; flex: none; }
+.verdict.yes { background: #e3ede7; color: #2f5d47; }
+.verdict.no { background: #f6dcd8; color: #8a2f25; }
+.verdict.meh { background: #f2e7c6; color: #6b5310; }
+.toolchips { display: flex; flex-wrap: wrap; gap: 6px; }
+.tc { min-height: 40px; padding: 0 12px; border-radius: 99px; border: 1.5px solid var(--rule); background: #fff; font: 500 13px ui-monospace, "SF Mono", Menlo, monospace; cursor: pointer; }
+.tc.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+.pat { display: block; width: 100%; height: auto; }
+===BODY===
+  <h1>派分身去做，只帶結論回來</h1>
+  <p class="lead">Subagent（分身）是另一個 Claude，有<b>自己獨立的 context</b>。它在自己的桌上翻遍資料，做完只把一份報告交給你的主對話。</p>
+
+  <section id="s1">
+    <h2><span class="no">1</span>分身有自己的桌子</h2>
+    <p>按「派出分身」，看兩張桌子各堆了什麼。</p>
+    <div class="fig">
+      <div class="desk">
+        <div><h5>{{icon chat}}主對話</h5><div class="pile" id="main"></div></div>
+        <div><h5>{{icon agents}}分身</h5><div class="pile" id="sub"></div></div>
+      </div>
+      <div class="ctl"><button class="btn pri" id="send">{{icon agents}}派出分身</button><button class="btn" id="self">{{icon file}}自己讀</button></div>
+      <div class="read" id="out1">先比較看看：同一份工作，派分身做和自己讀，主對話各剩下什麼。</div>
+    </div>
+    <p>要記得：分身<b>從零開始</b>，不知道你們剛才聊過什麼，也不會沿用主對話已經打開的 skill。所以派它出去時，要把範圍、要做什麼、報告要長什麼樣子講清楚；需要「沒被先前討論影響」的眼光時，也可以直接說明。</p>
+    {{hint 1}}
+  </section>
+
+  <section id="s2">
+    <h2><span class="no">2</span>什麼時候該派</h2>
+    <p>經驗法則：<b>要翻 10 個以上的檔案，或有 3 件以上互不相關的工作</b>，就考慮派分身。打開符合你情況的開關：</p>
+    <div class="fig">
+      <div class="toggles" id="tgs">
+        <button class="tg" data-k="many">{{icon lens}}要翻十幾個檔案才能搞懂現況<span class="sw" style="margin-left:auto"></span></button>
+        <button class="tg" data-k="indep">{{icon branch}}有好幾件互不相關的事可以同時做<span class="sw" style="margin-left:auto"></span></button>
+        <button class="tg" data-k="fresh">{{icon eye}}需要沒被我們討論影響的審查<span class="sw" style="margin-left:auto"></span></button>
+        <button class="tg" data-k="seq">{{icon workflow}}下一步要用到上一步的完整結果<span class="sw" style="margin-left:auto"></span></button>
+        <button class="tg" data-k="same">{{icon file}}大家都要改同一個檔案<span class="sw" style="margin-left:auto"></span></button>
+        <button class="tg" data-k="tiny">{{icon feather}}其實是很小的事<span class="sw" style="margin-left:auto"></span></button>
+      </div>
+      <div class="verdict meh" id="verdict"></div>
+    </div>
+    {{hint 2}}
+  </section>
+
+  <section id="s3">
+    <h2><span class="no">3</span>自訂分身：給它多少權限</h2>
+    <p>自訂分身是一個 markdown 檔，放在 <code>.claude/agents/</code>（這個專案用）或 <code>~/.claude/agents/</code>（所有專案都能用），可以用 <code>/agents</code> 互動建立。裡面寫它的提示、<b>能用哪些工具</b>、要用哪個模型。點選工具，看這個分身能做什麼：</p>
+    <div class="fig">
+      <div class="toolchips" id="tcs"></div>
+      <div class="read" id="out3"></div>
+    </div>
+    <p>兩個要點：<b>description 寫「什麼時候該派它」</b>，Claude 會照這個自動委派；專門的分身也不要開太多，太多反而會讓自動委派變得不準。會吐出大量輸出的雜事，可以指定 <code>model: haiku</code>，不必用主對話的大模型。</p>
+    {{hint 3}}
+  </section>
+
+  <section id="s4">
+    <h2><span class="no">4</span>一次指揮很多個：workflow</h2>
+    <p>任務很大時，Claude Code 可以當場寫一個 <b>workflow</b>（工作流程腳本），一次派出、串起很多個分身。說「用 workflow 做」，或用觸發詞 <code>ultracode</code> 就會開始。幾種常見的編排方式：</p>
+    <div class="fig">
+      <div class="ctl" id="pats">
+        <button class="btn" data-k="fan">分頭找再匯整</button>
+        <button class="btn" data-k="adv">做完找人挑錯</button>
+        <button class="btn" data-k="pipe">流水線</button>
+        <button class="btn" data-k="tour">淘汰賽</button>
+      </div>
+      <svg class="pat" id="pat" viewBox="0 0 340 170" role="img" aria-label="workflow 的編排方式"></svg>
+      <div class="read" id="out4"></div>
+    </div>
+    <p>代價是 token 用得很兇：每個分身都在花額度。小型的日常工作用一般對話就好，大規模搬遷、深度研究、大量排序這種，才值得拿出 workflow。</p>
+    {{hint 4}}
+  </section>
+===JS===
+const { mk, color } = Iso;
+const pile = (el, items) => { el.innerHTML = items.map(([c, rep], i) => rep ? `<i class="rep" style="--c:${c};animation-delay:${i * 30}ms">${rep}</i>` : `<i style="--c:${c};animation-delay:${i * 30}ms"></i>`).join(''); };
+const BASE = [['var(--dusk)'], ['var(--clay)'], ['var(--clay)']];
+pile(document.getElementById('main'), BASE); pile(document.getElementById('sub'), []);
+document.getElementById('send').addEventListener('click', () => {
+  pile(document.getElementById('sub'), [['var(--dusk)'], ...Array.from({ length: 8 }, () => ['var(--teal)'])]);
+  setTimeout(() => pile(document.getElementById('main'), [...BASE, ['var(--sage)', '報告']]), 500);
+  document.getElementById('out1').innerHTML = '分身那邊堆了一大疊（讀過的檔案、搜尋結果），<b>主對話只多了一份報告</b>。分身做完，它的桌子就收掉了。';
+});
+document.getElementById('self').addEventListener('click', () => {
+  pile(document.getElementById('sub'), []);
+  pile(document.getElementById('main'), [...BASE, ...Array.from({ length: 8 }, () => ['var(--teal)'])]);
+  document.getElementById('out1').innerHTML = '自己讀：所有搜尋過程都堆在<b>主對話</b>裡，之後每一輪都要跟著重讀。如果你之後只需要結論，這就是浪費。';
+});
+
+const on = {};
+const tgs = document.getElementById('tgs'), verdict = document.getElementById('verdict');
+function judge() {
+  const good = ['many', 'indep', 'fresh'].filter((k) => on[k]).length, bad = ['seq', 'same', 'tiny'].filter((k) => on[k]);
+  let cls = 'meh', ic = 'info', t = '打開符合你情況的開關。';
+  if (bad.length) {
+    cls = 'no'; ic = 'cross';
+    t = { seq: '步驟互相依賴時，一個對話從頭做到尾比較單純。', same: '同時改同一個檔案很容易互相衝突。', tiny: '小事委派出去，交代和接收的成本比事情本身還高。' }[bad[0]] + (good ? '即使有適合派分身的理由，這點也要先解決。' : '這次不建議派分身。');
+  } else if (good) { cls = 'yes'; ic = 'check'; t = good >= 2 ? '很適合派分身，而且可以同時派好幾個。' : '適合派分身。'; }
+  verdict.className = 'verdict ' + cls; verdict.innerHTML = Kit.icon(ic) + `<span>${t}</span>`;
+}
+tgs.querySelectorAll('.tg').forEach((b) => b.addEventListener('click', () => { on[b.dataset.k] = !on[b.dataset.k]; b.classList.toggle('on', on[b.dataset.k]); judge(); }));
+judge();
+
+const TOOLS = ['Read', 'Grep', 'Glob', 'Edit', 'Write', 'Bash', 'WebSearch'];
+const sel = new Set(['Read', 'Grep', 'Glob']);
+const tcs = document.getElementById('tcs');
+function drawTools() {
+  tcs.innerHTML = TOOLS.map((t) => `<button class="tc${sel.has(t) ? ' on' : ''}" data-t="${t}">${t}</button>`).join('');
+  tcs.querySelectorAll('.tc').forEach((b) => b.addEventListener('click', () => { const t = b.dataset.t; sel.has(t) ? sel.delete(t) : sel.add(t); drawTools(); }));
+  const can = [], cannot = [];
+  (sel.has('Read') || sel.has('Grep') || sel.has('Glob') ? can : cannot).push('讀檔、搜尋');
+  (sel.has('Edit') || sel.has('Write') ? can : cannot).push('修改或新增檔案');
+  (sel.has('Bash') ? can : cannot).push('執行指令');
+  (sel.has('WebSearch') ? can : cannot).push('上網查資料');
+  const ro = !sel.has('Edit') && !sel.has('Write') && !sel.has('Bash');
+  document.getElementById('out3').innerHTML = `能：<b>${can.join('、') || '幾乎什麼都不能'}</b><br>不能：${cannot.join('、') || '（全開）'}` + (ro ? '<br>這是<b>唯讀審查員</b>的標準配置：只看不改，不會不小心動到你的程式。' : '');
+}
+drawTools();
+
+const PAT = {
+  fan: ['分頭找再匯整：同一個問題切成好幾塊，每個分身查一塊，最後一個分身把結果整理成一份。適合深度研究。', [[40, 85, '問題', 'slate'], [160, 30, '分身', 'teal'], [160, 85, '分身', 'teal'], [160, 140, '分身', 'teal'], [290, 85, '匯整', 'sage']], [[0, 1], [0, 2], [0, 3], [1, 4], [2, 4], [3, 4]]],
+  adv: ['做完找人挑錯：每個分身做完，另派一個分身照標準專門挑錯，過了才算數。適合查核事實、檢查修正有沒有漏。', [[50, 50, '做事', 'teal'], [50, 120, '做事', 'teal'], [190, 50, '挑錯', 'stamp'], [190, 120, '挑錯', 'stamp'], [300, 85, '合併', 'sage']], [[0, 2], [1, 3], [2, 4], [3, 4]]],
+  pipe: ['流水線：設計、實作、測試，一關一關交棒，每一關都是全新的 context，不會被前面的過程拖累。', [[40, 85, '設計', 'slate'], [130, 85, '實作', 'teal'], [220, 85, '測試', 'ochre'], [305, 85, '完成', 'sage']], [[0, 1], [1, 2], [2, 3]]],
+  tour: ['淘汰賽：要從一大堆選項裡排出好壞，每一場兩兩比較都派一個新分身當裁判，一個 context 不用裝下全部。比打分數更可靠。', [[40, 30, 'A', 'teal'], [40, 70, 'B', 'teal'], [40, 110, 'C', 'teal'], [40, 150, 'D', 'teal'], [160, 50, '裁判', 'ochre'], [160, 130, '裁判', 'ochre'], [285, 90, '冠軍', 'clay']], [[0, 4], [1, 4], [2, 5], [3, 5], [4, 6], [5, 6]]]
+};
+Kit.tabs(document.getElementById('s4'), (k) => {
+  const [txt, nodes, edges] = PAT[k], svg = document.getElementById('pat');
+  svg.replaceChildren();
+  edges.forEach(([a, b], i) => {
+    const [x1, y1] = nodes[a], [x2, y2] = nodes[b];
+    const p = mk('path', { d: `M${x1 + 26} ${y1} C${(x1 + x2) / 2} ${y1} ${(x1 + x2) / 2} ${y2} ${x2 - 26} ${y2}`, stroke: '#cfcabd', 'stroke-width': 2, fill: 'none', 'stroke-dasharray': 300, 'stroke-dashoffset': 300 });
+    p.style.transition = 'stroke-dashoffset .7s cubic-bezier(.16,1,.3,1)'; p.style.transitionDelay = (i * 70) + 'ms';
+    svg.append(p); requestAnimationFrame(() => requestAnimationFrame(() => p.setAttribute('stroke-dashoffset', 0)));
+  });
+  nodes.forEach(([x, y, t, c]) => {
+    svg.append(mk('rect', { x: x - 26, y: y - 15, width: 52, height: 30, rx: 9, fill: color(c) }));
+    svg.append(mk('text', { x, y: y + 4.5, 'text-anchor': 'middle', class: 'lbl', fill: '#fff', 'font-weight': 600 }, t));
+  });
+  document.getElementById('out4').innerHTML = txt;
+}, 'fan');

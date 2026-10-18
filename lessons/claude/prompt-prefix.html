@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>快取只認開頭</title>
+<meta name="description" content="快取從頭逐字比對，前面一動，後面全部重算。開工前先定好模型與 effort。">
+<meta name="theme-color" content="#f1f0eb">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="icon" href="../../icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css?v=20261018b">
+<style>
+.chain { display: flex; flex-wrap: wrap; gap: 4px; margin: 4px 0 2px; }
+.blk { display: inline-flex; align-items: center; gap: 4px; height: 34px; padding: 0 9px; border-radius: 4px 9px 9px 9px; font-size: 12px; color: #fff; background: var(--sage); animation: drop .4s var(--ease) both; }
+.blk.miss { background: var(--stamp); }
+.blk.new { background: var(--ochre); }
+.blk svg { width: 14px; height: 14px; }
+.cost { display: flex; align-items: baseline; gap: 8px; margin-top: 8px; font-size: 13px; color: var(--ink-2); }
+.cost b { font: 22px var(--hand); color: var(--ink); }
+.phase { display: grid; gap: 8px; margin-top: 10px; }
+.tip { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; background: #f6f4ee; border-radius: 12px; font-size: 13.5px; line-height: 1.6; animation: drop .4s var(--ease) both; }
+.tip svg { width: 20px; height: 20px; flex: none; color: var(--clay); margin-top: 1px; }
+.tip code { font-size: 12px; }
+.ratio { display: grid; gap: 10px; }
+.ratio-row { display: grid; grid-template-columns: 76px 1fr 44px; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-2); }
+.ratio-row .track { height: 16px; background: #f3f1ea; border-radius: 8px; overflow: hidden; }
+.ratio-row .fill { height: 100%; border-radius: 8px; background: var(--c); transform-origin: left; animation: grow .7s var(--ease) both; }
+.ratio-row em { font-style: normal; text-align: right; font-weight: 500; color: var(--ink); }
+@keyframes grow { from { transform: scaleX(0); } }
+</style>
+</head>
+<body class="lesson">
+<header class="bar"><div class="bar-in">
+  <a class="back" href="../../index.html#/t/claude/context" aria-label="回到主題"><svg class="i"><use href="../../assets/icons.svg?v=20261018b#back"/></svg></a>
+  <span class="bar-title">context 與額度</span>
+</div></header>
+
+<main class="wrap">
+<h1>快取只認開頭</h1>
+  <p class="lead">上一課「帳單」說過，重讀的部分如果還在快取裡，價格只要一折。但快取有個脾氣：它<b>只從開頭逐字比對</b>。前面任何一處改了，後面全部當成新的，重算一次。</p>
+
+  <section id="s1">
+    <h2><span class="no">1</span>動到哪裡，後面就全部重算</h2>
+    <p>每次送出的內容是照順序排的：最穩定的放前面，最常變的放後面。點下面的動作，看哪些部分還能用快取（綠色）、哪些要重算（紅色）。</p>
+    <div class="fig">
+      <div class="chain" id="chain"></div>
+      <div class="ctl" id="acts">
+        <button class="btn" data-k="msg"><svg><use href="../../assets/icons.svg?v=20261018b#chat"/></svg>多問一句</button>
+        <button class="btn" data-k="claude"><svg><use href="../../assets/icons.svg?v=20261018b#memory"/></svg>CLAUDE.md 變了</button>
+        <button class="btn" data-k="tool"><svg><use href="../../assets/icons.svg?v=20261018b#mcp"/></svg>中途開關工具</button>
+        <button class="btn" data-k="model"><svg><use href="../../assets/icons.svg?v=20261018b#dial"/></svg>中途換模型</button>
+      </div>
+      <div class="cost" id="cost"></div>
+      <div class="read" id="out1"></div>
+    </div>
+    <p>這也是 Claude Code 自己的設計原則：時間、檔案變動這類常變的資訊，它不改開頭的系統提示，而是夾在下一則訊息裡送出；MCP 工具平常只放名稱，不在中途增減，就是為了不打破前綴。</p>
+    <div class="ask-hint">看不懂就回來說 <code>前綴 1</code></div>
+  </section>
+
+  <section id="s2">
+    <h2><span class="no">2</span>照時機做對的事</h2>
+    <p>知道快取只認開頭，習慣就很清楚了。點一個時機，看這時候該做什麼。</p>
+    <div class="fig">
+      <div class="ctl" id="phases">
+        <button class="btn" data-k="start"><svg><use href="../../assets/icons.svg?v=20261018b#flag"/></svg>開工前</button>
+        <button class="btn" data-k="during"><svg><use href="../../assets/icons.svg?v=20261018b#play"/></svg>進行中</button>
+        <button class="btn" data-k="leave"><svg><use href="../../assets/icons.svg?v=20261018b#clock"/></svg>要離開</button>
+        <button class="btn" data-k="back"><svg><use href="../../assets/icons.svg?v=20261018b#rewind"/></svg>回來時</button>
+      </div>
+      <div class="phase" id="phase"></div>
+    </div>
+    <div class="ask-hint">看不懂就回來說 <code>前綴 2</code></div>
+  </section>
+
+  <section id="s3">
+    <h2><span class="no">3</span>價目的比例</h2>
+    <p>以「輸入一般內容」當作 1，其他幾種的相對價格是這樣：</p>
+    <div class="fig">
+      <div class="ratio" id="ratio"></div>
+      <div class="read">所以快取命中省很多；但<b>寫入快取</b>比一般輸入貴，打破前綴等於又付一次寫入的錢。快取壽命：訂閱方案約 1 小時，API 金鑰約 5 分鐘。恢復一個很久以前的 session 時，快取通常早就過期，整段對話會重新讀一次。</div>
+    </div>
+    <div class="ask-hint">看不懂就回來說 <code>前綴 3</code></div>
+  </section>
+
+  <h2>原文</h2>
+  <ul class="srcs">
+    <li><a href="https://claude.dev/blog/lessons-from-building-claude-code-prompt-caching-is-everything/" target="_blank" rel="noopener">Lessons from building Claude Code: Prompt caching is everything</a></li>
+    <li><a href="https://claude.com/resources/articles/maximizing-the-value-of-your-claude-code-sessions" target="_blank" rel="noopener">Maximizing the value of your Claude Code sessions</a></li>
+  </ul>
+
+  <div class="foot"><svg><use href="../../assets/icons.svg?v=20261018b#chat"/></svg><span>學完了，回研究夥伴說「學完前綴」。一起回顧、寫成筆記之後，這張卡才會蓋上「學完」章。</span></div>
+</main>
+
+<script src="../../assets/iso.js?v=20261018b"></script>
+<script src="../../assets/kit.js?v=20261018b"></script>
+<script>
+(() => {
+const BASE = [['info', '系統提示'], ['mcp', '工具'], ['memory', 'CLAUDE.md'], ['chat', '對話 1'], ['chat', '對話 2'], ['chat', '對話 3']];
+const ACT = {
+  msg: [-1, '<b>多問一句</b>：只有最後的新訊息要算全價（黃色），前面全部命中快取。這是最理想的情況。'],
+  claude: [2, '<b>CLAUDE.md 變了</b>：它排在對話前面，只要送出的內容跟上次不同，從它開始到最後全部重算。所以日期、待辦這類常變的資訊不要寫進 CLAUDE.md。'],
+  tool: [1, '<b>中途開關工具</b>（例如在 /mcp 開關某個伺服器）：工具清單在很前面，後面整串對話都要重算。'],
+  model: [0, '<b>中途換模型</b>：快取是跟著模型走的，effort 和 fast mode 也算在內。中途換任何一個，整段對話都要從頭讀一次，所以中途切換時 Claude Code 會先問你確定嗎。真的需要別的模型做某件事，交給 subagent。']
+};
+function draw(k) {
+  const [from, msg] = k ? ACT[k] : [-1, '點一個動作看看。'];
+  const blocks = [...BASE, ['chat', '新問題']];
+  document.getElementById('chain').innerHTML = blocks.map(([ic, t], i) => {
+    const cls = i === blocks.length - 1 ? 'new' : (from >= 0 && i >= from ? 'miss' : '');
+    return `<span class="blk ${cls}" style="animation-delay:${i * 40}ms">${Kit.icon(ic)}${t}</span>`;
+  }).join('');
+  const full = blocks.length, miss = from >= 0 ? full - from : 1, hit = full - miss;
+  const cost = (hit * 0.1 + miss * (from >= 0 ? 1.25 : 1)).toFixed(1);
+  document.getElementById('cost').innerHTML = `這次大約要付 <b>${cost}</b> 格（全部原價是 ${full} 格，示意）`;
+  document.getElementById('out1').innerHTML = msg;
+}
+document.querySelectorAll('#acts .btn').forEach((b) => b.addEventListener('click', () => {
+  document.querySelectorAll('#acts .btn').forEach((x) => x.classList.toggle('on', x === b)); draw(b.dataset.k);
+}));
+draw();
+
+const PH = {
+  start: [['dial', '先用 <code>/model</code> 和 <code>/effort</code> 決定好，之後不要中途換。'], ['lens', '新 session 先跑一次 <code>/context</code>，看看 CLAUDE.md、MCP 工具一開場就佔了多少。'], ['mcp', '用 <code>/mcp</code> 關掉這次用不到的伺服器。']],
+  during: [['file', '用 <code>@檔名</code> 指名檔案，直接附在訊息裡，省下 Claude 自己去找、去讀。同一個檔案在同一段對話只要 <code>@</code> 一次。'], ['context', '會吐出一大堆文字的指令，加上安靜模式的參數，或交給 subagent 跑。'], ['code', '常用指令和它的安靜參數，寫進 CLAUDE.md，Claude 就不會每次都用很吵的版本。']],
+  leave: [['compress', '要離開一陣子，先 <code>/compact</code>：趁快取還在的時候做摘要最便宜。'], ['pencil', '之後想回來的 session，先 <code>/rename</code> 取個名字。']],
+  back: [['rewind', '回到很久以前的 session，快取多半已過期，整段會重讀一次。內容很長的話，從摘要接續或開新 session 比較划算。'], ['dial', '想換模型或 effort，現在是好時機：在新 session 或 <code>/clear</code> 之後再換。']]
+};
+Kit.tabs(document.getElementById('s2'), (k) => {
+  document.getElementById('phase').innerHTML = PH[k].map(([ic, t], i) => `<div class="tip" style="animation-delay:${i * 60}ms">${Kit.icon(ic)}<span>${t}</span></div>`).join('');
+}, 'start');
+
+const R = [['讀快取', 0.1, 'var(--sage)'], ['一般輸入', 1, 'var(--slate)'], ['寫入快取', 2, 'var(--ochre)'], ['輸出', 5, 'var(--clay)']];
+document.getElementById('ratio').innerHTML = R.map(([t, v, c], i) => `<div class="ratio-row"><span>${t}</span><div class="track"><div class="fill" style="--c:${c};width:${Math.max(v / 5 * 100, 3)}%;animation-delay:${i * 90}ms"></div></div><em>${v}×</em></div>`).join('') + '<div class="cap" style="font-size:11.5px;color:var(--ink-3)">寫入快取最多約 2 倍（依快取壽命而定）；數字取自原文的大約比例。</div>';
+})();
+</script>
+<script src="../../assets/lesson.js" data-root="../../"></script>
+</body>
+</html>

@@ -32,6 +32,52 @@
        "url": "https://code.claude.com/docs/en/memory"
       }
      ]
+    },
+    {
+     "id": "session-fork",
+     "short": "岔路",
+     "title": "每一輪都是岔路口",
+     "summary": "繼續、回溯、壓縮、清空、交給分身：每一輪結束後怎麼選，決定了 context 乾不乾淨。",
+     "file": "lessons/claude/session-fork.html",
+     "status": "ready",
+     "added": "2026-10-18",
+     "learnedAt": null,
+     "note": null,
+     "sources": [
+      {
+       "title": "Using Claude Code: session management and 1M context",
+       "url": "https://claude.com/resources/articles/using-claude-code-session-management-and-1m-context"
+      },
+      {
+       "title": "Maximizing the value of your Claude Code sessions",
+       "url": "https://claude.com/resources/articles/maximizing-the-value-of-your-claude-code-sessions"
+      },
+      {
+       "title": "Claude Code best practices（官方文件）",
+       "url": "https://code.claude.com/docs/en/best-practices"
+      }
+     ]
+    },
+    {
+     "id": "prompt-prefix",
+     "short": "前綴",
+     "title": "快取只認開頭",
+     "summary": "快取從頭逐字比對，前面一動，後面全部重算。開工前先定好模型與 effort。",
+     "file": "lessons/claude/prompt-prefix.html",
+     "status": "ready",
+     "added": "2026-10-18",
+     "learnedAt": null,
+     "note": null,
+     "sources": [
+      {
+       "title": "Lessons from building Claude Code: Prompt caching is everything",
+       "url": "https://claude.dev/blog/lessons-from-building-claude-code-prompt-caching-is-everything/"
+      },
+      {
+       "title": "Maximizing the value of your Claude Code sessions",
+       "url": "https://claude.com/resources/articles/maximizing-the-value-of-your-claude-code-sessions"
+      }
+     ]
     }
    ]
   },
@@ -41,7 +87,33 @@
    "summary": "什麼工作配什麼模型、effort 怎麼調。",
    "icon": "gauge",
    "color": "teal",
-   "lessons": []
+   "lessons": [
+    {
+     "id": "model-effort",
+     "short": "旋鈕",
+     "title": "兩個旋鈕：模型與 effort",
+     "summary": "模型決定會什麼，effort 決定這次多用力。出錯時先診斷，再決定轉哪一個。",
+     "file": "lessons/claude/model-effort.html",
+     "status": "ready",
+     "added": "2026-10-18",
+     "learnedAt": null,
+     "note": null,
+     "sources": [
+      {
+       "title": "Claude Code effort level and model selection",
+       "url": "https://claude.com/resources/articles/claude-model-and-effort-level-in-claude-code"
+      },
+      {
+       "title": "Claude models explained: choosing the best model for your use case",
+       "url": "https://claude.com/resources/articles/claude-models-explained-choosing-the-best-model-for-your-use-case"
+      },
+      {
+       "title": "Using Claude Code: Spending your effort",
+       "url": "https://claude.dev/blog/spending-your-effort/"
+      }
+     ]
+    }
+   ]
   },
   {
    "id": "memory",
@@ -49,7 +121,33 @@
    "summary": "哪些指示該常駐、哪些該按需載入。",
    "icon": "memory",
    "color": "slate",
-   "lessons": []
+   "lessons": [
+    {
+     "id": "steering",
+     "short": "指揮台",
+     "title": "指揮 Claude 的七種方式",
+     "summary": "CLAUDE.md、rules、skills、subagents、hooks……各自什麼時候進場、適合放什麼。",
+     "file": "lessons/claude/steering.html",
+     "status": "ready",
+     "added": "2026-10-18",
+     "learnedAt": null,
+     "note": null,
+     "sources": [
+      {
+       "title": "Steering Claude Code: when to use CLAUDE.md, skills, hooks, and subagents",
+       "url": "https://claude.com/resources/articles/steering-claude-code-skills-hooks-rules-subagents-and-more"
+      },
+      {
+       "title": "Using CLAUDE.MD files: Customizing Claude Code for your codebase",
+       "url": "https://claude.com/resources/articles/using-claude-md-files"
+      },
+      {
+       "title": "The new rules of context engineering for Claude 5 generation models",
+       "url": "https://claude.dev/blog/the-new-rules-of-context-engineering-for-claude-5-generation-models/"
+      }
+     ]
+    }
+   ]
   },
   {
    "id": "skills",
@@ -57,7 +155,37 @@
    "summary": "把做事方法包成按需載入的能力。",
    "icon": "skills",
    "color": "ochre",
-   "lessons": []
+   "lessons": [
+    {
+     "id": "skill-pack",
+     "short": "技能包",
+     "title": "Skill 是一個會自己打開的工具箱",
+     "summary": "三層載入、跟其他機制的分工、好 skill 的寫法，以及讓它自己驗證的迴圈。",
+     "file": "lessons/claude/skill-pack.html",
+     "status": "ready",
+     "added": "2026-10-18",
+     "learnedAt": null,
+     "note": null,
+     "sources": [
+      {
+       "title": "Skills explained: How Skills compares to prompts, Projects, MCP, and subagents",
+       "url": "https://claude.com/resources/articles/skills-explained"
+      },
+      {
+       "title": "Lessons from building Claude Code: How we use skills",
+       "url": "https://claude.dev/blog/lessons-from-building-claude-code-how-we-use-skills/"
+      },
+      {
+       "title": "A complete guide to building skills for Claude",
+       "url": "https://claude.com/resources/articles/complete-guide-to-building-skills-for-claude"
+      },
+      {
+       "title": "Building verification loops in Claude Code with skills",
+       "url": "https://claude.com/resources/articles/building-verification-loops-in-claude-code-with-skills"
+      }
+     ]
+    }
+   ]
   },
   {
    "id": "agents",
@@ -65,7 +193,29 @@
    "summary": "分工、隔離 context、讓不同角色各司其職。",
    "icon": "agents",
    "color": "clay",
-   "lessons": []
+   "lessons": [
+    {
+     "id": "subagents",
+     "short": "分身",
+     "title": "派分身去做，只帶結論回來",
+     "summary": "subagent 有自己的 context；什麼時候該派、怎麼自訂，以及用 workflow 一次指揮很多個。",
+     "file": "lessons/claude/subagents.html",
+     "status": "ready",
+     "added": "2026-10-18",
+     "learnedAt": null,
+     "note": null,
+     "sources": [
+      {
+       "title": "How and when to use subagents in Claude Code",
+       "url": "https://claude.com/resources/articles/subagents-in-claude-code"
+      },
+      {
+       "title": "A harness for every task: dynamic workflows in Claude Code",
+       "url": "https://claude.dev/blog/a-harness-for-every-task-dynamic-workflows-in-claude-code/"
+      }
+     ]
+    }
+   ]
   },
   {
    "id": "mcp",
@@ -81,7 +231,37 @@
    "summary": "在固定時機自動執行，不靠 Claude 記得。",
    "icon": "hooks",
    "color": "dusk",
-   "lessons": []
+   "lessons": [
+    {
+     "id": "hooks-loops",
+     "short": "開關",
+     "title": "不靠記得，靠開關",
+     "summary": "hooks 在固定時刻一定執行；mods 常駐在 session 裡；loops 讓 Claude 做到完成為止。",
+     "file": "lessons/claude/hooks-loops.html",
+     "status": "ready",
+     "added": "2026-10-18",
+     "learnedAt": null,
+     "note": null,
+     "sources": [
+      {
+       "title": "Claude Code power user customization: How to configure hooks",
+       "url": "https://claude.com/resources/articles/how-to-configure-hooks"
+      },
+      {
+       "title": "Getting started with Claude Code mods",
+       "url": "https://claude.dev/blog/getting-started-with-claude-code-mods/"
+      },
+      {
+       "title": "Customize Claude Code with mods in TypeScript",
+       "url": "https://claude.com/resources/articles/claude-code-mods"
+      },
+      {
+       "title": "Loop engineering: Getting started with loops",
+       "url": "https://claude.com/resources/articles/getting-started-with-loops"
+      }
+     ]
+    }
+   ]
   },
   {
    "id": "workflow",
@@ -89,7 +269,37 @@
    "summary": "規劃、驗證、雲端 session，讓開發少繞路。",
    "icon": "workflow",
    "color": "stone",
-   "lessons": []
+   "lessons": [
+    {
+     "id": "workflow",
+     "short": "工作流",
+     "title": "開發少繞路的四個習慣",
+     "summary": "先探索規劃再動手、讓 auto mode 把關、把工作丟到雲端、用 HTML 取代長篇 Markdown。",
+     "file": "lessons/claude/workflow.html",
+     "status": "ready",
+     "added": "2026-10-18",
+     "learnedAt": null,
+     "note": null,
+     "sources": [
+      {
+       "title": "Claude Code best practices（官方文件）",
+       "url": "https://code.claude.com/docs/en/best-practices"
+      },
+      {
+       "title": "Running auto mode in production",
+       "url": "https://claude.com/resources/articles/auto-mode-in-production"
+      },
+      {
+       "title": "Claude Code in the cloud: a field guide to cloud sessions",
+       "url": "https://claude.dev/blog/claude-code-in-the-cloud/"
+      },
+      {
+       "title": "Using Claude Code: The unreasonable effectiveness of HTML",
+       "url": "https://claude.dev/blog/using-claude-code-the-unreasonable-effectiveness-of-html/"
+      }
+     ]
+    }
+   ]
   },
   {
    "id": "artifacts",
@@ -97,7 +307,29 @@
    "summary": "官方新推出、值得跟上的功能。",
    "icon": "artifacts",
    "color": "sage",
-   "lessons": []
+   "lessons": [
+    {
+     "id": "artifact-pages",
+     "short": "成品頁",
+     "title": "把工作變成會更新的頁面",
+     "summary": "Claude Code 的 artifact、會自己更新的儀表板、用程式畫的動畫解說，以及各自要什麼方案。",
+     "file": "lessons/claude/artifact-pages.html",
+     "status": "ready",
+     "added": "2026-10-18",
+     "learnedAt": null,
+     "note": null,
+     "sources": [
+      {
+       "title": "Claude Code now supports artifacts",
+       "url": "https://claude.com/resources/articles/artifacts-in-claude-code"
+      },
+      {
+       "title": "Build live dashboards and animate explainers with Claude",
+       "url": "https://claude.com/resources/articles/dashboards-and-motion"
+      }
+     ]
+    }
+   ]
   }
  ]
 }
