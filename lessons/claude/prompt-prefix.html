@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../../assets/style.css?v=20261018b">
+<link rel="stylesheet" href="../../assets/style.css?v=20261025a">
 <style>
 .chain { display: flex; flex-wrap: wrap; gap: 4px; margin: 4px 0 2px; }
 .blk { display: inline-flex; align-items: center; gap: 4px; height: 34px; padding: 0 9px; border-radius: 4px 9px 9px 9px; font-size: 12px; color: #fff; background: var(--sage); animation: drop .4s var(--ease) both; }
@@ -35,7 +35,7 @@
 </head>
 <body class="lesson">
 <header class="bar"><div class="bar-in">
-  <a class="back" href="../../index.html#/t/claude/context" aria-label="回到主題"><svg class="i"><use href="../../assets/icons.svg?v=20261018b#back"/></svg></a>
+  <a class="back" href="../../index.html#/t/claude/context" aria-label="回到主題"><svg class="i"><use href="../../assets/icons.svg?v=20261025a#back"/></svg></a>
   <span class="bar-title">context 與額度</span>
 </div></header>
 
@@ -49,10 +49,10 @@
     <div class="fig">
       <div class="chain" id="chain"></div>
       <div class="ctl" id="acts">
-        <button class="btn" data-k="msg"><svg><use href="../../assets/icons.svg?v=20261018b#chat"/></svg>多問一句</button>
-        <button class="btn" data-k="claude"><svg><use href="../../assets/icons.svg?v=20261018b#memory"/></svg>CLAUDE.md 變了</button>
-        <button class="btn" data-k="tool"><svg><use href="../../assets/icons.svg?v=20261018b#mcp"/></svg>中途開關工具</button>
-        <button class="btn" data-k="model"><svg><use href="../../assets/icons.svg?v=20261018b#dial"/></svg>中途換模型</button>
+        <button class="btn" data-k="msg"><svg><use href="../../assets/icons.svg?v=20261025a#chat"/></svg>多問一句</button>
+        <button class="btn" data-k="claude"><svg><use href="../../assets/icons.svg?v=20261025a#memory"/></svg>CLAUDE.md 變了</button>
+        <button class="btn" data-k="tool"><svg><use href="../../assets/icons.svg?v=20261025a#mcp"/></svg>中途開關工具</button>
+        <button class="btn" data-k="model"><svg><use href="../../assets/icons.svg?v=20261025a#dial"/></svg>中途換模型</button>
       </div>
       <div class="cost" id="cost"></div>
       <div class="read" id="out1"></div>
@@ -66,10 +66,10 @@
     <p>知道快取只認開頭，習慣就很清楚了。點一個時機，看這時候該做什麼。</p>
     <div class="fig">
       <div class="ctl" id="phases">
-        <button class="btn" data-k="start"><svg><use href="../../assets/icons.svg?v=20261018b#flag"/></svg>開工前</button>
-        <button class="btn" data-k="during"><svg><use href="../../assets/icons.svg?v=20261018b#play"/></svg>進行中</button>
-        <button class="btn" data-k="leave"><svg><use href="../../assets/icons.svg?v=20261018b#clock"/></svg>要離開</button>
-        <button class="btn" data-k="back"><svg><use href="../../assets/icons.svg?v=20261018b#rewind"/></svg>回來時</button>
+        <button class="btn" data-k="start"><svg><use href="../../assets/icons.svg?v=20261025a#flag"/></svg>開工前</button>
+        <button class="btn" data-k="during"><svg><use href="../../assets/icons.svg?v=20261025a#play"/></svg>進行中</button>
+        <button class="btn" data-k="leave"><svg><use href="../../assets/icons.svg?v=20261025a#clock"/></svg>要離開</button>
+        <button class="btn" data-k="back"><svg><use href="../../assets/icons.svg?v=20261025a#rewind"/></svg>回來時</button>
       </div>
       <div class="phase" id="phase"></div>
     </div>
@@ -92,11 +92,11 @@
     <li><a href="https://claude.com/resources/articles/maximizing-the-value-of-your-claude-code-sessions" target="_blank" rel="noopener">Maximizing the value of your Claude Code sessions</a></li>
   </ul>
 
-  <div class="foot"><svg><use href="../../assets/icons.svg?v=20261018b#chat"/></svg><span>學完了，回研究夥伴說「學完前綴」。一起回顧、寫成筆記之後，這張卡才會蓋上「學完」章。</span></div>
+  <div class="foot"><svg><use href="../../assets/icons.svg?v=20261025a#chat"/></svg><span>學完了，回研究夥伴說「學完前綴」。一起回顧、寫成筆記之後，這張卡才會蓋上「學完」章。</span></div>
 </main>
 
-<script src="../../assets/iso.js?v=20261018b"></script>
-<script src="../../assets/kit.js?v=20261018b"></script>
+<script src="../../assets/iso.js?v=20261025a"></script>
+<script src="../../assets/kit.js?v=20261025a"></script>
 <script>
 (() => {
 const BASE = [['info', '系統提示'], ['mcp', '工具'], ['memory', 'CLAUDE.md'], ['chat', '對話 1'], ['chat', '對話 2'], ['chat', '對話 3']];

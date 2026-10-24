@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>把網站放上網的三條路</title>
+<meta name="description" content="共享主機、託管平台、自己的 VPS：每一層由誰管，決定你要顧多少事。">
+<meta name="theme-color" content="#f1f0eb">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="icon" href="../../icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css?v=20261025a">
+<style>
+#layers { max-width: 340px; margin: 4px auto 0; }
+.key { display: flex; gap: 14px; font-size: 12.5px; color: var(--ink-2); padding: 4px 4px 0; }
+.key i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; background: var(--c); margin-right: 5px; vertical-align: -1px; }
+.dns { display: grid; gap: 5px; margin-top: 8px; }
+.hop { display: grid; grid-template-columns: 30px 1fr auto; gap: 8px; align-items: center; padding: 7px 9px; border-radius: 10px; background: #f6f4ee; font-size: 13px; transition: background .3s, opacity .3s; }
+.hop .chip { width: 30px; height: 30px; border-radius: 9px; background: #e6e2d8; color: var(--ink-2); display: grid; place-items: center; transition: background .3s, color .3s; }
+.hop .chip svg { width: 17px; height: 17px; }
+.hop em { font-style: normal; font-size: 12px; color: var(--ink-3); }
+.hop.on { background: #eef2f6; }
+.hop.on .chip { background: var(--slate); color: #fff; }
+.hop.hit { background: #e7efe9; }
+.hop.hit .chip { background: var(--sage); color: #fff; }
+.hop.skip { opacity: .3; }
+.wire { display: grid; grid-template-columns: 54px 1fr 54px; align-items: center; gap: 6px; margin-top: 8px; }
+.end { text-align: center; font-size: 11.5px; color: var(--ink-2); }
+.end svg { width: 28px; height: 28px; display: block; margin: 0 auto 2px; color: var(--ink-2); }
+.pkt { position: relative; padding: 10px 8px; border-radius: 10px; background: #f6f4ee; font: 500 11.5px/1.6 ui-monospace, "SF Mono", Menlo, monospace; overflow-wrap: anywhere; text-align: center; animation: drop .45s var(--ease) both; }
+.pkt.enc { background: #e7efe9; color: var(--sage); }
+.spy { margin-top: 8px; display: flex; gap: 8px; align-items: flex-start; font-size: 13px; color: var(--ink-2); background: #f7ece6; border-radius: 10px; padding: 8px 10px; }
+.spy svg { width: 20px; height: 20px; flex: none; color: var(--clay); }
+.btn:disabled { opacity: .45; }
+</style>
+</head>
+<body class="lesson">
+<header class="bar"><div class="bar-in">
+  <a class="back" href="../../index.html#/t/ai-dev/deploy" aria-label="回到主題"><svg class="i"><use href="../../assets/icons.svg?v=20261025a#back"/></svg></a>
+  <span class="bar-title">上線與主機</span>
+</div></header>
+
+<main class="wrap">
+<h1>把網站放上網的三條路</h1>
+  <p class="lead">「上線」就是把程式放在一台 24 小時開著、連得到網路的機器上，再讓網域指到它。輪值網站走的是<b>共享主機</b>；另外兩條常見的路是<b>託管平台</b>和<b>自己租一台 VPS</b>。三條路的差別，在於每一層由誰負責。</p>
+
+  <section id="s1">
+    <h2><span class="no">1</span>一層一層，誰在管</h2>
+    <p>一個網站從底到頂大約有六層。切換三條路，看哪幾層是主機商幫你顧（灰）、哪幾層得自己來（橘）。</p>
+    <div class="fig">
+      <div class="ctl" id="hostTabs">
+        <button class="btn" data-k="shared">共享主機</button>
+        <button class="btn" data-k="paas">託管平台</button>
+        <button class="btn" data-k="vps">VPS</button>
+      </div>
+      <svg id="layers" viewBox="0 0 340 292" role="img" aria-label="網站的六層"></svg>
+      <div class="key"><span><i style="--c:var(--stone)"></i>主機商管</span><span><i style="--c:var(--clay)"></i>你管</span></div>
+      <div class="read" id="hostOut"></div>
+    </div>
+    <p>你管的層越多，能做的事越自由，要顧的也越多：系統更新、防火牆、程式掛了要能自動重啟。原文的 VPS 教學光是「開機到能連上」就要設定雲端安全群組、主機防火牆、Nginx 轉發、程式常駐、HTTPS 憑證五件事，漏一件就連不上。</p>
+    <div class="ask-hint">看不懂就回來說 <code>上線 1</code></div>
+  </section>
+
+  <section id="s2">
+    <h2><span class="no">2</span>什麼網站走哪條路</h2>
+    <p>沒有哪條最好，看網站是什麼型態。選一個：</p>
+    <div class="fig" id="pick2">
+      <div class="picks">
+        <button class="pick" data-c="0"><svg><use href="../../assets/icons.svg?v=20261025a#calendar"/></svg>輪值登記網站：PHP＋MySQL，社大成員用</button>
+        <button class="pick" data-c="1"><svg><use href="../../assets/icons.svg?v=20261025a#book"/></svg>純 HTML 的學習網站，沒有後端</button>
+        <button class="pick" data-c="2"><svg><use href="../../assets/icons.svg?v=20261025a#bell"/></svg>要 24 小時開著、隨時回訊息的聊天機器人</button>
+        <button class="pick" data-c="3"><svg><use href="../../assets/icons.svg?v=20261025a#code"/></svg>想試試 Next.js 這類新框架做的網站</button>
+      </div>
+      <div class="answer"></div>
+    </div>
+    <div class="note"><svg><use href="../../assets/icons.svg?v=20261025a#info"/></svg><span>託管平台的免費方案常有限制：一陣子沒人用就休眠、單次請求有時間上限、免費資料庫過期會刪除。條件常常變，用之前查官網的最新說明。</span></div>
+    <div class="ask-hint">看不懂就回來說 <code>上線 2</code></div>
+  </section>
+
+  <section id="s3">
+    <h2><span class="no">3</span>網域怎麼找到你的主機</h2>
+    <p>網址是給人記的名字，電腦要的是 IP 位址。DNS 就是查名字換地址的過程，而且每一層都會記住答案一段時間（快取）。按「查一次」：</p>
+    <div class="fig">
+      <div class="dns" id="dns"></div>
+      <div class="ctl">
+        <button class="btn pri" id="lookup"><svg><use href="../../assets/icons.svg?v=20261025a#lens"/></svg>查一次 duty.example.tw</button>
+        <button class="btn" id="flush"><svg><use href="../../assets/icons.svg?v=20261025a#eraser"/></svg>清掉快取</button>
+      </div>
+      <div class="read" id="dnsOut"></div>
+    </div>
+    <p>這也解釋了為什麼<b>改了 DNS 設定不會馬上生效</b>：各地的解析器還記著舊答案，要等它們的記憶時間（TTL）到期才會重查。搬主機前，可以先把 TTL 調短。</p>
+    <div class="ask-hint">看不懂就回來說 <code>上線 3</code></div>
+  </section>
+
+  <section id="s4">
+    <h2><span class="no">4</span>HTTPS 的鎖頭在擋什麼</h2>
+    <p>從手機到主機，資料會經過咖啡店 Wi-Fi、電信業者等許多中間站。切換看看，中間的人看得到什麼。</p>
+    <div class="fig">
+      <div class="ctl" id="tlsTabs">
+        <button class="btn" data-k="http"><svg><use href="../../assets/icons.svg?v=20261025a#aidev-globe"/></svg>http://</button>
+        <button class="btn" data-k="https"><svg><use href="../../assets/icons.svg?v=20261025a#aidev-lock"/></svg>https://</button>
+      </div>
+      <div class="wire">
+        <div class="end"><svg><use href="../../assets/icons.svg?v=20261025a#eye"/></svg>你的手機</div>
+        <div class="pkt" id="pkt"></div>
+        <div class="end"><svg><use href="../../assets/icons.svg?v=20261025a#aidev-server"/></svg>主機</div>
+      </div>
+      <div class="spy" id="spy"></div>
+    </div>
+    <p>HTTPS 做兩件事：<b>加密</b>內容，以及用<b>憑證</b>證明「你連到的真的是這個網域的主機」，不是有人冒充。cPanel 主機多半有 AutoSSL，會自動申請免費的 Let's Encrypt 憑證並定期續約；自己的 VPS 則要用 Certbot 這類工具自己設。</p>
+    <div class="ask-hint">看不懂就回來說 <code>上線 4</code></div>
+  </section>
+
+  <h2>原文</h2>
+  <ul class="srcs">
+    <li><a href="https://datawhalechina.github.io/easy-vibe/zh-tw/stage-2/backend/zeabur-deployment/" target="_blank" rel="noopener">Easy-Vibe：把網站發到網上（簡單方式）</a></li>
+    <li><a href="https://datawhalechina.github.io/easy-vibe/zh-tw/stage-2/backend/cloud-server-deployment/" target="_blank" rel="noopener">Easy-Vibe：把網站發到網上（進階方式）：VPS</a></li>
+    <li><a href="https://datawhalechina.github.io/easy-vibe/zh-tw/appendix/7-infrastructure-and-operations/dns-https.html" target="_blank" rel="noopener">Easy-Vibe 附錄：域名 DNS 與 HTTPS 原理</a></li>
+  </ul>
+
+  <div class="foot"><svg><use href="../../assets/icons.svg?v=20261025a#chat"/></svg><span>學完了，回研究夥伴說「學完上線」。一起回顧、寫成筆記之後，這張卡才會蓋上「學完」章。</span></div>
+  <p class="lic" style="margin:18px 2px 0;font-size:12.5px;line-height:1.7;color:var(--ink-3)">原文出處：<a href="https://github.com/datawhalechina/easy-vibe" target="_blank" rel="noopener">Datawhale〈Easy-Vibe〉</a>（上方原文清單），以 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hant" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a> 授權。本頁是用自己的話改寫、並換成自己的例子，改寫內容同樣以 CC BY-NC-SA 4.0 授權。</p>
+</main>
+
+<script src="../../assets/iso.js?v=20261025a"></script>
+<script src="../../assets/kit.js?v=20261025a"></script>
+<script>
+(() => {
+const LAYERS = ['機器與網路', '防火牆', '網頁伺服器', '執行環境（PHP 等）', '資料庫', '你的程式'];
+const WHO = {
+  shared: [[0, 0, 0, 0, 0.5, 1], '<b>共享主機</b>：機器、防火牆、Apache、PHP、MySQL 服務都由主機商顧好。你上傳程式，在 phpMyAdmin 管資料表的內容。代價是版本由主機商決定（例如只有 PHP 7.0），也不能常駐自己的程式。'],
+  paas: [[0, 0, 0, 0, 0.5, 1], '<b>託管平台</b>（Vercel、Render、Zeabur 這類）：連上 GitHub，推新版本就自動建置、上線。底下全部它管；資料庫通常另外接一個服務。適合現代框架，但要照它的規則來。'],
+  vps: [[0, 1, 1, 1, 1, 1], '<b>VPS</b>：租到一台空的 Linux 主機，除了機器本身，系統更新、防火牆、Nginx、PHP 或 Node、資料庫、HTTPS 全是你的事。最自由，也最容易漏掉某一層。']
+};
+const L = document.getElementById('layers');
+Kit.tabs(document.getElementById('s1'), (k) => {
+  const [own, msg] = WHO[k];
+  L.innerHTML = '';
+  LAYERS.forEach((t, i) => {
+    const y = 262 - i * 42, c = own[i] === 1 ? Iso.color('clay') : own[i] === 0.5 ? Iso.color('ochre') : Iso.color('stone');
+    const g = Iso.block(110, y, 72, 20, c);
+    g.style.animation = `drop .45s var(--ease) ${i * 50}ms both`;
+    L.append(g);
+    L.append(Iso.mk('path', { d: `M${184} ${y - 18}H${200}`, stroke: '#cfcbbf', 'stroke-width': 1 }));
+    L.append(Iso.mk('text', { x: 204, y: y - 14, class: 'lbl' }, t));
+  });
+  document.getElementById('hostOut').innerHTML = msg + (own[4] === 0.5 ? '<br><span style="color:var(--ochre)">黃色</span>：服務別人顧，裡面的資料表與內容是你的。' : '');
+}, 'shared');
+
+Kit.picks(document.getElementById('pick2'), [
+  ['aidev-server', '共享主機就很合適', 'PHP＋MySQL、使用人數不多，共享主機便宜又不用顧系統。要注意的是它的 PHP 版本，寫程式時要配合。'],
+  ['flag', '靜態託管（例如 GitHub Pages）', '沒有後端程式，只要放檔案就好。免費、推上 GitHub 就更新，連主機都不用租。'],
+  ['aidev-terminal', 'VPS，或支援常駐服務的平台', '共享主機不能讓程式一直跑著，一般的函式型平台也會逾時或休眠。需要「常駐」就得找支援長時間執行的地方。'],
+  ['cloud', '託管平台', '這類框架的作者常有自己的平台（例如 Vercel 之於 Next.js），連上 GitHub 就能自動部署，最省事。']
+]);
+
+const HOPS = [['eye', '瀏覽器自己的快取'], ['aidev-terminal', '電腦作業系統的快取'], ['aidev-server', '網路業者的解析器'], ['aidev-globe', '根伺服器：「.tw 去問那邊」'], ['flag', '.tw 伺服器：「example.tw 去問那邊」'], ['key', 'example.tw 的權威伺服器：「IP 是 203.0.113.7」']];
+let cached = false, busy = false;
+const dns = document.getElementById('dns');
+function drawHops(on = -1, hit = -1, skipFrom = 99) {
+  dns.innerHTML = HOPS.map(([ic, t], i) => `<div class="hop${i === hit ? ' hit' : i <= on ? ' on' : ''}${i > skipFrom ? ' skip' : ''}"><span class="chip">${Kit.icon(ic)}</span><span>${t}</span><em>${i === hit ? '有答案' : i <= on ? '問過' : ''}</em></div>`).join('');
+}
+document.getElementById('lookup').addEventListener('click', () => {
+  if (busy) return; busy = true;
+  const stop = cached ? 2 : 5;
+  let i = 0;
+  const tick = () => {
+    drawHops(i, i === stop ? i : -1, i === stop && cached ? stop : 99);
+    if (i < stop) { i++; setTimeout(tick, 280); return; }
+    busy = false;
+    document.getElementById('dnsOut').innerHTML = cached
+      ? '<b>第二次</b>：網路業者的解析器還記得答案，問到第三站就結束，後面三站完全不用跑。'
+      : '<b>第一次</b>：一路問到負責 example.tw 的權威伺服器才拿到 IP。拿到之後，沿路每一層都會記住一段時間。';
+    cached = true;
+  };
+  tick();
+});
+document.getElementById('flush').addEventListener('click', () => { cached = false; drawHops(); document.getElementById('dnsOut').textContent = '快取清空，下一次會從頭問起。'; });
+drawHops();
+document.getElementById('dnsOut').textContent = '六站從近到遠排列。';
+
+Kit.tabs(document.getElementById('s4'), (k) => {
+  const p = document.getElementById('pkt'), s = document.getElementById('spy');
+  p.className = 'pkt' + (k === 'https' ? ' enc' : '');
+  p.style.animation = 'none'; void p.offsetWidth; p.style.animation = '';
+  if (k === 'http') {
+    p.textContent = 'POST /save.php  name=小明&shift=週六上午&password=mypass';
+    s.innerHTML = `${Kit.icon('eye')}<span>中間站<b>看得到全部</b>：誰、排哪一班、連登入密碼都是明碼。也能偷偷改掉內容再轉送。</span>`;
+  } else {
+    p.textContent = '9f3a c7e1 52bd 0a8e 6d14 e9f2 7b3c a145 …';
+    s.innerHTML = `${Kit.icon('shield')}<span>中間站只知道你連到哪個網域、傳了多少資料；內容是亂碼，改了也會被發現。</span>`;
+  }
+}, 'http');
+})();
+</script>
+<script src="../../assets/lesson.js" data-root="../../"></script>
+</body>
+</html>

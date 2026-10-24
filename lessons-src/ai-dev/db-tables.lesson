@@ -1,0 +1,189 @@
+{"id":"db-tables","short":"資料表","title":"資料表變大以後","desc":"索引為什麼快、換班為什麼要用交易、參數化查詢擋住什麼、權限該寫在哪裡。","topic":"data","topicTitle":"資料庫","sources":[["Easy-Vibe 附錄：資料庫基礎：索引/事務/查詢最佳化","https://datawhalechina.github.io/easy-vibe/zh-tw/appendix/5-data/database-fundamentals.html"],["Easy-Vibe：從資料庫到 Supabase","https://datawhalechina.github.io/easy-vibe/zh-tw/stage-2/backend/database-supabase/"],["Easy-Vibe 附錄：安全思維與攻防基礎","https://datawhalechina.github.io/easy-vibe/zh-tw/appendix/9-engineering-excellence/security-thinking.html"]],"license":{"work":"Datawhale〈Easy-Vibe〉","url":"https://github.com/datawhalechina/easy-vibe","name":"CC BY-NC-SA 4.0","licenseUrl":"https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hant"}}
+===CSS===
+.sql { font: 500 12px/1.65 ui-monospace, "SF Mono", Menlo, monospace; background: #f3f1ea; border-radius: 10px; padding: 8px 10px; margin-top: 8px; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--ink-2); }
+.sql .hl { background: #f3e2c2; color: var(--ink); border-radius: 4px; }
+.sql .bad { background: #f7d3cc; color: var(--stamp); border-radius: 4px; }
+.sql .ph { background: #dbe6dd; color: var(--ink); border-radius: 4px; }
+.cmp { display: grid; gap: 8px; margin-top: 10px; }
+.cmp-row { display: grid; grid-template-columns: 64px 1fr 82px; gap: 8px; align-items: center; font-size: 12.5px; color: var(--ink-2); }
+.cmp-row .track { height: 16px; background: #f3f1ea; border-radius: 8px; overflow: hidden; }
+.cmp-row .fill { height: 100%; border-radius: 8px; background: var(--c); width: 0; transition: width .6s var(--ease); }
+.cmp-row em { font-style: normal; text-align: right; font-weight: 500; color: var(--ink); font-size: 12.5px; }
+.slots { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-top: 8px; }
+.slot { padding: 8px 10px; border-radius: 4px 10px 10px 10px; background: #f6f4ee; font-size: 13px; }
+.slot b { display: block; font: 14px var(--hand); }
+.slot.empty { background: #f7e3df; color: var(--stamp); }
+.steps2 { display: grid; gap: 5px; margin-top: 8px; }
+.s2 { display: flex; gap: 8px; align-items: center; font-size: 13px; padding: 6px 8px; border-radius: 8px; background: #f6f4ee; animation: drop .4s var(--ease) both; }
+.s2 svg { width: 16px; height: 16px; flex: none; }
+.s2.ok svg { color: var(--sage); }
+.s2.x { background: #f7e3df; }
+.s2.x svg { color: var(--stamp); }
+.s2.undo { background: #eef2f6; }
+.s2.undo svg { color: var(--slate); }
+.inp { display: flex; gap: 6px; margin-top: 4px; }
+.inp input { flex: 1; min-width: 0; min-height: 44px; border-radius: 10px; border: 1.5px solid var(--rule); padding: 0 10px; font: 500 14px ui-monospace, "SF Mono", Menlo, monospace; background: #fff; color: var(--ink); }
+.rows { display: grid; gap: 4px; margin-top: 8px; }
+.row { display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 6px; padding: 6px 8px; border-radius: 8px; background: #f6f4ee; font-size: 12.5px; transition: opacity .3s; animation: drop .35s var(--ease) both; }
+.row.hd { background: transparent; color: var(--ink-3); font-size: 12px; animation: none; }
+.row.hide { opacity: .15; }
+.row.leak { background: #f7e3df; }
+.ctl.four .btn { flex: 1 1 40%; font-size: 13px; }
+===BODY===
+  <h1>資料表變大以後</h1>
+  <p class="lead">表、欄、主鍵、CRUD，你在 phpMyAdmin 裡已經操作過。這一課講資料變多、使用的人變多以後才會冒出來的四件事：<b>速度、半途而廢、惡意輸入、誰能看什麼</b>。</p>
+
+  <section id="s1">
+    <h2><span class="no">1</span>索引：不用一頁一頁翻</h2>
+    <p>要找出某一天的值班紀錄。沒有索引，資料庫只能從第一筆看到最後一筆；有索引，它像查字典一樣跳著找。拖動滑桿讓資料變多：</p>
+    <div class="fig">
+      <div class="range-lbl"><span>值班紀錄有幾筆</span><b id="nTxt"></b></div>
+      <input id="n" type="range" min="2" max="7" step="1" value="3" aria-label="資料筆數（10 的次方）">
+      <div class="ctl" id="idxTabs">
+        <button class="btn" data-k="ok">條件直接比日期</button>
+        <button class="btn" data-k="fn">條件包在函式裡</button>
+      </div>
+      <div class="sql" id="idxSql"></div>
+      <div class="cmp">
+        <div class="cmp-row"><span>沒索引</span><div class="track"><div class="fill" id="fScan" style="--c:var(--stamp)"></div></div><em id="eScan"></em></div>
+        <div class="cmp-row"><span>有索引</span><div class="track"><div class="fill" id="fIdx" style="--c:var(--sage)"></div></div><em id="eIdx"></em></div>
+      </div>
+      <div class="read" id="idxOut"></div>
+    </div>
+    <p>長條是「要看幾筆」的比例（示意）。索引不是免費的：每次新增、修改，索引也要跟著更新，也佔空間。所以只替<b>常拿來當查詢條件</b>的欄位加，在 phpMyAdmin 的「結構」頁就能看到、新增。</p>
+    {{hint 1}}
+  </section>
+
+  <section id="s2">
+    <h2><span class="no">2</span>交易：要嘛全做，要嘛全不做</h2>
+    <p>小明和小華換班，資料庫要做兩件事：刪掉小明的週六、把小華加到週六。如果做到一半主機斷線呢？</p>
+    <div class="fig">
+      <div class="ctl" id="txTabs">
+        <button class="btn" data-k="no">一句一句執行</button>
+        <button class="btn" data-k="tx">包成一個交易</button>
+      </div>
+      <div class="steps2" id="txSteps"></div>
+      <div class="slots" id="txSlots"></div>
+      <div class="ctl"><button class="btn pri" id="txRun">{{icon play}}執行，第二步前斷線</button></div>
+      <div class="read" id="txOut"></div>
+    </div>
+    <div class="note">{{icon info}}<span>MySQL 的交易要資料表用 InnoDB 引擎才有效；舊的 MyISAM 會默默忽略。phpMyAdmin 資料表清單的「類型」欄看得到，用的是 MyISAM 就請 AI 幫你評估轉換。</span></div>
+    {{hint 2}}
+  </section>
+
+  <section id="s3">
+    <h2><span class="no">3</span>把輸入塞進 SQL，等於讓別人寫 SQL</h2>
+    <p>查詢某人的班表時，如果直接把輸入框的文字黏進 SQL 字串，有人就能輸入一段「看起來像 SQL」的東西改掉整句的意思。試試兩種輸入：</p>
+    <div class="fig">
+      <div class="inp"><input id="who" value="小明" aria-label="輸入的名字"></div>
+      <div class="ctl">
+        <button class="btn" id="good">正常名字</button>
+        <button class="btn" id="evil">' OR '1'='1</button>
+      </div>
+      <div class="ctl" id="qTabs">
+        <button class="btn" data-k="cat">直接黏進字串</button>
+        <button class="btn" data-k="prep">參數化查詢</button>
+      </div>
+      <div class="sql" id="qSql"></div>
+      <div class="read" id="qOut"></div>
+    </div>
+    <p>參數化查詢（PHP 的 PDO <code>prepare</code>，7.0 就有）把「SQL 的句型」和「使用者給的值」分兩次送：值永遠只被當成值，不會變成指令。同樣的道理，把使用者輸入顯示到網頁上時要用 <code>htmlspecialchars</code> 跳脫，免得被塞進可執行的程式碼。</p>
+    {{hint 3}}
+  </section>
+
+  <section id="s4">
+    <h2><span class="no">4</span>誰能看哪幾列，寫在哪裡</h2>
+    <p>值班表裡有手機號碼。不同的人打開，應該看到不一樣的東西。切換身分：</p>
+    <div class="fig">
+      <div class="ctl four" id="roleTabs">
+        <button class="btn" data-k="guest">訪客</button>
+        <button class="btn" data-k="me">小明</button>
+        <button class="btn" data-k="admin">管理者</button>
+        <button class="btn" data-k="raw">前端直連、沒設規則</button>
+      </div>
+      <div class="rows" id="rows"></div>
+      <div class="read" id="roleOut"></div>
+    </div>
+    <p>你現在的網站，權限判斷寫在 PHP 裡，資料庫密碼放在主機上，訪客碰不到資料庫。Easy-Vibe 中級篇介紹的 Supabase 這類服務不同：網頁直接連資料庫，連線用的金鑰放在前端、誰都拿得到，所以<b>權限必須寫在資料庫本身</b>（叫做 RLS，列層級安全）。之後換架構時，記得權限要跟著搬家。</p>
+    {{hint 4}}
+  </section>
+===JS===
+let n = 3, idxMode = 'ok';
+function drawIdx() {
+  n = +document.getElementById('n').value;
+  const rows = 10 ** n, fmt = (x) => x.toLocaleString('zh-TW');
+  document.getElementById('nTxt').textContent = fmt(rows) + ' 筆';
+  const steps = Math.ceil(Math.log2(rows));
+  const useIdx = idxMode === 'ok';
+  document.getElementById('idxSql').innerHTML = useIdx
+    ? "SELECT * FROM duty\nWHERE <span class=\"hl\">duty_date = '2026-10-31'</span>;"
+    : "SELECT * FROM duty\nWHERE <span class=\"bad\">DATE_FORMAT(duty_date, '%m-%d') = '10-31'</span>;";
+  const idxCost = useIdx ? steps : rows;
+  document.getElementById('fScan').style.width = '100%';
+  document.getElementById('fIdx').style.width = Math.max(1.5, (idxCost / rows) * 100) + '%';
+  document.getElementById('eScan').textContent = fmt(rows) + ' 筆';
+  document.getElementById('eIdx').textContent = useIdx ? `約 ${steps} 次` : fmt(rows) + ' 筆';
+  document.getElementById('idxOut').innerHTML = !useIdx
+    ? '<b>索引失效</b>：條件是「每一筆的日期算過之後」的結果，資料庫只能每一筆都算一次，跟沒索引一樣慢。請 AI 改寫成直接比較欄位（例如用日期範圍）。'
+    : n <= 3 ? '資料少的時候差別感覺不出來，全部看一遍也很快。'
+    : `資料多了，差距就是 ${fmt(rows)} 對 ${steps}。資料多 10 倍，有索引只多三、四次比較。`;
+}
+document.getElementById('n').addEventListener('input', drawIdx);
+Kit.tabs(document.getElementById('s1'), (k) => { idxMode = k; drawIdx(); }, 'ok');
+
+let tx = 'no';
+const SLOT = (sat, ok = true) => `<div class="slot"><b>週六上午</b>${sat}</div><div class="slot"><b>週日上午</b>小華</div>`;
+function drawTx(stage) {
+  const stepsEl = document.getElementById('txSteps'), slots = document.getElementById('txSlots'), out = document.getElementById('txOut');
+  const line = (cls, ic, t) => `<div class="s2 ${cls}">${Kit.icon(ic)}<span>${t}</span></div>`;
+  const s = [];
+  if (tx === 'tx') s.push(line('ok', 'flag', '<code>START TRANSACTION</code>'));
+  if (!stage) {
+    s.push(line('', 'clock', '① 刪掉週六的「小明」'), line('', 'clock', '② 週六加上「小華」'));
+    if (tx === 'tx') s.push(line('', 'clock', '<code>COMMIT</code>：兩步都成功才算數'));
+    slots.innerHTML = '<div class="slot"><b>週六上午</b>小明</div><div class="slot"><b>週日上午</b>小華</div>';
+    out.textContent = '按下執行。';
+  } else if (tx === 'no') {
+    s.push(line('ok', 'check', '① 刪掉週六的「小明」：已寫入'), line('x', 'cross', '② 週六加上「小華」：斷線，沒執行'));
+    slots.innerHTML = '<div class="slot empty"><b>週六上午</b>沒有人</div><div class="slot"><b>週日上午</b>小華</div>';
+    out.innerHTML = '<b>週六開天窗</b>：第一步已經生效，第二步沒做到。沒有人知道，直到週六沒人來。';
+  } else {
+    s.push(line('ok', 'check', '① 刪掉週六的「小明」：先記著，還沒生效'), line('x', 'cross', '② 週六加上「小華」：斷線'), line('undo', 'rewind', '資料庫發現交易沒有 COMMIT，自動復原'));
+    slots.innerHTML = '<div class="slot"><b>週六上午</b>小明</div><div class="slot"><b>週日上午</b>小華</div>';
+    out.innerHTML = '<b>一切回到換班前</b>：換班失敗，但班表是完整的。重新再換一次就好。';
+  }
+  stepsEl.innerHTML = s.join('');
+}
+Kit.tabs(document.getElementById('s2'), (k) => { tx = k; drawTx(0); }, 'no');
+document.getElementById('txRun').addEventListener('click', () => drawTx(1));
+
+let qMode = 'cat';
+const who = document.getElementById('who');
+const esc = (s) => s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+function drawQ() {
+  const v = who.value, evil = /'\s*or\s*'?1'?\s*=\s*'?1/i.test(v);
+  document.getElementById('qSql').innerHTML = qMode === 'cat'
+    ? `"SELECT * FROM duty WHERE name = '" . $name . "'"\n→ SELECT * FROM duty WHERE name = '<span class="${evil ? 'bad' : 'hl'}">${esc(v)}</span>'`
+    : `prepare("SELECT * FROM duty WHERE name = <span class="ph">?</span>")\nexecute([<span class="hl">${esc(JSON.stringify(v))}</span>])`;
+  document.getElementById('qOut').innerHTML = qMode === 'prep'
+    ? (evil ? '<b>擋住了</b>：整段文字只被當成一個名字去找，當然找不到叫這個名字的人，回傳 0 筆。' : '句型和值分開送，結果和直接黏一樣：找出小明的班。')
+    : (evil ? '<b>整句意思被改了</b>：條件變成「名字等於空白，<b>或者 1 等於 1</b>」，1 永遠等於 1，所以<b>每一筆都回傳</b>，包括所有人的資料。' : '正常名字沒問題，回傳小明的班。問題在於你不能控制別人輸入什麼。');
+}
+who.addEventListener('input', drawQ);
+document.getElementById('good').addEventListener('click', () => { who.value = '小明'; drawQ(); });
+document.getElementById('evil').addEventListener('click', () => { who.value = "' OR '1'='1"; drawQ(); });
+Kit.tabs(document.getElementById('s3'), (k) => { qMode = k; drawQ(); }, 'cat');
+
+const DATA = [['週六上午', '小明', '0912-xxx-001'], ['週六下午', '小華', '0912-xxx-002'], ['週日上午', '小美', '0912-xxx-003']];
+const ROLE = {
+  guest: [(r) => [r[0], r[1], '—'], '<b>訪客</b>：看得到誰值哪一班，看不到電話。'],
+  me: [(r) => [r[0], r[1], r[1] === '小明' ? r[2] : '—'], '<b>小明</b>：看得到全部班表，但只看得到自己的電話。'],
+  admin: [(r) => r, '<b>管理者</b>：全部看得到，才能聯絡臨時缺班的人。'],
+  raw: [(r) => r, '<b>全部外洩</b>：網頁直接連資料庫、又沒在資料庫設規則時，任何人打開開發者工具、拿前端的金鑰，就能讀（甚至改）整張表。']
+};
+Kit.tabs(document.getElementById('s4'), (k) => {
+  const [f, msg] = ROLE[k];
+  document.getElementById('rows').innerHTML = '<div class="row hd"><span>班別</span><span>值班</span><span>電話</span></div>' +
+    DATA.map((r) => { const c = f(r); return `<div class="row${k === 'raw' ? ' leak' : ''}"><span>${c[0]}</span><span>${c[1]}</span><span>${c[2]}</span></div>`; }).join('');
+  document.getElementById('roleOut').innerHTML = msg;
+}, 'guest');

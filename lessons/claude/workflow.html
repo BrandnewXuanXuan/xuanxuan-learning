@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../../assets/style.css?v=20261018b">
+<link rel="stylesheet" href="../../assets/style.css?v=20261025a">
 <style>
 .stream { display: grid; gap: 6px; }
 .act { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; background: #f6f4ee; font-size: 13px; animation: drop .35s var(--ease) both; }
@@ -37,7 +37,7 @@
 </head>
 <body class="lesson">
 <header class="bar"><div class="bar-in">
-  <a class="back" href="../../index.html#/t/claude/workflow" aria-label="回到主題"><svg class="i"><use href="../../assets/icons.svg?v=20261018b#back"/></svg></a>
+  <a class="back" href="../../index.html#/t/claude/workflow" aria-label="回到主題"><svg class="i"><use href="../../assets/icons.svg?v=20261025a#back"/></svg></a>
   <span class="bar-title">開發工作流</span>
 </div></header>
 
@@ -50,8 +50,8 @@
     <p>大一點的工作，先用 plan mode（規劃模式）讓 Claude 探索、提出做法，你確認後再實作；小改動直接做就好。選看看：</p>
     <div class="fig">
       <div class="ctl" id="size">
-        <button class="btn" data-k="small"><svg><use href="../../assets/icons.svg?v=20261018b#feather"/></svg>小改動</button>
-        <button class="btn" data-k="big"><svg><use href="../../assets/icons.svg?v=20261018b#folder"/></svg>新功能</button>
+        <button class="btn" data-k="small"><svg><use href="../../assets/icons.svg?v=20261025a#feather"/></svg>小改動</button>
+        <button class="btn" data-k="big"><svg><use href="../../assets/icons.svg?v=20261025a#folder"/></svg>新功能</button>
       </div>
       <div class="flow" id="flow" style="margin-top:12px"></div>
       <div class="read" id="out1"></div>
@@ -65,7 +65,7 @@
     <p>Auto mode 現在是 Claude Code 的預設：不再每個指令都問你，而是由一個<b>分類器</b>逐一判斷，只擋下看起來有風險的動作。內部評估中，它抓到的危險動作比開發者手動點「允許」時還多；Claude 被打斷前能連續工作的時間，大約是以前的 9 倍。按下面看一串動作怎麼被處理：</p>
     <div class="fig">
       <div class="stream" id="stream"></div>
-      <div class="ctl"><button class="btn pri" id="runS"><svg><use href="../../assets/icons.svg?v=20261018b#play"/></svg>跑一串動作</button></div>
+      <div class="ctl"><button class="btn pri" id="runS"><svg><use href="../../assets/icons.svg?v=20261025a#play"/></svg>跑一串動作</button></div>
     </div>
     <p>團隊的做法：日常開發交給 auto mode，但在設定裡<b>直接禁止</b>最危險的指令（例如遞迴刪除）；碰到<b>正式環境</b>、<b>別人的工作</b>（例如替別人審 PR），就改回逐一確認。也有人設定成：<b>代表自己對外發言</b>（發 Slack、寄信）一律不自動放行。</p>
     <div class="ask-hint">看不懂就回來說 <code>工作流 2</code></div>
@@ -76,8 +76,8 @@
     <p><code>claude --cloud "要做的事"</code> 會把工作丟到雲端的獨立機器上跑，每件事各自一條分支，彼此不會搶資源、改到同一批檔案。點工作看該放哪裡：</p>
     <div class="fig">
       <div class="where">
-        <div><h5><svg><use href="../../assets/icons.svg?v=20261018b#cloud"/></svg>雲端</h5><div id="cloudCol"></div></div>
-        <div><h5><svg><use href="../../assets/icons.svg?v=20261018b#code"/></svg>你的電腦</h5><div id="localCol"></div></div>
+        <div><h5><svg><use href="../../assets/icons.svg?v=20261025a#cloud"/></svg>雲端</h5><div id="cloudCol"></div></div>
+        <div><h5><svg><use href="../../assets/icons.svg?v=20261025a#code"/></svg>你的電腦</h5><div id="localCol"></div></div>
       </div>
       <div class="ctl" id="taskBtns" style="margin-top:8px"></div>
       <div class="read" id="out3">點下面的工作，它會飛到適合的那一邊。</div>
@@ -108,11 +108,11 @@
     <li><a href="https://claude.dev/blog/using-claude-code-the-unreasonable-effectiveness-of-html/" target="_blank" rel="noopener">Using Claude Code: The unreasonable effectiveness of HTML</a></li>
   </ul>
 
-  <div class="foot"><svg><use href="../../assets/icons.svg?v=20261018b#chat"/></svg><span>學完了，回研究夥伴說「學完工作流」。一起回顧、寫成筆記之後，這張卡才會蓋上「學完」章。</span></div>
+  <div class="foot"><svg><use href="../../assets/icons.svg?v=20261025a#chat"/></svg><span>學完了，回研究夥伴說「學完工作流」。一起回顧、寫成筆記之後，這張卡才會蓋上「學完」章。</span></div>
 </main>
 
-<script src="../../assets/iso.js?v=20261018b"></script>
-<script src="../../assets/kit.js?v=20261018b"></script>
+<script src="../../assets/iso.js?v=20261025a"></script>
+<script src="../../assets/kit.js?v=20261025a"></script>
 <script>
 (() => {
 const FLOW = {

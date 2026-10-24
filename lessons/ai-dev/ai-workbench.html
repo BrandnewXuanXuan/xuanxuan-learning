@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>三種工作台：網頁、AI IDE、CLI</title>
+<meta name="description" content="同一個需求交給三種工具，差在誰動手改檔、誰跑指令、誰驗證結果。">
+<meta name="theme-color" content="#f1f0eb">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="icon" href="../../icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css?v=20261025a">
+<style>
+.who { display: grid; gap: 6px; margin-top: 8px; }
+.who-row { display: grid; grid-template-columns: 26px 1fr 64px; align-items: center; gap: 8px; padding: 7px 8px; border-radius: 10px; background: #f6f4ee; font-size: 13.5px; animation: drop .4s var(--ease) both; }
+.who-row svg { width: 18px; height: 18px; color: var(--ink-3); }
+.who-row .tag { justify-self: end; font-size: 12px; font-weight: 500; color: #fff; padding: 2px 9px; border-radius: 99px; background: var(--c); }
+.who-sum { display: flex; gap: 14px; font-size: 12.5px; color: var(--ink-2); margin-top: 8px; padding: 0 4px; }
+.who-sum i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; background: var(--c); margin-right: 5px; vertical-align: -1px; }
+.loop { display: grid; gap: 6px; margin-top: 10px; min-height: 60px; }
+.step { display: flex; gap: 10px; align-items: flex-start; padding: 9px 10px; border-radius: 4px 12px 12px 12px; background: #f6f4ee; font-size: 13.5px; line-height: 1.55; animation: drop .45s var(--ease) both; }
+.step .chip { width: 30px; height: 30px; border-radius: 9px; background: var(--c); color: #fff; display: grid; place-items: center; flex: none; }
+.step .chip svg { width: 17px; height: 17px; }
+.step b { display: block; font: 14.5px var(--hand); }
+.step code { font-size: 11.5px; }
+.step.bad { background: #f7e3df; }
+.step.good { background: #e7efe9; }
+#stack { max-width: 300px; margin: 0 auto; }
+.btn:disabled { opacity: .45; }
+</style>
+</head>
+<body class="lesson">
+<header class="bar"><div class="bar-in">
+  <a class="back" href="../../index.html#/t/ai-dev/collab" aria-label="回到主題"><svg class="i"><use href="../../assets/icons.svg?v=20261025a#back"/></svg></a>
+  <span class="bar-title">和 AI 一起做</span>
+</div></header>
+
+<main class="wrap">
+<h1>三種工作台：網頁、AI IDE、CLI</h1>
+  <p class="lead">跟 AI 寫程式，大致有三種工作台：在網頁上聊天、在 AI IDE（例如 Cursor）裡讓它改檔，或在終端機跑 CLI agent（例如 Claude Code）。模型可以是同一個，差別在<b>誰動手改檔、誰跑指令、誰檢查結果</b>。</p>
+
+  <section id="s1">
+    <h2><span class="no">1</span>同一個需求，誰在動手</h2>
+    <p>假設要在輪值登記網站加一個功能：「首頁顯示本週誰值班」。切換三種工作台，看每一步是你做還是 AI 做。</p>
+    <div class="fig">
+      <div class="ctl" id="benchTabs">
+        <button class="btn" data-k="web"><svg><use href="../../assets/icons.svg?v=20261025a#chat"/></svg>網頁聊天</button>
+        <button class="btn" data-k="ide"><svg><use href="../../assets/icons.svg?v=20261025a#code"/></svg>AI IDE</button>
+        <button class="btn" data-k="cli"><svg><use href="../../assets/icons.svg?v=20261025a#aidev-terminal"/></svg>CLI agent</button>
+      </div>
+      <div class="who" id="who"></div>
+      <div class="who-sum"><span><i style="--c:var(--clay)"></i>你做</span><span><i style="--c:var(--sage)"></i>AI 做</span><span><i style="--c:var(--ochre)"></i>AI 做、你點頭</span></div>
+      <div class="read" id="benchOut"></div>
+    </div>
+    <p>AI IDE 多半是拿 VS Code 改出來的，畫面熟悉、看得到每一處改動；CLI agent 沒有漂亮的介面，但它能自己讀整個專案、跑指令、看結果再修，是三者中「自己做完一輪」能力最強的。</p>
+    <div class="ask-hint">看不懂就回來說 <code>工作台 1</code></div>
+  </section>
+
+  <section id="s2">
+    <h2><span class="no">2</span>agent 的一輪：讀、想、做、驗</h2>
+    <p>CLI agent 不是一次吐出答案，而是一輪一輪地跑：讀檔、決定、動手、再用指令驗證，看結果決定下一步。但它只能驗證<b>它知道的事</b>。先選專案說明裡有沒有寫主機的 PHP 版本，再一步一步看。</p>
+    <div class="fig">
+      <div class="ctl" id="verTabs">
+        <button class="btn" data-k="yes"><svg><use href="../../assets/icons.svg?v=20261025a#memory"/></svg>有寫「主機 PHP 7.0」</button>
+        <button class="btn" data-k="no"><svg><use href="../../assets/icons.svg?v=20261025a#cross"/></svg>沒寫</button>
+      </div>
+      <div class="loop" id="loop"></div>
+      <div class="ctl">
+        <button class="btn pri" id="next"><svg><use href="../../assets/icons.svg?v=20261025a#play"/></svg>下一步</button>
+        <button class="btn" id="reset"><svg><use href="../../assets/icons.svg?v=20261025a#rewind"/></svg>重來</button>
+      </div>
+      <div class="read" id="loopOut">按「下一步」開始。</div>
+    </div>
+    <p>你的電腦上可能是新版 PHP，語法檢查會過；但共享主機還是 7.0，<code>??=</code> 這種 7.4 才有的寫法一上傳就壞。把這類「AI 看不到的環境事實」寫進 CLAUDE.md，等於替它的驗證補上眼睛。</p>
+    <div class="ask-hint">看不懂就回來說 <code>工作台 2</code></div>
+  </section>
+
+  <section id="s3">
+    <h2><span class="no">3</span>一次一件事，壞了才找得到</h2>
+    <p>原文一再強調：先做到「看得到一點變化」，再加下一個功能。下面每一塊積木是一個功能。選一次要加幾個，再按「出錯了」，看你得懷疑幾塊。</p>
+    <div class="fig">
+      <div class="ctl" id="sizeTabs">
+        <button class="btn" data-k="1">一次 1 個</button>
+        <button class="btn" data-k="4">一次 4 個</button>
+      </div>
+      <svg id="stack" viewBox="0 0 300 230" role="img" aria-label="功能積木堆疊"></svg>
+      <div class="ctl">
+        <button class="btn pri" id="add"><svg><use href="../../assets/icons.svg?v=20261025a#spark"/></svg>加功能</button>
+        <button class="btn" id="boom"><svg><use href="../../assets/icons.svg?v=20261025a#aidev-bug"/></svg>出錯了</button>
+      </div>
+      <div class="read" id="stackOut"></div>
+    </div>
+    <p>每一小步確認沒問題就用 Git 存一個版本（下一個主題「分支」會講），壞掉時就能退回上一個好的版本，而不是在一大堆改動裡猜。</p>
+    <div class="ask-hint">看不懂就回來說 <code>工作台 3</code></div>
+  </section>
+
+  <section id="s4">
+    <h2><span class="no">4</span>這件事，用哪個工作台</h2>
+    <p>三種工作台不是誰取代誰，而是看事情的大小與需不需要碰到檔案。選一個情境：</p>
+    <div class="fig" id="pick4">
+      <div class="picks">
+        <button class="pick" data-c="0"><svg><use href="../../assets/icons.svg?v=20261025a#chat"/></svg>想先弄懂 MySQL 的 JOIN 是什麼</button>
+        <button class="pick" data-c="1"><svg><use href="../../assets/icons.svg?v=20261025a#folder"/></svg>輪值網站要改三個 PHP 檔，還要確認沒改壞</button>
+        <button class="pick" data-c="2"><svg><use href="../../assets/icons.svg?v=20261025a#eye"/></svg>一邊看畫面、一邊微調按鈕的顏色和間距</button>
+        <button class="pick" data-c="3"><svg><use href="../../assets/icons.svg?v=20261025a#cloud"/></svg>人在外面，想先讓 AI 開工，回家再看</button>
+      </div>
+      <div class="answer"></div>
+    </div>
+    <div class="ask-hint">看不懂就回來說 <code>工作台 4</code></div>
+  </section>
+
+  <h2>原文</h2>
+  <ul class="srcs">
+    <li><a href="https://datawhalechina.github.io/easy-vibe/zh-tw/stage-1/introduction-to-ai-ide/" target="_blank" rel="noopener">Easy-Vibe 初級二：學會 AI 編程工具</a></li>
+    <li><a href="https://datawhalechina.github.io/easy-vibe/zh-tw/stage-2/backend/modern-cli/" target="_blank" rel="noopener">Easy-Vibe：CLI AI 程式設計工具</a></li>
+    <li><a href="https://datawhalechina.github.io/easy-vibe/zh-tw/appendix/2-development-tools/ide-basics.html" target="_blank" rel="noopener">Easy-Vibe 附錄：整合開發環境（IDE）基礎</a></li>
+  </ul>
+
+  <div class="foot"><svg><use href="../../assets/icons.svg?v=20261025a#chat"/></svg><span>學完了，回研究夥伴說「學完工作台」。一起回顧、寫成筆記之後，這張卡才會蓋上「學完」章。</span></div>
+  <p class="lic" style="margin:18px 2px 0;font-size:12.5px;line-height:1.7;color:var(--ink-3)">原文出處：<a href="https://github.com/datawhalechina/easy-vibe" target="_blank" rel="noopener">Datawhale〈Easy-Vibe〉</a>（上方原文清單），以 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hant" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a> 授權。本頁是用自己的話改寫、並換成自己的例子，改寫內容同樣以 CC BY-NC-SA 4.0 授權。</p>
+</main>
+
+<script src="../../assets/iso.js?v=20261025a"></script>
+<script src="../../assets/kit.js?v=20261025a"></script>
+<script>
+(() => {
+const ACT = { you: ['var(--clay)', '你'], ai: ['var(--sage)', 'AI'], ok: ['var(--ochre)', 'AI＋你'] };
+const STEPS = [['lens', '讀懂現有的程式'], ['pencil', '寫出要改的程式碼'], ['file', '放進正確的檔案'], ['play', '執行、看有沒有壞'], ['branch', '存成一個版本（commit）']];
+const BENCH = {
+  web: [['you', 'ai', 'you', 'you', 'you'], '<b>網頁聊天</b>：AI 只看得到你貼過去的片段。它寫程式碼，其餘複製、貼上、上傳、測試、存版本都是你。適合問觀念或小片段。'],
+  ide: [['ai', 'ai', 'ok', 'you', 'you'], '<b>AI IDE</b>：AI 能讀專案裡的檔案、直接改檔，你在編輯器裡看改動、按接受。執行和測試多半還是你按。'],
+  cli: [['ai', 'ai', 'ok', 'ai', 'ok'], '<b>CLI agent</b>：讀檔、改檔、跑指令、看結果再修，一輪自己跑完；你負責說清楚要什麼、核准關鍵動作、最後檢查。']
+};
+const who = document.getElementById('who');
+Kit.tabs(document.getElementById('s1'), (k) => {
+  const [acts, msg] = BENCH[k];
+  who.innerHTML = STEPS.map(([ic, t], i) => `<div class="who-row" style="animation-delay:${i * 50}ms">${Kit.icon(ic)}<span>${t}</span><span class="tag" style="--c:${ACT[acts[i]][0]}">${ACT[acts[i]][1]}</span></div>`).join('');
+  document.getElementById('benchOut').innerHTML = msg;
+}, 'web');
+
+const LOOP = {
+  yes: [
+    ['lens', 'var(--slate)', '讀', '讀 <code>CLAUDE.md</code>：「主機是 PHP 7.0」。再讀 <code>index.php</code> 和值班資料表。'],
+    ['spark', 'var(--dusk)', '想', '要算出「本週」的日期範圍，查出值班的人。記得不能用 7.0 沒有的語法。'],
+    ['pencil', 'var(--clay)', '做', '寫好查詢和顯示區塊，預設值用 <code>isset()</code> 判斷，不用 <code>??=</code>。'],
+    ['check', 'var(--sage)', '驗', '跑 <code>php -l index.php</code> 沒有語法錯；再對照 7.0 不支援的寫法清單檢查一次。', 'good']
+  ],
+  no: [
+    ['lens', 'var(--slate)', '讀', '讀 <code>index.php</code> 和值班資料表。專案裡沒寫主機環境。'],
+    ['spark', 'var(--dusk)', '想', '要算出「本週」的日期範圍，查出值班的人。'],
+    ['pencil', 'var(--clay)', '做', '寫好查詢和顯示區塊，預設值用了簡潔的 <code>$week ??= date(\'W\');</code>。'],
+    ['check', 'var(--sage)', '驗', '跑 <code>php -l index.php</code>：你電腦上是 PHP 8，檢查通過，回報「完成」。'],
+    ['cross', 'var(--stamp)', '上線', '上傳到共享主機（PHP 7.0）：首頁變成 500 錯誤。<code>??=</code> 要 7.4 才有。', 'bad']
+  ]
+};
+let mode = 'yes', at = 0;
+const loop = document.getElementById('loop'), loopOut = document.getElementById('loopOut');
+function drawLoop() {
+  const st = LOOP[mode].slice(0, at);
+  loop.innerHTML = st.map(([ic, c, t, d, cls]) => `<div class="step ${cls || ''}"><span class="chip" style="--c:${c}">${Kit.icon(ic)}</span><div><b>${t}</b>${d}</div></div>`).join('');
+  const done = at >= LOOP[mode].length;
+  document.getElementById('next').disabled = done;
+  loopOut.innerHTML = !at ? '按「下一步」開始。'
+    : !done ? `第 ${at} 步：每一步都根據上一步<b>真的看到的結果</b>決定。`
+    : mode === 'yes' ? '<b>一次就對</b>：環境事實寫在專案說明裡，AI 動手前就避開了舊版不支援的寫法。'
+    : '<b>驗證過了還是壞</b>：AI 用它看得到的環境驗證，看不到主機的版本。不是它偷懶，是沒人告訴它。';
+}
+Kit.tabs(document.getElementById('s2'), (k) => { mode = k; at = 0; drawLoop(); }, 'yes');
+document.getElementById('next').addEventListener('click', () => { at++; drawLoop(); });
+document.getElementById('reset').addEventListener('click', () => { at = 0; drawLoop(); });
+
+const svg = document.getElementById('stack'), C = ['sage', 'slate', 'ochre', 'moss', 'dusk', 'teal', 'stone', 'clay'];
+let size = 1, blocks = [], boom = false;
+function drawStack() {
+  svg.innerHTML = '';
+  svg.append(Iso.outline(150, 205, 70, 0, '#d6d2c6'));
+  blocks.forEach((b, i) => {
+    const g = Iso.block(150, 205 - i * 17, 70, 14, boom && b.batch === blocks[blocks.length - 1].batch ? Iso.color('stamp') : Iso.color(C[b.batch % C.length]));
+    if (i >= blocks.length - size && !boom) g.style.animation = 'drop .45s var(--ease) both';
+    svg.append(g);
+  });
+  if (boom && blocks.length) {
+    const n = blocks.filter((b) => b.batch === blocks[blocks.length - 1].batch).length;
+    document.getElementById('stackOut').innerHTML = n === 1
+      ? '只有最上面這<b>一塊</b>可疑：剛剛加的就是它。退回上一版、或只針對它問 AI，很快就定位。'
+      : `剛剛一次加了 <b>${n} 塊</b>，全部變紅：任何一塊、或它們互相影響都可能是原因，得一個個拆開來試。`;
+  } else {
+    document.getElementById('stackOut').innerHTML = blocks.length ? `已經疊了 ${blocks.length} 個功能，每一批顏色不同。` : '按「加功能」開始疊。';
+  }
+}
+let batch = 0;
+Kit.tabs(document.getElementById('s3'), (k) => { size = +k; blocks = []; boom = false; batch = 0; drawStack(); }, '1');
+document.getElementById('add').addEventListener('click', () => {
+  boom = false;
+  if (blocks.length + size > 9) blocks = [];
+  batch++;
+  for (let i = 0; i < size; i++) blocks.push({ batch });
+  drawStack();
+});
+document.getElementById('boom').addEventListener('click', () => { if (blocks.length) { boom = true; drawStack(); } });
+
+Kit.picks(document.getElementById('pick4'), [
+  ['chat', '網頁聊天', '弄懂觀念不需要碰任何檔案。在網頁上請它舉例、畫表格，懂了再回專案動手。'],
+  ['aidev-terminal', 'CLI agent', '跨好幾個檔案、還要跑指令確認沒壞，正是 agent 一輪自己做完的強項。記得先讓它讀專案說明。'],
+  ['code', 'AI IDE（或 CLI 搭配瀏覽器預覽）', '需要一直看畫面、一點一點調整時，在編輯器裡即時看到改動最順手。用 CLI 也行，開著本機預覽一邊看。'],
+  ['cloud', '雲端 session', '有些 CLI agent 可以在雲端跑，手機交代完就去忙，做完回來看結果，再把分支拉回自己電腦。']
+]);
+})();
+</script>
+<script src="../../assets/lesson.js" data-root="../../"></script>
+</body>
+</html>

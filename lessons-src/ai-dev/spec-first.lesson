@@ -1,0 +1,162 @@
+{"id":"spec-first","short":"規格書","title":"先寫規格，再叫 AI 動手","desc":"程式碼記不住「為什麼」；把需求寫成規格、切成能用的小塊，再一張一張做。","topic":"collab","topicTitle":"和 AI 一起做","sources":[["Easy-Vibe：從 Vibe Coding 到 Spec Coding","https://datawhalechina.github.io/easy-vibe/zh-tw/stage-3/core-skills/spec-coding/"],["Easy-Vibe：AI 輔助開發工作流程","https://datawhalechina.github.io/easy-vibe/zh-tw/stage-3/core-skills/workflow/"],["Easy-Vibe：用 GitHub Issues 驅動 AI 全流程開發","https://datawhalechina.github.io/easy-vibe/zh-tw/stage-3/core-skills/github-iterative-development/"]],"license":{"work":"Datawhale〈Easy-Vibe〉","url":"https://github.com/datawhalechina/easy-vibe","name":"CC BY-NC-SA 4.0","licenseUrl":"https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hant"}}
+===CSS===
+.intent { display: grid; gap: 6px; margin-top: 10px; }
+.it { display: grid; grid-template-columns: 30px 1fr; gap: 10px; align-items: flex-start; padding: 8px 10px; border-radius: 4px 12px 12px 12px; background: #f6f4ee; font-size: 13.5px; line-height: 1.55; transition: opacity .45s, filter .45s; }
+.it .chip { width: 30px; height: 30px; border-radius: 9px; background: var(--c); color: #fff; display: grid; place-items: center; }
+.it .chip svg { width: 17px; height: 17px; }
+.it b { font: 14.5px var(--hand); display: block; }
+.it.lost { opacity: .22; filter: grayscale(1); }
+.codebox { margin-top: 8px; font: 500 12px/1.6 ui-monospace, "SF Mono", Menlo, monospace; background: #f3f1ea; border-radius: 10px; padding: 8px 10px; white-space: pre-wrap; color: var(--ink-2); }
+.deals { display: grid; gap: 6px; margin-top: 8px; }
+.deal { display: flex; justify-content: space-between; gap: 8px; align-items: center; padding: 8px 10px; border-radius: 10px; background: #f6f4ee; font-size: 13.5px; transition: opacity .35s; }
+.deal em { font-style: normal; font-size: 12px; color: var(--ink-3); white-space: nowrap; }
+.deal.risk em { color: var(--stamp); }
+.tix { display: grid; gap: 6px; margin-top: 8px; }
+.tk { display: flex; gap: 8px; align-items: center; padding: 8px 10px; border-radius: 4px 10px 10px 10px; background: #f6f4ee; font-size: 13.5px; }
+.tk svg { width: 18px; height: 18px; flex: none; color: var(--ink-3); }
+.tk.done { background: #e7efe9; }
+.tk.done svg { color: var(--sage); }
+.big { display: flex; align-items: baseline; gap: 8px; padding: 10px 4px 0; font-size: 13px; color: var(--ink-2); }
+.big b { font: 28px var(--hand); color: var(--ink); }
+.mx { width: 100%; border-collapse: separate; border-spacing: 4px; font-size: 13px; margin-top: 6px; }
+.mx th { font-weight: 500; color: var(--ink-3); font-size: 12px; text-align: left; }
+.mx td { background: #f6f4ee; border-radius: 8px; padding: 7px 8px; }
+.mx td.ok { background: #e7efe9; color: var(--ink); text-align: center; width: 64px; }
+.mx td.no { background: #f7e3df; color: var(--stamp); text-align: center; width: 64px; font-weight: 500; }
+===BODY===
+  <h1>先寫規格，再叫 AI 動手</h1>
+  <p class="lead">用聊天一句一句叫 AI 改，開頭很快，越做越亂：早先講好的事被忘掉、改 A 壞 B。Easy-Vibe 高級篇的主張是把需求寫成一份<b>規格</b>（一個 Markdown 檔），讓它成為真正的原始資料，程式碼只是照著規格產生的結果。</p>
+
+  <section id="s1">
+    <h2><span class="no">1</span>程式碼記不住「為什麼」</h2>
+    <p>輪值網站有條規則：「每人每週最多登記兩班」。這條規則背後其實有四樣東西。切換看看，哪些會留下來。</p>
+    <div class="fig">
+      <div class="ctl" id="keepTabs">
+        <button class="btn" data-k="code">{{icon code}}只留程式碼</button>
+        <button class="btn" data-k="spec">{{icon memory}}寫進規格</button>
+      </div>
+      <div class="intent" id="intent"></div>
+      <div class="codebox" id="code"></div>
+      <div class="read" id="keepOut"></div>
+    </div>
+    <p>程式碼是意圖的「有損壓縮」：做什麼留下了，為什麼、取捨、限制都沒了。下一個人（或下一輪的 AI）只看得到 <code>2</code> 這個數字，不知道能不能改、改了會怎樣。</p>
+    {{hint 1}}
+  </section>
+
+  <section id="s2">
+    <h2><span class="no">2</span>聊天裡的約定會淡掉</h2>
+    <p>開工時你講好了三件事。拖動滑桿讓對話往下進行，比較「只在聊天裡講」和「寫在規格檔裡」。</p>
+    <div class="fig">
+      <div class="ctl" id="chatTabs">
+        <button class="btn" data-k="chat">{{icon chat}}只在聊天裡講</button>
+        <button class="btn" data-k="spec">{{icon file}}寫在規格檔</button>
+      </div>
+      <div class="range-lbl"><span>對話進行到</span><b id="roundTxt">第 1 輪</b></div>
+      <input id="round" type="range" min="1" max="30" value="1" aria-label="對話輪數">
+      <div class="deals" id="deals"></div>
+      <div class="read" id="chatOut"></div>
+    </div>
+    <p>需求要改時，順序是<b>先改規格，再請 AI 照新規格改程式</b>，不要只在聊天裡補一句。Claude Code 的 CLAUDE.md、規劃模式先出計畫再動手，都是同一個想法。</p>
+    {{hint 2}}
+  </section>
+
+  <section id="s3">
+    <h2><span class="no">3</span>直著切，每一刀都能用</h2>
+    <p>要加「換班申請」功能，可以拆成四張工作單。橫著切是按技術層分（資料表、後端、頁面、測試）；直著切是每張都從資料到畫面做完一小塊。拖動滑桿，一張一張完成。</p>
+    <div class="fig">
+      <div class="ctl" id="cutTabs">
+        <button class="btn" data-k="h">橫著切（按層）</button>
+        <button class="btn" data-k="v">直著切（按功能）</button>
+      </div>
+      <div class="range-lbl"><span>完成幾張</span><b id="doneTxt">0 張</b></div>
+      <input id="done" type="range" min="0" max="4" value="0" aria-label="完成的工作單數">
+      <div class="tix" id="tix"></div>
+      <div class="big">現在能用的功能：<b id="usable">0</b></div>
+      <div class="read" id="cutOut"></div>
+    </div>
+    <p>直著切的好處：每關一張，就能打開網站實際試；中途發現方向不對，也只浪費一小塊。原文另一個重點是<b>先看依賴，再看重要性</b>：被別張卡住的工作單再重要，也還不能開始。</p>
+    {{hint 3}}
+  </section>
+
+  <section id="s4">
+    <h2><span class="no">4</span>測試全過，不等於需求做完</h2>
+    <p>AI 寫完會說「測試全部通過」。但測試只驗它想到要測的事。切換兩種檢查方式：</p>
+    <div class="fig">
+      <div class="ctl" id="viewTabs">
+        <button class="btn" data-k="test">{{icon check}}只看測試</button>
+        <button class="btn" data-k="spec">{{icon file}}逐條對照規格</button>
+      </div>
+      <table class="mx" id="mx"></table>
+      <div class="read" id="mxOut"></div>
+    </div>
+    <p>所以最後一步是請 AI（最好是沒參與實作、context 乾淨的另一個）<b>拿規格逐條對照</b>，列出哪一條沒做到，而不是只跑測試。</p>
+    {{hint 4}}
+  </section>
+===JS===
+const IT = [
+  ['target', 'var(--sage)', '做什麼', '每人每週最多登記兩班，超過就擋下。', 1],
+  ['spark', 'var(--clay)', '為什麼', '避免熱心的幾位包辦，其他人排不進去。'],
+  ['dial', 'var(--ochre)', '取捨', '選擇「擋下」而不是「提醒」；幹部臨時代班由管理頁處理，不走這條。'],
+  ['shield', 'var(--slate)', '限制', '主機是 PHP 7.0、MySQL；不能另外裝套件。']
+];
+Kit.tabs(document.getElementById('s1'), (k) => {
+  const spec = k === 'spec';
+  document.getElementById('intent').innerHTML = IT.map(([ic, c, t, d, keep]) => `<div class="it${!spec && !keep ? ' lost' : ''}"><span class="chip" style="--c:${c}">${Kit.icon(ic)}</span><div><b>${t}</b>${d}</div></div>`).join('');
+  document.getElementById('code').textContent = spec
+    ? '## 登記上限\n- 每人每週最多 2 班，超過時擋下並說明原因\n- 原因：讓更多人有機會排班\n- 不處理：幹部代班（走管理頁）\n- 限制：PHP 7.0，不加套件'
+    : 'if ($count >= 2) {\n  $error = "本週已登記兩班";\n}';
+  document.getElementById('keepOut').innerHTML = spec
+    ? '<b>四樣都在</b>：之後有人說「改成三班」，AI 讀規格就知道要一併改原因、確認代班流程是否受影響。'
+    : '<b>只剩「做什麼」</b>：為什麼是 2、可不可以改成提醒、為什麼不用某個套件，全都要靠猜。';
+}, 'code');
+
+const DEALS = [['日期一律顯示成「10/25（六）」', 4], ['只能用 PHP 7.0 支援的寫法', 9], ['不要動到管理頁的程式', 14]];
+let chatMode = 'chat';
+function drawDeals() {
+  const r = +document.getElementById('round').value;
+  document.getElementById('roundTxt').textContent = `第 ${r} 輪`;
+  let lost = 0;
+  document.getElementById('deals').innerHTML = DEALS.map(([t, fade]) => {
+    const risk = chatMode === 'chat' && r > fade + 6;
+    const op = chatMode === 'spec' ? 1 : Math.max(.25, 1 - Math.max(0, r - fade) / 14);
+    if (risk) lost++;
+    return `<div class="deal${risk ? ' risk' : ''}" style="opacity:${op}"><span>${t}</span><em>${chatMode === 'spec' ? '每輪都讀得到' : risk ? '可能被忘了' : '還記得'}</em></div>`;
+  }).join('');
+  document.getElementById('chatOut').innerHTML = chatMode === 'spec'
+    ? '寫在檔案裡的約定，每次開工都重新讀到；換一個新的 session 也一樣。'
+    : r < 8 ? '剛講完，還記得很清楚。'
+    : lost ? `對話越長，早先的約定被越多新內容淹沒；壓縮對話時也可能被摘掉。已經有 <b>${lost}</b> 條有風險。（輪數是示意）`
+    : '早先的約定開始被新內容擠到後面。';
+}
+document.getElementById('round').addEventListener('input', drawDeals);
+Kit.tabs(document.getElementById('s2'), (k) => { chatMode = k; drawDeals(); }, 'chat');
+
+const CUT = {
+  h: [['資料表：新增換班申請表'], ['後端：送出、接受、拒絕的 PHP'], ['頁面：申請表單與待處理清單'], ['測試：整個流程']],
+  v: [['能送出換班申請（存進資料表、看得到「已送出」）'], ['對方能接受，班表跟著換'], ['對方能拒絕，申請人看得到結果'], ['管理者看得到所有換班紀錄']]
+};
+const USABLE = { h: [0, 0, 0, 0, 4], v: [0, 1, 2, 3, 4] };
+let cut = 'h';
+function drawCut() {
+  const d = +document.getElementById('done').value;
+  document.getElementById('doneTxt').textContent = `${d} 張`;
+  document.getElementById('tix').innerHTML = CUT[cut].map(([t], i) => `<div class="tk${i < d ? ' done' : ''}">${Kit.icon(i < d ? 'check' : 'flag')}<span>${t}</span></div>`).join('');
+  const u = USABLE[cut][d];
+  document.getElementById('usable').textContent = u;
+  document.getElementById('cutOut').innerHTML = cut === 'h'
+    ? (d < 4 ? '做了好幾張，網站上還是<b>什麼都不能用</b>；各層接不起來的問題，要到最後才會發現。' : '最後一刻才一次接通，出問題時四層都可疑。')
+    : (d ? `每關一張就多一個<b>能實際操作</b>的功能，可以馬上請大家試。` : '每一張都是一條從資料到畫面的完整小功能。');
+}
+document.getElementById('done').addEventListener('input', drawCut);
+Kit.tabs(document.getElementById('s3'), (k) => { cut = k; drawCut(); }, 'h');
+
+const SPEC = [['送出換班申請', 1, 1], ['對方接受後班表互換', 1, 1], ['一週上限兩班照樣適用', 1, 1], ['換班成功後通知原本值班的人', 0, 0]];
+Kit.tabs(document.getElementById('s4'), (k) => {
+  const test = k === 'test';
+  const rows = test ? SPEC.filter((r) => r[1]) : SPEC;
+  document.getElementById('mx').innerHTML = `<tr><th>${test ? '測試項目' : '規格條目'}</th><th>${test ? '結果' : '做到了？'}</th></tr>` +
+    rows.map(([t, , ok]) => `<tr><td>${t}</td><td class="${ok ? 'ok' : 'no'}">${ok ? '通過' : '沒做'}</td></tr>`).join('');
+  document.getElementById('mxOut').innerHTML = test
+    ? '三項測試全部通過，看起來完工了。'
+    : '<b>第四條沒有測試，也沒有做</b>。測試只能證明「寫了的有做對」，證明不了「該做的都做了」。';
+}, 'test');

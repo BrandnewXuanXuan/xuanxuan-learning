@@ -15,5 +15,15 @@
    "sitemap": "https://www.anthropic.com/sitemap.xml",
    "match": "^https://www\\.anthropic\\.com/engineering/[^/]+$"
   }
+ ],
+ "ai-dev": [
+  {
+   "name": "easy-vibe",
+   "type": "github",
+   "repo": "datawhalechina/easy-vibe",
+   "branch": "main",
+   "path": "docs/zh-tw",
+   "site": "https://datawhalechina.github.io/easy-vibe/zh-tw/"
+  }
  ]
 }

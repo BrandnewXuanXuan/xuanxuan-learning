@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../../assets/style.css?v=20261018b">
+<link rel="stylesheet" href="../../assets/style.css?v=20261025a">
 <style>
 .knobs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .knob { background: #f6f4ee; border-radius: 14px; padding: 10px; text-align: center; }
@@ -32,7 +32,7 @@
 </head>
 <body class="lesson">
 <header class="bar"><div class="bar-in">
-  <a class="back" href="../../index.html#/t/claude/models" aria-label="回到主題"><svg class="i"><use href="../../assets/icons.svg?v=20261018b#back"/></svg></a>
+  <a class="back" href="../../index.html#/t/claude/models" aria-label="回到主題"><svg class="i"><use href="../../assets/icons.svg?v=20261025a#back"/></svg></a>
   <span class="bar-title">模型與思考力度</span>
 </div></header>
 
@@ -45,15 +45,15 @@
     <p>模型是一組固定的權重，決定它<b>最多能做到多難</b>；你給的提示和 context 只能引導它，改變不了上限。effort 則決定<b>這一次投入多少</b>：讀幾個檔案、跑幾次驗證、多步驟的工作要推進多遠才回頭找你。轉轉看。</p>
     <div class="fig">
       <div class="knobs">
-        <div class="knob"><h4><svg><use href="../../assets/icons.svg?v=20261018b#target"/></svg>模型</h4><svg class="dialsvg" id="dm" viewBox="0 0 110 110"></svg><div class="val" id="vm"></div>
+        <div class="knob"><h4><svg><use href="../../assets/icons.svg?v=20261025a#target"/></svg>模型</h4><svg class="dialsvg" id="dm" viewBox="0 0 110 110"></svg><div class="val" id="vm"></div>
           <div class="ctl"><button class="btn" data-d="m-1" aria-label="模型降一級">－</button><button class="btn" data-d="m1" aria-label="模型升一級">＋</button></div></div>
-        <div class="knob"><h4><svg><use href="../../assets/icons.svg?v=20261018b#dial"/></svg>effort</h4><svg class="dialsvg" id="de" viewBox="0 0 110 110"></svg><div class="val" id="ve"></div>
+        <div class="knob"><h4><svg><use href="../../assets/icons.svg?v=20261025a#dial"/></svg>effort</h4><svg class="dialsvg" id="de" viewBox="0 0 110 110"></svg><div class="val" id="ve"></div>
           <div class="ctl"><button class="btn" data-d="e-1" aria-label="effort 降一級">－</button><button class="btn" data-d="e1" aria-label="effort 升一級">＋</button></div></div>
       </div>
       <div class="meter" id="meter"></div>
       <div class="read" id="out1"></div>
     </div>
-    <p class="note"><svg><use href="../../assets/icons.svg?v=20261018b#info"/></svg><span>格數只是示意兩個旋鈕各自影響什麼，不是實測數據。</span></p>
+    <p class="note"><svg><use href="../../assets/icons.svg?v=20261025a#info"/></svg><span>格數只是示意兩個旋鈕各自影響什麼，不是實測數據。</span></p>
     <div class="ask-hint">看不懂就回來說 <code>旋鈕 1</code></div>
   </section>
 
@@ -62,9 +62,9 @@
     <p>Claude 做得不好，第一反應常是「換強一點的模型」。但原因可能根本不在模型。選一個症狀：</p>
     <div class="fig" id="pick2">
       <div class="picks">
-        <button class="pick" data-c="0"><svg><use href="../../assets/icons.svg?v=20261018b#target"/></svg>資料都給齊了，它也很認真，還是做錯</button>
-        <button class="pick" data-c="1"><svg><use href="../../assets/icons.svg?v=20261018b#stop"/></svg>跳過檔案、沒跑測試、做到一半就說好了</button>
-        <button class="pick" data-c="2"><svg><use href="../../assets/icons.svg?v=20261018b#cross"/></svg>它誤會你要什麼，或不照專案的慣例做</button>
+        <button class="pick" data-c="0"><svg><use href="../../assets/icons.svg?v=20261025a#target"/></svg>資料都給齊了，它也很認真，還是做錯</button>
+        <button class="pick" data-c="1"><svg><use href="../../assets/icons.svg?v=20261025a#stop"/></svg>跳過檔案、沒跑測試、做到一半就說好了</button>
+        <button class="pick" data-c="2"><svg><use href="../../assets/icons.svg?v=20261025a#cross"/></svg>它誤會你要什麼，或不照專案的慣例做</button>
       </div>
       <div class="answer"></div>
     </div>
@@ -85,10 +85,10 @@
     </div>
     <p>effort 調高，主要減少的是「漏掉邊界情況」這類錯；如果是「整個方法選錯」，調高幫助有限，要回頭檢查需求。所以官方建議的節奏是：</p>
     <div class="fig"><div class="flow">
-      <span class="node" style="--c:var(--slate)"><svg><use href="../../assets/icons.svg?v=20261018b#chat"/></svg>先讓它問你需求</span><span class="arrow">→</span>
-      <span class="node" style="--c:var(--sage)"><svg><use href="../../assets/icons.svg?v=20261018b#dial"/></svg>low 快速做出來</span><span class="arrow">→</span>
-      <span class="node" style="--c:var(--ochre)"><svg><use href="../../assets/icons.svg?v=20261018b#eye"/></svg>你看過、來回修</span><span class="arrow">→</span>
-      <span class="node" style="--c:var(--clay)"><svg><use href="../../assets/icons.svg?v=20261018b#shield"/></svg>high 驗證與測試</span>
+      <span class="node" style="--c:var(--slate)"><svg><use href="../../assets/icons.svg?v=20261025a#chat"/></svg>先讓它問你需求</span><span class="arrow">→</span>
+      <span class="node" style="--c:var(--sage)"><svg><use href="../../assets/icons.svg?v=20261025a#dial"/></svg>low 快速做出來</span><span class="arrow">→</span>
+      <span class="node" style="--c:var(--ochre)"><svg><use href="../../assets/icons.svg?v=20261025a#eye"/></svg>你看過、來回修</span><span class="arrow">→</span>
+      <span class="node" style="--c:var(--clay)"><svg><use href="../../assets/icons.svg?v=20261025a#shield"/></svg>high 驗證與測試</span>
     </div></div>
     <div class="ask-hint">看不懂就回來說 <code>旋鈕 3</code></div>
   </section>
@@ -111,11 +111,11 @@
     <li><a href="https://claude.dev/blog/spending-your-effort/" target="_blank" rel="noopener">Using Claude Code: Spending your effort</a></li>
   </ul>
 
-  <div class="foot"><svg><use href="../../assets/icons.svg?v=20261018b#chat"/></svg><span>學完了，回研究夥伴說「學完旋鈕」。一起回顧、寫成筆記之後，這張卡才會蓋上「學完」章。</span></div>
+  <div class="foot"><svg><use href="../../assets/icons.svg?v=20261025a#chat"/></svg><span>學完了，回研究夥伴說「學完旋鈕」。一起回顧、寫成筆記之後，這張卡才會蓋上「學完」章。</span></div>
 </main>
 
-<script src="../../assets/iso.js?v=20261018b"></script>
-<script src="../../assets/kit.js?v=20261018b"></script>
+<script src="../../assets/iso.js?v=20261025a"></script>
+<script src="../../assets/kit.js?v=20261025a"></script>
 <script>
 (() => {
 const { mk, color, block } = Iso;

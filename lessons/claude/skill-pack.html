@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../../assets/style.css?v=20261018b">
+<link rel="stylesheet" href="../../assets/style.css?v=20261025a">
 <style>
 .box3 { display: grid; gap: 6px; }
 .tier { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 4px 12px 12px 12px; background: #f3f1ea; color: var(--ink-3); font-size: 13px; transition: background .35s, color .35s, transform .35s var(--ease); }
@@ -28,7 +28,7 @@
 </head>
 <body class="lesson">
 <header class="bar"><div class="bar-in">
-  <a class="back" href="../../index.html#/t/claude/skills" aria-label="回到主題"><svg class="i"><use href="../../assets/icons.svg?v=20261018b#back"/></svg></a>
+  <a class="back" href="../../index.html#/t/claude/skills" aria-label="回到主題"><svg class="i"><use href="../../assets/icons.svg?v=20261025a#back"/></svg></a>
   <span class="bar-title">Skills</span>
 </div></header>
 
@@ -42,9 +42,9 @@
     <div class="fig">
       <div class="box3" id="box3"></div>
       <div class="ctl" id="when">
-        <button class="btn" data-k="idle"><svg><use href="../../assets/icons.svg?v=20261018b#clock"/></svg>平常</button>
-        <button class="btn" data-k="hit"><svg><use href="../../assets/icons.svg?v=20261018b#spark"/></svg>用得到時</button>
-        <button class="btn" data-k="deep"><svg><use href="../../assets/icons.svg?v=20261018b#lens"/></svg>需要細節</button>
+        <button class="btn" data-k="idle"><svg><use href="../../assets/icons.svg?v=20261025a#clock"/></svg>平常</button>
+        <button class="btn" data-k="hit"><svg><use href="../../assets/icons.svg?v=20261025a#spark"/></svg>用得到時</button>
+        <button class="btn" data-k="deep"><svg><use href="../../assets/icons.svg?v=20261025a#lens"/></svg>需要細節</button>
       </div>
       <div class="read" id="out1"></div>
     </div>
@@ -90,7 +90,7 @@
     <p>效果最明顯的一類 skill 是<b>驗證</b>：Claude 改完東西，自己跑測試、檢查或實際操作一遍，沒過就修，修到過為止。按「跑一次」看迴圈怎麼轉：</p>
     <div class="fig">
       <svg class="loop" id="loop" viewBox="0 0 340 200" role="img" aria-label="驗證迴圈"></svg>
-      <div class="ctl"><button class="btn pri" id="run"><svg><use href="../../assets/icons.svg?v=20261018b#play"/></svg>跑一次</button></div>
+      <div class="ctl"><button class="btn pri" id="run"><svg><use href="../../assets/icons.svg?v=20261025a#play"/></svg>跑一次</button></div>
       <div class="read" id="loopOut">修改 → 檢查 → 沒過就修 → 再檢查。</div>
     </div>
     <p>驗證 skill 可以三種方式掛上去：<b>單獨叫用</b>（需要時說「/verify」）、<b>嵌進別的 skill</b>（每次產出都會跑）、<b>串在後面</b>（一個 skill 做完接著叫下一個）。第一步可以先找出「你這週最常手動做的檢查」，把它寫成 skill。</p>
@@ -105,11 +105,11 @@
     <li><a href="https://claude.com/resources/articles/building-verification-loops-in-claude-code-with-skills" target="_blank" rel="noopener">Building verification loops in Claude Code with skills</a></li>
   </ul>
 
-  <div class="foot"><svg><use href="../../assets/icons.svg?v=20261018b#chat"/></svg><span>學完了，回研究夥伴說「學完技能包」。一起回顧、寫成筆記之後，這張卡才會蓋上「學完」章。</span></div>
+  <div class="foot"><svg><use href="../../assets/icons.svg?v=20261025a#chat"/></svg><span>學完了，回研究夥伴說「學完技能包」。一起回顧、寫成筆記之後，這張卡才會蓋上「學完」章。</span></div>
 </main>
 
-<script src="../../assets/iso.js?v=20261018b"></script>
-<script src="../../assets/kit.js?v=20261018b"></script>
+<script src="../../assets/iso.js?v=20261025a"></script>
+<script src="../../assets/kit.js?v=20261025a"></script>
 <script>
 (() => {
 const { mk, color } = Iso;

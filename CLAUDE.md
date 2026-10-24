@@ -3,7 +3,7 @@
 公開的靜態 PWA，由 GitHub Pages 發佈：`https://brandnewxuanxuan.github.io/xuanxuan-learning/`。
 本檔只放技術規範；色票、字體、元件與可視化教學規範在 [DESIGN.md](DESIGN.md)，做任何頁面前都要先讀。學習流程與各領域進度在使用者的 Obsidian 專案筆記，不寫在這裡。
 
-網站會有多個領域（Claude、之後的佛學、術數…），每個領域通常由不同的研究夥伴 session 負責。所以：**只動自己負責的領域的檔案**；共用檔（`assets/`、`DESIGN.md`、本檔、`data/domains.json`、`data/feeds.json`）要改時，改動範圍越小越好。
+網站會有多個領域（Claude、AI 開發、之後的佛學、術數…），每個領域通常由不同的研究夥伴 session 負責。所以：**只動自己負責的領域的檔案**；共用檔（`assets/`、`DESIGN.md`、本檔、`data/domains.json`、`data/feeds.json`）要改時，改動範圍越小越好。
 
 ## 隱私（硬規則）
 
@@ -31,7 +31,7 @@ assets/icons.svg            全站 icon（SVG symbol）；新增時只在 </defs
 data/domains.json           領域清單與順序：{"domains": ["claude", ...]}
 data/domains/<領域>.json     該領域的主題與單元（含狀態），一個領域一個檔
 data/sources/<領域>.json     該領域的來源清單（見下方「來源清單」）
-data/feeds.json             有自動追蹤的領域與它們的 sitemap；沒有 feed 的領域不用列
+data/feeds.json             有自動追蹤的領域與它們的 sitemap（沒有 feed 的課程 repo 用 type: github，追蹤指定資料夾的 commit）；沒有可追的領域不用列
 lessons-src/<領域>/<單元>.lesson  單元原始檔（JSON 標頭＋CSS／BODY／JS 三段）；用 tools/build_lessons.py 組成頁面
 lessons/<領域>/<單元>.html   組好的單元頁（不要直接改，改 .lesson 再重組；context-budget.html 是早期手寫頁，例外）
 tools/sources.py            來源清單工具與全站一致性檢查
@@ -63,6 +63,7 @@ manifest.webmanifest        PWA 設定；icons/ 放圖示（make_icons.py 產生
 - 該領域所有候選來源的唯一清單，每篇一筆：網址、標題、日期、分類、摘要、`status`、`topic`、`priority`、`lesson`、`reason`。狀態說明寫在檔內 `statuses`：`new` 待分類、`todo` 要學、`done` 已做成課、`skip` 不學、`outdated` 過時。
 - 一篇來源只歸一個領域：放在「會拿它來教」的那個領域；別的領域也用到時，在自己的單元 `sources` 裡引用網址即可，不重複建清單。
 - 有 feed 的領域：`tools/sources.py scan` 只抓還不在清單裡的網址，不呼叫 AI；每週一由 GitHub Actions 自動跑，有新文章就 commit 並開 issue。
+- 課程 repo（type: github，例如 Easy-Vibe）：看指定資料夾自上次以來的 commit；新頁面加進清單（status: new），要學或已做成課的頁面改版時標上 `changed` 日期並列進 issue。上次看到的 commit 記在來源清單的 `watch`。
 - 沒有 feed 的領域（使用者想到什麼就學什麼）：用 `tools/sources.py add <領域> <網址>` 手動加入。
 - 分類時只讀 `tools/sources.py new <領域>` 的輸出，不要整份讀清單。做成課之後改 `status: done` 並填 `lesson`。
 

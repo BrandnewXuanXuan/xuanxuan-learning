@@ -3,10 +3,11 @@
 用法：python3 tools/build_lessons.py            # 全部重組
       python3 tools/build_lessons.py <領域>     # 只組某個領域
 
-.lesson 格式：第一行 JSON（id, short, title, desc, topic, topicTitle, sources:[[title,url]]；可選 domain，預設為資料夾名）
+.lesson 格式：第一行 JSON（id, short, title, desc, topic, topicTitle, sources:[[title,url]]；可選 domain，預設為資料夾名；
+可選 license:{work,url,name,licenseUrl}，原文有授權條款（例如 CC BY-NC-SA）時在頁面最下方標出處與授權）
 接著用 ===CSS=== / ===BODY=== / ===JS=== 分段。BODY 裡用 {{hint N}} 產生提問提示、{{icon x}} 產生 icon。"""
 import json, re, sys, html
-VER = '20261018b'  # 改了 assets 就換版本號，強制瀏覽器抓新檔
+VER = '20261025a'  # 改了 assets 就換版本號，強制瀏覽器抓新檔
 from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 ONLY = sys.argv[1] if len(sys.argv) > 1 else None
@@ -21,6 +22,8 @@ def build(f):
     body = parts.get('BODY', '')
     body = re.sub(r'\{\{hint (\d+)\}\}', lambda x: f'<div class="ask-hint">看不懂就回來說 <code>{m["short"]} {x.group(1)}</code></div>', body)
     body = re.sub(r'\{\{icon ([\w-]+)\}\}', lambda x: f'<svg><use href="../../assets/icons.svg?v={VER}#{x.group(1)}"/></svg>', body)
+    lic = m.get('license')
+    lic = (f'''\n  <p class="lic" style="margin:18px 2px 0;font-size:12.5px;line-height:1.7;color:var(--ink-3)">原文出處：<a href="{lic["url"]}" target="_blank" rel="noopener">{html.escape(lic["work"])}</a>（上方原文清單），以 <a href="{lic["licenseUrl"]}" target="_blank" rel="noopener">{html.escape(lic["name"])}</a> 授權。本頁是用自己的話改寫、並換成自己的例子，改寫內容同樣以 {html.escape(lic["name"])} 授權。</p>''' if lic else '')
     srcs = '\n'.join(f'    <li><a href="{u}" target="_blank" rel="noopener">{html.escape(t)}</a></li>' for t, u in m['sources'])
     page = f'''<!doctype html>
 <html lang="zh-Hant-TW">
@@ -55,7 +58,7 @@ def build(f):
 {srcs}
   </ul>
 
-  <div class="foot"><svg><use href="../../assets/icons.svg?v={VER}#chat"/></svg><span>學完了，回研究夥伴說「學完{m["short"]}」。一起回顧、寫成筆記之後，這張卡才會蓋上「學完」章。</span></div>
+  <div class="foot"><svg><use href="../../assets/icons.svg?v={VER}#chat"/></svg><span>學完了，回研究夥伴說「學完{m["short"]}」。一起回顧、寫成筆記之後，這張卡才會蓋上「學完」章。</span></div>{lic}
 </main>
 
 <script src="../../assets/iso.js?v={VER}"></script>

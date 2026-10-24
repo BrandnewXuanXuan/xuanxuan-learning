@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../../assets/style.css?v=20261018b">
+<link rel="stylesheet" href="../../assets/style.css?v=20261025a">
 <style>
 .road { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 10px; }
 .road .btn { flex-direction: column; gap: 2px; padding: 8px 2px; font-size: 12.5px; min-height: 58px; }
@@ -29,7 +29,7 @@
 </head>
 <body class="lesson">
 <header class="bar"><div class="bar-in">
-  <a class="back" href="../../index.html#/t/claude/context" aria-label="回到主題"><svg class="i"><use href="../../assets/icons.svg?v=20261018b#back"/></svg></a>
+  <a class="back" href="../../index.html#/t/claude/context" aria-label="回到主題"><svg class="i"><use href="../../assets/icons.svg?v=20261025a#back"/></svg></a>
   <span class="bar-title">context 與額度</span>
 </div></header>
 
@@ -43,14 +43,14 @@
     <div class="fig">
       <div class="ctx-row"><span>現在</span><div class="ctxbar" id="now"></div></div>
       <div class="ctx-row"><span>選完後</span><div class="ctxbar" id="after"></div></div>
-      <div class="side" id="side"><div class="side-title"><svg><use href="../../assets/icons.svg?v=20261018b#agents"/></svg>分身自己的 context（用完就丟）</div><div class="ctxbar" id="sub"></div></div>
+      <div class="side" id="side"><div class="side-title"><svg><use href="../../assets/icons.svg?v=20261025a#agents"/></svg>分身自己的 context（用完就丟）</div><div class="ctxbar" id="sub"></div></div>
       <div class="legend" id="legend"></div>
       <div class="road" id="road">
-        <button class="btn" data-k="go"><svg><use href="../../assets/icons.svg?v=20261018b#play"/></svg>繼續</button>
-        <button class="btn" data-k="rewind"><svg><use href="../../assets/icons.svg?v=20261018b#rewind"/></svg>回溯</button>
-        <button class="btn" data-k="compact"><svg><use href="../../assets/icons.svg?v=20261018b#compress"/></svg>壓縮</button>
-        <button class="btn" data-k="clear"><svg><use href="../../assets/icons.svg?v=20261018b#eraser"/></svg>清空</button>
-        <button class="btn" data-k="sub"><svg><use href="../../assets/icons.svg?v=20261018b#agents"/></svg>分身</button>
+        <button class="btn" data-k="go"><svg><use href="../../assets/icons.svg?v=20261025a#play"/></svg>繼續</button>
+        <button class="btn" data-k="rewind"><svg><use href="../../assets/icons.svg?v=20261025a#rewind"/></svg>回溯</button>
+        <button class="btn" data-k="compact"><svg><use href="../../assets/icons.svg?v=20261025a#compress"/></svg>壓縮</button>
+        <button class="btn" data-k="clear"><svg><use href="../../assets/icons.svg?v=20261025a#eraser"/></svg>清空</button>
+        <button class="btn" data-k="sub"><svg><use href="../../assets/icons.svg?v=20261025a#agents"/></svg>分身</button>
       </div>
       <div class="read" id="out">點一條路試試看。</div>
     </div>
@@ -63,8 +63,8 @@
     <p>方法失敗時，多數人會接著說「這樣不行，改用 B」。但失敗的那段嘗試還留在 context 裡，之後每一輪都會跟著重讀，還可能把 Claude 帶偏。<b>回溯</b>（連按兩下 Esc，或輸入 <code>/rewind</code>）會回到讀完檔案、還沒動手的那一刻，你直接說「不要用 A，用 B」。</p>
     <div class="fig">
       <div class="ctl" id="fixTabs">
-        <button class="btn" data-k="patch"><svg><use href="../../assets/icons.svg?v=20261018b#chat"/></svg>補一句修正</button>
-        <button class="btn" data-k="rewind"><svg><use href="../../assets/icons.svg?v=20261018b#rewind"/></svg>回溯再說</button>
+        <button class="btn" data-k="patch"><svg><use href="../../assets/icons.svg?v=20261025a#chat"/></svg>補一句修正</button>
+        <button class="btn" data-k="rewind"><svg><use href="../../assets/icons.svg?v=20261025a#rewind"/></svg>回溯再說</button>
       </div>
       <div class="ctx-row"><span>之後</span><div class="ctxbar" id="fixBar"></div></div>
       <div class="read" id="fixOut"></div>
@@ -91,10 +91,10 @@
     <p>判斷要不要交給 subagent，只要問：<b>「之後我還需要這些過程，還是只要結論？」</b>選一個情境看看。</p>
     <div class="fig" id="pick4">
       <div class="picks">
-        <button class="pick" data-c="0"><svg><use href="../../assets/icons.svg?v=20261018b#lens"/></svg>找出程式碼裡所有用到某個函式的地方</button>
-        <button class="pick" data-c="1"><svg><use href="../../assets/icons.svg?v=20261018b#pencil"/></svg>剛做完一個功能，接著幫它寫說明文件</button>
-        <button class="pick" data-c="2"><svg><use href="../../assets/icons.svg?v=20261018b#shield"/></svg>照規格檔驗證剛寫好的東西有沒有漏</button>
-        <button class="pick" data-c="3"><svg><use href="../../assets/icons.svg?v=20261018b#folder"/></svg>做完網站改版，接著要整理 Obsidian 筆記</button>
+        <button class="pick" data-c="0"><svg><use href="../../assets/icons.svg?v=20261025a#lens"/></svg>找出程式碼裡所有用到某個函式的地方</button>
+        <button class="pick" data-c="1"><svg><use href="../../assets/icons.svg?v=20261025a#pencil"/></svg>剛做完一個功能，接著幫它寫說明文件</button>
+        <button class="pick" data-c="2"><svg><use href="../../assets/icons.svg?v=20261025a#shield"/></svg>照規格檔驗證剛寫好的東西有沒有漏</button>
+        <button class="pick" data-c="3"><svg><use href="../../assets/icons.svg?v=20261025a#folder"/></svg>做完網站改版，接著要整理 Obsidian 筆記</button>
       </div>
       <div class="answer"></div>
     </div>
@@ -108,11 +108,11 @@
     <li><a href="https://code.claude.com/docs/en/best-practices" target="_blank" rel="noopener">Claude Code best practices（官方文件）</a></li>
   </ul>
 
-  <div class="foot"><svg><use href="../../assets/icons.svg?v=20261018b#chat"/></svg><span>學完了，回研究夥伴說「學完岔路」。一起回顧、寫成筆記之後，這張卡才會蓋上「學完」章。</span></div>
+  <div class="foot"><svg><use href="../../assets/icons.svg?v=20261025a#chat"/></svg><span>學完了，回研究夥伴說「學完岔路」。一起回顧、寫成筆記之後，這張卡才會蓋上「學完」章。</span></div>
 </main>
 
-<script src="../../assets/iso.js?v=20261018b"></script>
-<script src="../../assets/kit.js?v=20261018b"></script>
+<script src="../../assets/iso.js?v=20261025a"></script>
+<script src="../../assets/kit.js?v=20261025a"></script>
 <script>
 (() => {
 const C = { sys: ['var(--dusk)', '設定'], file: ['var(--slate)', '讀過的檔案'], fail: ['var(--stamp)', '失敗的嘗試'], talk: ['var(--clay)', '對話'], sum: ['var(--stone)', '摘要'], note: ['var(--ochre)', '你的交接'], rep: ['var(--sage)', '分身的報告'], tool: ['var(--teal)', '大量輸出'] };

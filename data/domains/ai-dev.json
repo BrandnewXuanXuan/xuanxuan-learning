@@ -1,0 +1,265 @@
+{
+ "id": "ai-dev",
+ "title": "AI 開發",
+ "short": "AI 開發",
+ "icon": "code",
+ "summary": "一半是怎麼跟 AI 一起做東西，一半是做的過程中碰到的主機、部署、資料庫與 Git。",
+ "topics": [
+  {
+   "id": "collab",
+   "title": "和 AI 一起做",
+   "summary": "選對工作台、說清楚需求、卡住時怎麼求救。",
+   "icon": "chat",
+   "color": "sage",
+   "lessons": [
+    {
+     "id": "ai-workbench",
+     "short": "工作台",
+     "title": "三種工作台：網頁、AI IDE、CLI",
+     "summary": "同一個需求交給三種工具，差在誰動手改檔、誰跑指令、誰驗證結果。",
+     "file": "lessons/ai-dev/ai-workbench.html",
+     "status": "ready",
+     "added": "2026-10-25",
+     "learnedAt": null,
+     "note": null,
+     "sources": [
+      {
+       "title": "初級二：學會 AI 編程工具",
+       "url": "https://datawhalechina.github.io/easy-vibe/zh-tw/stage-1/introduction-to-ai-ide/"
+      },
+      {
+       "title": "CLI AI 程式設計工具",
+       "url": "https://datawhalechina.github.io/easy-vibe/zh-tw/stage-2/backend/modern-cli/"
+      },
+      {
+       "title": "整合開發環境（IDE）基礎",
+       "url": "https://datawhalechina.github.io/easy-vibe/zh-tw/appendix/2-development-tools/ide-basics.html"
+      }
+     ]
+    },
+    {
+     "id": "ask-for-help",
+     "short": "求救",
+     "title": "卡住時，怎麼讓 AI 幫得上忙",
+     "summary": "一則好的求救要有哪幾樣、怎麼讀報錯、怎麼用二分法把問題圍起來。",
+     "file": "lessons/ai-dev/ask-for-help.html",
+     "status": "ready",
+     "added": "2026-10-25",
+     "learnedAt": null,
+     "note": null,
+     "sources": [
+      {
+       "title": "寫程式碼時遇到錯誤怎麼辦",
+       "url": "https://datawhalechina.github.io/easy-vibe/zh-tw/stage-1/appendix-b-common-errors/"
+      },
+      {
+       "title": "除錯原理與藝術",
+       "url": "https://datawhalechina.github.io/easy-vibe/zh-tw/appendix/2-development-tools/debugging-art.html"
+      },
+      {
+       "title": "瀏覽器除錯器（DevTools）基礎",
+       "url": "https://datawhalechina.github.io/easy-vibe/zh-tw/appendix/2-development-tools/debugging-art/"
+      }
+     ]
+    },
+    {
+     "id": "spec-first",
+     "short": "規格書",
+     "title": "先寫規格，再叫 AI 動手",
+     "summary": "程式碼記不住「為什麼」；把需求寫成規格、切成能用的小塊，再一張一張做。",
+     "file": "lessons/ai-dev/spec-first.html",
+     "status": "ready",
+     "added": "2026-10-25",
+     "learnedAt": null,
+     "note": null,
+     "sources": [
+      {
+       "title": "從 Vibe Coding 到 Spec Coding",
+       "url": "https://datawhalechina.github.io/easy-vibe/zh-tw/stage-3/core-skills/spec-coding/"
+      },
+      {
+       "title": "AI 輔助開發工作流程",
+       "url": "https://datawhalechina.github.io/easy-vibe/zh-tw/stage-3/core-skills/workflow/"
+      },
+      {
+       "title": "用 GitHub Issues 驅動 AI 全流程開發",
+       "url": "https://datawhalechina.github.io/easy-vibe/zh-tw/stage-3/core-skills/github-iterative-development/"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "git",
+   "title": "版本與分支",
+   "summary": "Git 的三個區、分支、合併與衝突，以及本機和 GitHub 怎麼同步。",
+   "icon": "branch",
+   "color": "slate",
+   "lessons": [
+    {
+     "id": "git-branch",
+     "short": "分支",
+     "title": "分支：在旁邊開一條路",
+     "summary": "改東西不必動到正在用的版本：開分支、推上 GitHub、回到電腦再拉下來。",
+     "file": "lessons/ai-dev/git-branch.html",
+     "status": "ready",
+     "added": "2026-10-25",
+     "learnedAt": null,
+     "note": null,
+     "sources": [
+      {
+       "title": "Git 版本控制原理",
+       "url": "https://datawhalechina.github.io/easy-vibe/zh-tw/appendix/2-development-tools/git-version-control.html"
+      },
+      {
+       "title": "Git 和 GitHub 工作流",
+       "url": "https://datawhalechina.github.io/easy-vibe/zh-tw/stage-2/backend/git-workflow/"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "deploy",
+   "title": "上線與主機",
+   "summary": "網站放在哪裡、網域怎麼找到它、HTTPS 的鎖頭從哪來。",
+   "icon": "aidev-server",
+   "color": "ochre",
+   "lessons": [
+    {
+     "id": "deploy-paths",
+     "short": "上線",
+     "title": "把網站放上網的三條路",
+     "summary": "共享主機、託管平台、自己的 VPS：每一層由誰管，決定你要顧多少事。",
+     "file": "lessons/ai-dev/deploy-paths.html",
+     "status": "ready",
+     "added": "2026-10-25",
+     "learnedAt": null,
+     "note": null,
+     "sources": [
+      {
+       "title": "把網站發到網上（簡單方式）",
+       "url": "https://datawhalechina.github.io/easy-vibe/zh-tw/stage-2/backend/zeabur-deployment/"
+      },
+      {
+       "title": "把網站發到網上（進階方式）：VPS",
+       "url": "https://datawhalechina.github.io/easy-vibe/zh-tw/stage-2/backend/cloud-server-deployment/"
+      },
+      {
+       "title": "域名 DNS 與 HTTPS 原理",
+       "url": "https://datawhalechina.github.io/easy-vibe/zh-tw/appendix/7-infrastructure-and-operations/dns-https.html"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "web",
+   "title": "請求的旅程",
+   "summary": "從按下送出到畫面出現，中間經過的每一層。",
+   "icon": "aidev-route",
+   "color": "clay",
+   "lessons": [
+    {
+     "id": "request-journey",
+     "short": "旅程",
+     "title": "按下送出之後",
+     "summary": "一次請求怎麼接力跑完全程、哪一層壞了會看到什麼、GET 和 POST 的差別。",
+     "file": "lessons/ai-dev/request-journey.html",
+     "status": "ready",
+     "added": "2026-10-25",
+     "learnedAt": null,
+     "note": null,
+     "sources": [
+      {
+       "title": "請求旅程全景",
+       "url": "https://datawhalechina.github.io/easy-vibe/zh-tw/appendix/4-server-and-backend/request-journey.html"
+      },
+      {
+       "title": "HTTP 協定原理",
+       "url": "https://datawhalechina.github.io/easy-vibe/zh-tw/appendix/4-server-and-backend/http-protocol.html"
+      },
+      {
+       "title": "連接埠與 localhost 原理",
+       "url": "https://datawhalechina.github.io/easy-vibe/zh-tw/appendix/2-development-tools/ports-localhost.html"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "data",
+   "title": "資料庫",
+   "summary": "資料表變大以後：索引、交易、安全的查詢與權限。",
+   "icon": "aidev-db",
+   "color": "moss",
+   "lessons": [
+    {
+     "id": "db-tables",
+     "short": "資料表",
+     "title": "資料表變大以後",
+     "summary": "索引為什麼快、換班為什麼要用交易、參數化查詢擋住什麼、權限該寫在哪裡。",
+     "file": "lessons/ai-dev/db-tables.html",
+     "status": "ready",
+     "added": "2026-10-25",
+     "learnedAt": null,
+     "note": null,
+     "sources": [
+      {
+       "title": "資料庫基礎：索引/事務/查詢最佳化",
+       "url": "https://datawhalechina.github.io/easy-vibe/zh-tw/appendix/5-data/database-fundamentals.html"
+      },
+      {
+       "title": "從資料庫到 Supabase",
+       "url": "https://datawhalechina.github.io/easy-vibe/zh-tw/stage-2/backend/database-supabase/"
+      },
+      {
+       "title": "安全思維與攻防基礎",
+       "url": "https://datawhalechina.github.io/easy-vibe/zh-tw/appendix/9-engineering-excellence/security-thinking.html"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "security",
+   "title": "登入與安全",
+   "summary": "帳號、權限、金鑰放哪裡。",
+   "icon": "key",
+   "color": "dusk",
+   "lessons": []
+  },
+  {
+   "id": "ai-basics",
+   "title": "AI 原理",
+   "summary": "大語言模型、agent、上下文與 RAG 是怎麼運作的。",
+   "icon": "spark",
+   "color": "teal",
+   "lessons": []
+  },
+  {
+   "id": "product",
+   "title": "產品與介面",
+   "summary": "想清楚要做什麼、為誰做，再把它做得好用好看。",
+   "icon": "target",
+   "color": "stone",
+   "lessons": []
+  },
+  {
+   "id": "build",
+   "title": "做成各種成品",
+   "summary": "網頁之外：App、擴充功能、桌面程式與上架。",
+   "icon": "aidev-box",
+   "color": "sage",
+   "lessons": []
+  },
+  {
+   "id": "cs",
+   "title": "電腦怎麼運作",
+   "summary": "作業系統、編碼、程式語言這些底層原理。",
+   "icon": "aidev-chip",
+   "color": "slate",
+   "lessons": []
+  }
+ ]
+}

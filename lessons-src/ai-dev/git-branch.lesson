@@ -1,0 +1,193 @@
+{"id":"git-branch","short":"分支","title":"分支：在旁邊開一條路","desc":"改東西不必動到正在用的版本：開分支、推上 GitHub、回到電腦再拉下來。","topic":"git","topicTitle":"版本與分支","sources":[["Easy-Vibe 附錄：Git 版本控制原理","https://datawhalechina.github.io/easy-vibe/zh-tw/appendix/2-development-tools/git-version-control.html"],["Easy-Vibe：Git 和 GitHub 工作流","https://datawhalechina.github.io/easy-vibe/zh-tw/stage-2/backend/git-workflow/"]],"license":{"work":"Datawhale〈Easy-Vibe〉","url":"https://github.com/datawhalechina/easy-vibe","name":"CC BY-NC-SA 4.0","licenseUrl":"https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hant"}}
+===CSS===
+.zones { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 6px; }
+.zone { background: #f6f4ee; border-radius: 4px 12px 12px 12px; padding: 8px 6px; min-height: 150px; }
+.zone h4 { margin: 0 0 6px; font: 14px var(--hand); display: flex; align-items: center; gap: 4px; }
+.zone h4 svg { width: 16px; height: 16px; color: var(--ink-3); }
+.f { display: block; font: 500 11.5px ui-monospace, "SF Mono", Menlo, monospace; padding: 5px 6px; border-radius: 7px; margin-bottom: 4px; background: var(--c, #e6e2d8); color: #fff; animation: drop .4s var(--ease) both; overflow-wrap: anywhere; }
+.f.plain { background: #fffefb; color: var(--ink-2); box-shadow: inset 0 0 0 1px var(--rule); }
+.cm { display: flex; gap: 6px; align-items: center; font-size: 12px; color: var(--ink-2); margin-bottom: 4px; animation: drop .4s var(--ease) both; }
+.cm i { width: 12px; height: 12px; border-radius: 50%; background: var(--slate); flex: none; }
+#graph { margin-top: 4px; }
+.places { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 6px; }
+.place { background: #f6f4ee; border-radius: 12px; padding: 8px 6px; text-align: center; font-size: 12px; color: var(--ink-2); min-height: 118px; }
+.place > svg { width: 24px; height: 24px; color: var(--ink-2); display: block; margin: 0 auto 2px; }
+.place b { display: block; font: 13.5px var(--hand); color: var(--ink); margin-bottom: 6px; }
+.br { display: block; font: 500 11px ui-monospace, "SF Mono", Menlo, monospace; padding: 3px 4px; border-radius: 6px; margin: 3px 0; background: var(--c); color: #fff; animation: drop .4s var(--ease) both; overflow-wrap: anywhere; }
+.br.cur { box-shadow: 0 0 0 2px var(--ink); }
+.seq { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; padding: 8px 0 0; }
+.seq .btn { font-size: 12.5px; padding: 0 6px; flex-direction: column; gap: 0; min-height: 52px; line-height: 1.3; }
+.seq .btn code { font-size: 10.5px; background: transparent; padding: 0; color: inherit; }
+.file { font: 500 12px/1.75 ui-monospace, "SF Mono", Menlo, monospace; background: #f3f1ea; border-radius: 10px; padding: 8px 10px; margin-top: 8px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.file .a { background: #dbe6dd; }
+.file .b { background: #f3e2c2; }
+.file .mk { color: var(--stamp); }
+.btn:disabled { opacity: .45; }
+===BODY===
+  <h1>分支：在旁邊開一條路</h1>
+  <p class="lead">clone、commit、push 你已經天天在用。這一課補上它們底下的樣子：檔案在 Git 裡經過哪三個區，以及<b>分支</b>怎麼讓你改東西時不動到正在用的版本。</p>
+
+  <section id="s1">
+    <h2><span class="no">1</span>三個區：改了、挑好、存檔</h2>
+    <p>改輪值網站時動了三個檔，其中 <code>debug.txt</code> 是除錯留下的。依序按下面三個動作。</p>
+    <div class="fig">
+      <div class="zones">
+        <div class="zone"><h4>{{icon pencil}}工作區</h4><div id="z0"></div></div>
+        <div class="zone"><h4>{{icon folder}}暫存區</h4><div id="z1"></div></div>
+        <div class="zone"><h4>{{icon branch}}儲存庫</h4><div id="z2"></div></div>
+      </div>
+      <div class="ctl">
+        <button class="btn" id="edit">{{icon pencil}}改檔案</button>
+        <button class="btn" id="add">{{icon check}}add 兩個</button>
+        <button class="btn pri" id="commit">{{icon flag}}commit</button>
+      </div>
+      <div class="read" id="zOut">先按「改檔案」。</div>
+    </div>
+    <p>中間這個暫存區，就是讓你「挑」：同一天改的東西不一定都該存成同一個版本。用 <code>git add .</code> 一次全加，就會把除錯檔、甚至密碼檔一起存進去。</p>
+    <div class="note">{{icon key}}<span>放資料庫密碼的設定檔（例如 <code>config.php</code>）要列進 <code>.gitignore</code>。一旦 commit 又推上公開的 GitHub，就算之後刪掉，歷史裡還找得到，只能去換密碼。</span></div>
+    {{hint 1}}
+  </section>
+
+  <section id="s2">
+    <h2><span class="no">2</span>分支是一張可以移動的書籤</h2>
+    <p>分支不是把整個專案複製一份，只是一個指向某個版本的名字；<code>HEAD</code> 標出你現在站在哪一條。依序按按看。</p>
+    <div class="fig">
+      <svg id="graph" viewBox="0 0 340 150" role="img" aria-label="分支圖"></svg>
+      <div class="ctl" id="gBtns">
+        <button class="btn" data-k="branch">{{icon branch}}開分支</button>
+        <button class="btn" data-k="commit">{{icon flag}}在分支 commit</button>
+        <button class="btn" data-k="main">{{icon back}}切回 main</button>
+        <button class="btn pri" data-k="merge">{{icon link}}合併</button>
+      </div>
+      <div class="read" id="gOut"></div>
+    </div>
+    <p>網站如果是從 main 發佈的（像 GitHub Pages），分支上做多少都不影響線上；確定沒問題再合併，網站才更新。</p>
+    {{hint 2}}
+  </section>
+
+  <section id="s3">
+    <h2><span class="no">3</span>雲端做的分支，怎麼回到電腦</h2>
+    <p>在雲端 session 讓 AI 開分支做事，做完推上 GitHub；回到自己電腦，再把它拉下來接著用。照順序按：</p>
+    <div class="fig">
+      <div class="places">
+        <div class="place">{{icon cloud}}<b>雲端 session</b><div id="p0"></div></div>
+        <div class="place">{{icon aidev-globe}}<b>GitHub</b><div id="p1"></div></div>
+        <div class="place">{{icon aidev-terminal}}<b>你的電腦</b><div id="p2"></div></div>
+      </div>
+      <div class="seq">
+        <button class="btn" id="s-push">推上去<code>git push</code></button>
+        <button class="btn" id="s-fetch">看看新的<code>git fetch</code></button>
+        <button class="btn" id="s-switch">切過去<code>git switch</code></button>
+      </div>
+      <div class="read" id="pOut">雲端 session 在新分支上做好了，還沒推。</div>
+    </div>
+    <p><code>fetch</code> 只把 GitHub 上的新東西抓下來看，不動你正在用的檔案；<code>pull</code> 則是「fetch 再合併進目前這條分支」。不確定別人做了什麼時，先 fetch 比較安全。</p>
+    {{hint 3}}
+  </section>
+
+  <section id="s4">
+    <h2><span class="no">4</span>衝突：兩邊改了同一行</h2>
+    <p>你在 main 上改了首頁標題，分支上的 AI 也改了。Git 合併時，只要改的是不同行就自動合好；<b>同一行兩種寫法</b>，它不會替你選。</p>
+    <div class="fig">
+      <div class="ctl" id="cfTabs">
+        <button class="btn" data-k="diff">改了不同行</button>
+        <button class="btn" data-k="same">改了同一行</button>
+      </div>
+      <div class="file" id="cfFile"></div>
+      <div class="ctl" id="cfAct"></div>
+      <div class="read" id="cfOut"></div>
+    </div>
+    <p>標記之間 <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code> 到 <code>=======</code> 是你這邊、<code>=======</code> 到 <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code> 是要合進來的那邊。挑好、刪掉標記，再 add、commit 就完成。分支開得越久越容易衝突，所以小步做、早點合。</p>
+    {{hint 4}}
+  </section>
+===JS===
+// 1 三個區
+const FILES = [['save.php', 'var(--clay)'], ['style.css', 'var(--teal)'], ['debug.txt', 'var(--stone)']];
+let zs = 0, commits = 0;
+function drawZones() {
+  const chip = (i, plain) => `<span class="f${plain ? ' plain' : ''}" style="--c:${FILES[i][1]}">${FILES[i][0]}</span>`;
+  const z0 = zs === 0 ? '' : zs === 1 ? [0, 1, 2].map((i) => chip(i)).join('') : chip(2);
+  const z1 = zs === 2 ? chip(0) + chip(1) : '';
+  document.getElementById('z0').innerHTML = z0 || '<span class="f plain">（乾淨）</span>';
+  document.getElementById('z1').innerHTML = z1;
+  document.getElementById('z2').innerHTML = Array.from({ length: 2 + commits }, (_, i) => `<div class="cm"><i></i>${i < 2 ? '舊版本' : '加上兩班上限'}</div>`).join('');
+  document.getElementById('edit').disabled = zs !== 0;
+  document.getElementById('add').disabled = zs !== 1;
+  document.getElementById('commit').disabled = zs !== 2;
+}
+document.getElementById('edit').addEventListener('click', () => { zs = 1; drawZones(); document.getElementById('zOut').innerHTML = '改過的三個檔都在<b>工作區</b>：Git 知道它們變了，但還沒打算存。'; });
+document.getElementById('add').addEventListener('click', () => { zs = 2; drawZones(); document.getElementById('zOut').innerHTML = '<code>git add save.php style.css</code>：只挑真正要存的兩個放進<b>暫存區</b>，debug.txt 留在原地。'; });
+document.getElementById('commit').addEventListener('click', () => { zs = 3; commits++; drawZones(); document.getElementById('zOut').innerHTML = '<code>git commit</code>：暫存區的內容封成一個<b>版本</b>，附上說明。debug.txt 沒被存進去。'; document.getElementById('edit').disabled = false; zs = 0; });
+drawZones();
+
+// 2 分支圖
+const g = document.getElementById('graph');
+let st;
+function resetG() { st = { br: false, bc: 0, head: 'main', merged: false }; }
+function drawG() {
+  const { mk } = Iso; g.innerHTML = '';
+  const Y1 = 50, Y2 = 112, X = (i) => 30 + i * 52;
+  const mainN = 3 + (st.merged ? 1 : 0);
+  g.append(mk('path', { d: `M${X(0)} ${Y1}H${X(mainN - 1)}`, stroke: Iso.color('slate'), 'stroke-width': 3, fill: 'none' }));
+  if (st.br) {
+    const end = X(2 + Math.max(st.bc, 0));
+    g.append(mk('path', { d: `M${X(2)} ${Y1}C${X(2) + 20} ${Y1} ${X(2) + 10} ${Y2} ${X(2) + 40} ${Y2}H${Math.max(end, X(2) + 40)}`, stroke: Iso.color('clay'), 'stroke-width': 3, fill: 'none' }));
+    if (st.merged) g.append(mk('path', { d: `M${X(2 + st.bc)} ${Y2}C${X(3) + 30} ${Y2} ${X(3) - 10} ${Y1} ${X(3)} ${Y1}`, stroke: Iso.color('clay'), 'stroke-width': 3, fill: 'none', 'stroke-dasharray': '5 4' }));
+  }
+  for (let i = 0; i < mainN; i++) g.append(mk('circle', { cx: X(i), cy: Y1, r: 9, fill: Iso.color('slate'), stroke: '#fff', 'stroke-width': 2.5 }));
+  for (let i = 1; i <= st.bc; i++) g.append(mk('circle', { cx: X(2 + i), cy: Y2, r: 9, fill: Iso.color('clay'), stroke: '#fff', 'stroke-width': 2.5 }));
+  g.append(mk('text', { x: X(mainN - 1) + 16, y: Y1 + 4, class: 'lbl' }, 'main'));
+  if (st.br) g.append(mk('text', { x: X(2 + st.bc) + 16, y: Y2 + 4, class: 'lbl' }, 'new-feature'));
+  const hx = st.head === 'main' ? X(mainN - 1) : X(2 + st.bc), hy = st.head === 'main' ? Y1 : Y2;
+  g.append(mk('rect', { x: hx - 22, y: hy - 38, width: 44, height: 18, rx: 6, fill: Iso.color('ochre') }));
+  g.append(mk('text', { x: hx, y: hy - 25, 'text-anchor': 'middle', style: 'font:700 11px var(--font);fill:#fff' }, 'HEAD'));
+  g.append(mk('text', { x: 12, y: 144, class: 'cap' }, st.merged ? '網站（main）現在包含新功能' : '網站從 main 發佈：' + (st.bc ? '分支上的改動還不在線上' : '目前是線上版本')));
+}
+const GMSG = {
+  branch: () => { if (st.br) return '已經開好了。'; st.br = true; st.head = 'new-feature'; return '<b>開分支</b>：在目前版本插一張新書籤 new-feature，HEAD 移過去。檔案一個都沒複製。'; },
+  commit: () => { if (!st.br || st.head !== 'new-feature' || st.merged) return '要先開分支、並站在分支上。'; if (st.bc >= 2) return '先這樣，試試切回 main。'; st.bc++; return `在分支上存了第 ${st.bc} 個版本，只有 new-feature 往前走，main 原地不動。`; },
+  main: () => { if (!st.br) return '還沒有分支。'; st.head = 'main'; return '<b>切回 main</b>：資料夾裡的檔案立刻變回 main 的樣子，分支上的改動收在旁邊，沒有不見。'; },
+  merge: () => { if (!st.bc) return '分支上還沒有新版本可以合。'; if (st.head !== 'main') return '合併要站在「要收進來的那條」，先切回 main。'; if (st.merged) { resetG(); return '重新開始。'; } st.merged = true; return '<b>合併</b>：把 new-feature 的改動收進 main，產生一個合併版本。網站下次發佈就有新功能了。'; }
+};
+document.querySelectorAll('#gBtns .btn').forEach((b) => b.addEventListener('click', () => { document.getElementById('gOut').innerHTML = GMSG[b.dataset.k](); drawG(); }));
+resetG(); drawG();
+document.getElementById('gOut').innerHTML = '目前只有 main，三個版本。';
+
+// 3 雲端 → GitHub → 電腦
+let ps = 0;
+const BR = (n, c, cur) => `<span class="br${cur ? ' cur' : ''}" style="--c:var(--${c})">${n}</span>`;
+function drawP() {
+  document.getElementById('p0').innerHTML = BR('main', 'slate') + BR('new-feature', 'clay', 1);
+  document.getElementById('p1').innerHTML = BR('main', 'slate') + (ps >= 1 ? BR('new-feature', 'clay') : '');
+  document.getElementById('p2').innerHTML = BR('main', 'slate', ps < 3) + (ps >= 2 ? BR('origin/new-feature', 'clay') : '') + (ps >= 3 ? BR('new-feature', 'clay', 1) : '');
+  ['s-push', 's-fetch', 's-switch'].forEach((id, i) => { document.getElementById(id).disabled = ps !== i; document.getElementById(id).classList.toggle('pri', ps === i); });
+}
+const PMSG = ['', '<b>push</b>：分支上傳到 GitHub。你的電腦還不知道有這回事。', '<b>fetch</b>：電腦知道 GitHub 上多了 <code>origin/new-feature</code>（遠端那份的影子），你的檔案還沒變。', '<b>switch</b>：建立同名的本機分支並切過去，資料夾裡就是雲端做好的版本。main 完全沒被動到。'];
+['s-push', 's-fetch', 's-switch'].forEach((id, i) => document.getElementById(id).addEventListener('click', () => { ps = i + 1; drawP(); document.getElementById('pOut').innerHTML = PMSG[ps] + (ps === 3 ? '' : ''); }));
+drawP();
+
+// 4 衝突
+let cfMode = 'diff';
+const BASE = ['&lt;h1&gt;本週值班&lt;/h1&gt;', '&lt;p&gt;每人每週最多兩班&lt;/p&gt;'];
+function drawCf(stage) {
+  const f = document.getElementById('cfFile'), act = document.getElementById('cfAct'), out = document.getElementById('cfOut');
+  if (cfMode === 'diff') {
+    f.innerHTML = stage ? '<span class="a">&lt;h1&gt;本週值班表&lt;/h1&gt;</span>\n<span class="b">&lt;p&gt;每人每週最多兩班，代班請找幹部&lt;/p&gt;</span>' : `你（main）改第 1 行：<span class="a">本週值班表</span>\n分支改第 2 行：<span class="b">…代班請找幹部</span>`;
+    act.innerHTML = stage ? '' : '<button class="btn pri" data-a="m">合併</button>';
+    out.innerHTML = stage ? '<b>自動合好</b>：兩邊改的是不同行，Git 兩個都收下。' : '兩邊各改一行，按合併看看。';
+  } else if (!stage) {
+    f.innerHTML = `你（main）改第 1 行：<span class="a">本週值班表</span>\n分支也改第 1 行：<span class="b">這週誰值班？</span>`;
+    act.innerHTML = '<button class="btn pri" data-a="m">合併</button>';
+    out.innerHTML = '兩邊都改了第 1 行，按合併看看。';
+  } else if (stage === 'm') {
+    f.innerHTML = `<span class="mk">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</span>\n<span class="a">&lt;h1&gt;本週值班表&lt;/h1&gt;</span>\n<span class="mk">=======</span>\n<span class="b">&lt;h1&gt;這週誰值班？&lt;/h1&gt;</span>\n<span class="mk">&gt;&gt;&gt;&gt;&gt;&gt;&gt; new-feature</span>\n${BASE[1]}`;
+    act.innerHTML = '<button class="btn" data-a="A">留 main 的</button><button class="btn" data-a="B">留分支的</button>';
+    out.innerHTML = '<b>衝突</b>：Git 把兩個版本都寫進檔案，用標記圍起來，等你決定。';
+  } else {
+    f.innerHTML = `<span class="${stage === 'A' ? 'a' : 'b'}">&lt;h1&gt;${stage === 'A' ? '本週值班表' : '這週誰值班？'}&lt;/h1&gt;</span>\n${BASE[1]}`;
+    act.innerHTML = '';
+    out.innerHTML = '標記刪掉了，只留你選的那行。接著 <code>git add</code>、<code>git commit</code>，合併完成。也可以兩行都不要，自己寫一個新的。';
+  }
+  act.querySelectorAll('.btn').forEach((b) => b.addEventListener('click', () => drawCf(b.dataset.a)));
+}
+Kit.tabs(document.getElementById('s4'), (k) => { cfMode = k; drawCf(0); }, 'diff');

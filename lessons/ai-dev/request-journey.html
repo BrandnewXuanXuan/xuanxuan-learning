@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>按下送出之後</title>
+<meta name="description" content="一次請求怎麼接力跑完全程、哪一層壞了會看到什麼、GET 和 POST 的差別。">
+<meta name="theme-color" content="#f1f0eb">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="icon" href="../../icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css?v=20261025a">
+<style>
+.legs { display: grid; gap: 4px; margin-top: 8px; }
+.leg { display: grid; grid-template-columns: 22px 1fr 40px; gap: 8px; align-items: center; font-size: 13px; padding: 4px 6px; border-radius: 8px; transition: opacity .3s; }
+.leg svg { width: 18px; height: 18px; color: var(--c); }
+.leg em { font-style: normal; text-align: right; font-size: 12px; color: var(--ink-3); }
+.leg.gone { opacity: .3; text-decoration: line-through; }
+.total { display: flex; align-items: baseline; gap: 8px; font-size: 13px; color: var(--ink-2); padding: 6px 4px 0; }
+.total b { font: 24px var(--hand); color: var(--ink); }
+.layers { display: grid; gap: 5px; }
+.layers .pick { min-height: 44px; font-size: 13.5px; }
+.browser { margin-top: 10px; border-radius: 12px; overflow: hidden; box-shadow: 0 0 0 1px var(--rule); background: #fff; animation: drop .4s var(--ease) both; }
+.browser .url { display: flex; align-items: center; gap: 6px; padding: 6px 10px; background: #efede6; font: 500 12px ui-monospace, "SF Mono", Menlo, monospace; color: var(--ink-2); overflow-wrap: anywhere; }
+.browser .url svg { width: 14px; height: 14px; flex: none; }
+.browser .page { padding: 14px 12px; min-height: 76px; font-size: 13.5px; }
+.browser .page h5 { margin: 0 0 4px; font: 17px var(--hand); }
+.browser .page.blank { background: #fff; }
+.browser .page .code { font: 700 22px var(--font); color: var(--ink-3); }
+.dlg { margin-top: 8px; padding: 10px 12px; border-radius: 10px; background: #f6f4ee; font-size: 13px; animation: drop .4s var(--ease) both; }
+.count { display: flex; gap: 6px; align-items: center; margin-top: 8px; font-size: 13px; color: var(--ink-2); flex-wrap: wrap; }
+.count i { width: 22px; height: 22px; border-radius: 6px; background: var(--clay); animation: drop .4s var(--ease) both; }
+.count i.dup { background: var(--stamp); }
+.lan { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.lan h4 { margin: 0 0 4px; font: 13px var(--font); color: var(--ink-3); font-weight: 500; }
+.lan .ctl { padding: 0; flex-direction: column; }
+.lan .btn { font-size: 12.5px; min-height: 40px; padding: 0 6px; }
+.btn:disabled { opacity: .45; }
+</style>
+</head>
+<body class="lesson">
+<header class="bar"><div class="bar-in">
+  <a class="back" href="../../index.html#/t/ai-dev/web" aria-label="回到主題"><svg class="i"><use href="../../assets/icons.svg?v=20261025a#back"/></svg></a>
+  <span class="bar-title">請求的旅程</span>
+</div></header>
+
+<main class="wrap">
+<h1>按下送出之後</h1>
+  <p class="lead">在輪值網站按「送出登記」，不到一秒就看到結果。這一秒裡，請求經過了好幾站接力。看懂這條路線，網站出問題時就知道該往哪一站找。</p>
+
+  <section id="s1">
+    <h2><span class="no">1</span>一次請求的接力</h2>
+    <p>下面是第一次打開網站時的每一段，右邊是耗時（示意單位，用來比大小）。切到「同一頁再操作一次」，看哪幾段被省掉。</p>
+    <div class="fig">
+      <div class="ctl" id="tripTabs">
+        <button class="btn" data-k="first">第一次打開</button>
+        <button class="btn" data-k="again">同一頁再操作一次</button>
+      </div>
+      <div class="ctxbar" id="tripBar"></div>
+      <div class="legs" id="legs"></div>
+      <div class="total">合計 <b id="tripSum"></b> 單位</div>
+      <div class="read" id="tripOut"></div>
+    </div>
+    <p>原文提醒一個常見現象：網站變慢時，最常卡住的是<b>資料庫查詢</b>，而不是 PHP 本身。資料表越來越大、查詢又沒有索引，這一段就會越拉越長（下一個主題「資料表」會講）。</p>
+    <div class="ask-hint">看不懂就回來說 <code>旅程 1</code></div>
+  </section>
+
+  <section id="s2">
+    <h2><span class="no">2</span>哪一站壞了，畫面長什麼樣</h2>
+    <p>每一站壞掉，瀏覽器看到的樣子都不同。點一站，讓它壞掉：</p>
+    <div class="fig" id="brk">
+      <div class="layers">
+        <button class="pick" data-k="dns"><svg><use href="../../assets/icons.svg?v=20261025a#aidev-globe"/></svg>DNS：網域查不到 IP</button>
+        <button class="pick" data-k="host"><svg><use href="../../assets/icons.svg?v=20261025a#aidev-server"/></svg>主機：關機或被防火牆擋住</button>
+        <button class="pick" data-k="file"><svg><use href="../../assets/icons.svg?v=20261025a#file"/></svg>網頁伺服器：找不到這個檔案</button>
+        <button class="pick" data-k="perm"><svg><use href="../../assets/icons.svg?v=20261025a#key"/></svg>網頁伺服器：沒有權限讀</button>
+        <button class="pick" data-k="php"><svg><use href="../../assets/icons.svg?v=20261025a#code"/></svg>PHP：程式出錯</button>
+        <button class="pick" data-k="db"><svg><use href="../../assets/icons.svg?v=20261025a#aidev-db"/></svg>資料庫：查詢太慢</button>
+      </div>
+      <div id="brkOut"></div>
+    </div>
+    <p>反過來用：看到 4 開頭的數字，多半是請求本身的問題（網址打錯、沒權限）；5 開頭是主機那邊出事，要去看錯誤日誌；完全沒回應，就往 DNS 和連線找。</p>
+    <div class="ask-hint">看不懂就回來說 <code>旅程 2</code></div>
+  </section>
+
+  <section id="s3">
+    <h2><span class="no">3</span>GET 拿東西，POST 送東西</h2>
+    <p>查班表用 GET：條件寫在網址上，可以加書籤、重新整理也沒事。送出登記用 POST：資料放在請求裡，代表「要改變某些東西」。分別試試按「重新整理」。</p>
+    <div class="fig">
+      <div class="ctl" id="formTabs">
+        <button class="btn" data-k="get">查班表（GET）</button>
+        <button class="btn" data-k="post">送出登記（POST）</button>
+        <button class="btn" data-k="prg">送出後轉址</button>
+      </div>
+      <div class="browser"><div class="url"><svg><use href="../../assets/icons.svg?v=20261025a#aidev-lock"/></svg><span id="fUrl"></span></div><div class="page" id="fPage"></div></div>
+      <div id="fDlg"></div>
+      <div class="count" id="fCount"></div>
+      <div class="ctl"><button class="btn pri" id="reload"><svg><use href="../../assets/icons.svg?v=20261025a#repeat"/></svg>按重新整理</button></div>
+      <div class="read" id="fOut"></div>
+    </div>
+    <p>「送出後轉址」的做法叫 PRG（POST → 轉址 → GET）：處理完 POST，立刻叫瀏覽器改去另一個 GET 頁面。之後怎麼重新整理，都只是重看結果頁。請 AI 寫表單時可以直接要求這個做法。</p>
+    <div class="ask-hint">看不懂就回來說 <code>旅程 3</code></div>
+  </section>
+
+  <section id="s4">
+    <h2><span class="no">4</span>localhost 只在你自己的電腦</h2>
+    <p>在電腦上預覽網站時，網址常是 <code>localhost:8765</code>：<code>localhost</code> 指「這台機器自己」，<code>8765</code> 是連接埠，像同一棟樓裡的房號。選一台裝置和一個網址：</p>
+    <div class="fig">
+      <div class="lan">
+        <div><h4>用哪台裝置打開</h4><div class="ctl" id="devBtns"><button class="btn" data-v="pc"><svg><use href="../../assets/icons.svg?v=20261025a#aidev-terminal"/></svg>電腦本身</button><button class="btn" data-v="phone"><svg><use href="../../assets/icons.svg?v=20261025a#bell"/></svg>同 Wi-Fi 的手機</button></div></div>
+        <div><h4>輸入的網址</h4><div class="ctl" id="addrBtns"><button class="btn" data-v="lh">localhost:8765</button><button class="btn" data-v="ip">192.168.1.20:8765</button></div></div>
+      </div>
+      <div class="browser"><div class="url"><svg><use href="../../assets/icons.svg?v=20261025a#aidev-globe"/></svg><span id="lUrl"></span></div><div class="page" id="lPage"></div></div>
+      <div class="read" id="lOut"></div>
+    </div>
+    <p>預覽伺服器有時只聽「自己人」的請求（綁在 127.0.0.1），這時連區網 IP 也進不來，要讓它改聽所有網路介面（0.0.0.0）。另一個常見訊息是「連接埠已被使用」：同一個房號已經有程式在了，關掉舊的或換一個號碼就好。</p>
+    <div class="ask-hint">看不懂就回來說 <code>旅程 4</code></div>
+  </section>
+
+  <h2>原文</h2>
+  <ul class="srcs">
+    <li><a href="https://datawhalechina.github.io/easy-vibe/zh-tw/appendix/4-server-and-backend/request-journey.html" target="_blank" rel="noopener">Easy-Vibe 附錄：請求旅程全景</a></li>
+    <li><a href="https://datawhalechina.github.io/easy-vibe/zh-tw/appendix/4-server-and-backend/http-protocol.html" target="_blank" rel="noopener">Easy-Vibe 附錄：HTTP 協定原理</a></li>
+    <li><a href="https://datawhalechina.github.io/easy-vibe/zh-tw/appendix/2-development-tools/ports-localhost.html" target="_blank" rel="noopener">Easy-Vibe 附錄：連接埠與 localhost 原理</a></li>
+  </ul>
+
+  <div class="foot"><svg><use href="../../assets/icons.svg?v=20261025a#chat"/></svg><span>學完了，回研究夥伴說「學完旅程」。一起回顧、寫成筆記之後，這張卡才會蓋上「學完」章。</span></div>
+  <p class="lic" style="margin:18px 2px 0;font-size:12.5px;line-height:1.7;color:var(--ink-3)">原文出處：<a href="https://github.com/datawhalechina/easy-vibe" target="_blank" rel="noopener">Datawhale〈Easy-Vibe〉</a>（上方原文清單），以 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hant" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a> 授權。本頁是用自己的話改寫、並換成自己的例子，改寫內容同樣以 CC BY-NC-SA 4.0 授權。</p>
+</main>
+
+<script src="../../assets/iso.js?v=20261025a"></script>
+<script src="../../assets/kit.js?v=20261025a"></script>
+<script>
+(() => {
+const LEGS = [
+  ['aidev-globe', 'var(--teal)', 'DNS 查 IP', 30, 1],
+  ['aidev-lock', 'var(--dusk)', '建立連線（含 HTTPS 握手）', 40, 1],
+  ['play', 'var(--slate)', '送出請求', 5],
+  ['aidev-server', 'var(--stone)', '網頁伺服器找到 save.php', 5],
+  ['code', 'var(--clay)', 'PHP 執行', 20],
+  ['aidev-db', 'var(--moss)', 'MySQL 查詢與寫入', 25],
+  ['back', 'var(--slate)', '傳回 HTML', 15],
+  ['eye', 'var(--ochre)', '瀏覽器畫出畫面', 20]
+];
+Kit.tabs(document.getElementById('s1'), (k) => {
+  const again = k === 'again';
+  const used = LEGS.filter((l) => !(again && l[4]));
+  document.getElementById('tripBar').innerHTML = used.map(([, c, t, n]) => `<div class="seg" style="--c:${c};flex:${n}">${n >= 20 ? t.slice(0, 4) : ''}</div>`).join('');
+  document.getElementById('legs').innerHTML = LEGS.map(([ic, c, t, n, skip]) => `<div class="leg${again && skip ? ' gone' : ''}" style="--c:${c}">${Kit.icon(ic)}<span>${t}</span><em>${n}</em></div>`).join('');
+  document.getElementById('tripSum').textContent = used.reduce((a, l) => a + l[3], 0);
+  document.getElementById('tripOut').innerHTML = again
+    ? '<b>省掉前兩段</b>：IP 已經記在快取裡，連線也還開著可以重複用。這就是為什麼第二次操作通常比較快。'
+    : '第一次要先查 IP、建立加密連線，才輪到真正的請求。';
+}, 'first');
+
+const BRK = {
+  dns: ['duty.example.tw', '<h5>找不到這個網站</h5>瀏覽器顯示「找不到伺服器的 IP 位址」。', '<b>往 DNS 找</b>：網域到期了嗎？DNS 設定剛改、還沒生效？'],
+  host: ['duty.example.tw', '<h5>連線逾時</h5>轉圈很久，最後說「回應時間過長」。', '<b>往主機與網路找</b>：主機商有沒有維護公告？防火牆擋了嗎？（VPS 常見：雲端安全群組沒開 80/443）'],
+  file: ['duty.example.tw/sav.php', '<div class="code">404</div>Not Found', '<b>網址或檔名不對</b>：檔案有沒有上傳到正確資料夾？大小寫一致嗎？Linux 主機分大小寫。'],
+  perm: ['duty.example.tw/admin/', '<div class="code">403</div>Forbidden', '<b>權限</b>：檔案權限設錯，或 <code>.htaccess</code> 擋住了這個路徑。'],
+  php: ['duty.example.tw/save.php', '', '<b>PHP 出錯</b>：正式主機常常只給白畫面或 500。去錯誤日誌（error_log）看真正的原因，再整段交給 AI。'],
+  db: ['duty.example.tw/history.php', '<h5>載入中…</h5>過了 20 秒才出現。', '<b>資料庫</b>：多半是查詢掃了整張大表。請 AI 看這支查詢的條件欄位有沒有索引。']
+};
+document.querySelectorAll('#brk .pick').forEach((b) => b.addEventListener('click', () => {
+  document.querySelectorAll('#brk .pick').forEach((x) => x.classList.toggle('on', x === b));
+  const [u, page, why] = BRK[b.dataset.k];
+  document.getElementById('brkOut').innerHTML = `<div class="browser"><div class="url">${Kit.icon('aidev-globe')}<span>${u}</span></div><div class="page${page ? '' : ' blank'}">${page || '<span style="color:var(--ink-3);font-size:12px">（一片空白）</span>'}</div></div><div class="read">${why}</div>`;
+}));
+
+let form = 'get', regs = 0, dlg = false;
+const F = {
+  get: ['duty.example.tw/schedule.php?week=43', '<h5>第 43 週班表</h5>週六上午：小明、小華'],
+  post: ['duty.example.tw/save.php', '<h5>登記成功</h5>你登記了週六上午。'],
+  prg: ['duty.example.tw/index.php?done=1', '<h5>登記成功</h5>你登記了週六上午。']
+};
+function drawForm(msg) {
+  document.getElementById('fUrl').textContent = F[form][0];
+  document.getElementById('fPage').innerHTML = F[form][1];
+  document.getElementById('fDlg').innerHTML = dlg ? '<div class="dlg"><b>確認重新提交表單？</b> 你剛才輸入的資料會再送出一次。<div class="ctl"><button class="btn pri" id="resend">繼續</button><button class="btn" id="cancel">取消</button></div></div>' : '';
+  document.getElementById('fCount').innerHTML = form === 'get' ? '' : `資料庫裡你的登記：${Array.from({ length: regs }, (_, i) => `<i class="${i ? 'dup' : ''}"></i>`).join('')}`;
+  document.getElementById('fOut').innerHTML = msg;
+  if (dlg) {
+    document.getElementById('resend').addEventListener('click', () => { dlg = false; regs++; drawForm('<b>重複登記了</b>：同一筆 POST 又送了一次，資料庫多一筆（紅色）。很多人看到這個視窗會直接按繼續。'); });
+    document.getElementById('cancel').addEventListener('click', () => { dlg = false; drawForm('取消就沒事，但不能指望每個人都會按取消。'); });
+  }
+}
+Kit.tabs(document.getElementById('s3'), (k) => {
+  form = k; dlg = false; regs = k === 'get' ? 0 : 1;
+  drawForm(k === 'get' ? '網址上看得到 <code>week=43</code>：這是 GET 的條件。' : k === 'post' ? '送出後，網址停在 save.php，畫面是 POST 的處理結果。' : '送出後，主機處理完立刻叫瀏覽器轉去 index.php，網址變了。');
+}, 'get');
+document.getElementById('reload').addEventListener('click', () => {
+  if (form === 'get') drawForm('<b>沒事</b>：只是再拿一次班表，什麼都不會改變。');
+  else if (form === 'post') { dlg = true; drawForm('瀏覽器問你要不要把資料<b>再送一次</b>。'); }
+  else drawForm('<b>沒事</b>：重新整理的是轉址後的 GET 頁面，登記不會重複。');
+});
+
+let dev = 'pc', addr = 'lh';
+function drawLan() {
+  document.querySelectorAll('#devBtns .btn').forEach((b) => b.classList.toggle('on', b.dataset.v === dev));
+  document.querySelectorAll('#addrBtns .btn').forEach((b) => b.classList.toggle('on', b.dataset.v === addr));
+  document.getElementById('lUrl').textContent = addr === 'lh' ? 'localhost:8765' : '192.168.1.20:8765';
+  const ok = dev === 'pc' || addr === 'ip';
+  document.getElementById('lPage').innerHTML = ok ? '<h5>預覽中的網站</h5>首頁正常顯示。' : '<h5>無法連上這個網站</h5>localhost 拒絕連線。';
+  document.getElementById('lOut').innerHTML = dev === 'pc'
+    ? (addr === 'lh' ? '電腦連自己：請求根本沒離開這台機器，直接在本機折返。' : '用區網 IP 連自己也可以，繞到網卡再回來。')
+    : (addr === 'lh' ? '<b>失敗</b>：在手機上，localhost 指的是<b>手機自己</b>，手機上沒有開這個網站。' : '<b>成功</b>：用電腦在區網的 IP，手機就找得到它（前提是預覽伺服器願意接受外來的連線）。');
+}
+document.querySelectorAll('#devBtns .btn').forEach((b) => b.addEventListener('click', () => { dev = b.dataset.v; drawLan(); }));
+document.querySelectorAll('#addrBtns .btn').forEach((b) => b.addEventListener('click', () => { addr = b.dataset.v; drawLan(); }));
+drawLan();
+})();
+</script>
+<script src="../../assets/lesson.js" data-root="../../"></script>
+</body>
+</html>

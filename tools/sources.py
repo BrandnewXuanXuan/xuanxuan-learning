@@ -2,7 +2,7 @@
 """各領域的來源清單管理（data/sources/<領域>.json）。只用 Python 標準庫，不呼叫任何 AI，不耗 Claude 額度。
 
 用法：
-  python3 tools/sources.py scan [領域]           # 依 data/feeds.json 的 sitemap 找新文章（不給領域＝全部有設定 feed 的領域）
+  python3 tools/sources.py scan [領域]           # 依 data/feeds.json 找新文章（sitemap，或 GitHub repo 的 commit；不給領域＝全部有設定 feed 的領域）
   python3 tools/sources.py add <領域> <網址>      # 手動加一個來源（沒有 feed 的領域，例如佛學、術數）
   python3 tools/sources.py new [領域]            # 列出 status=new（待分類）的來源
   python3 tools/sources.py stats [領域]          # 各狀態數量
@@ -14,6 +14,7 @@ import concurrent.futures as cf
 import datetime as dt
 import html
 import json
+import os
 import re
 import sys
 import urllib.request
@@ -89,13 +90,90 @@ def item(url, feed, m):
             "status": "new", "topic": None, "priority": None, "lesson": None, "reason": ""}
 
 
+def gh_get(url):
+    """GitHub API（公開 repo）。Actions 裡有 GH_TOKEN 就帶上，避免共用 IP 撞到速率限制。"""
+    h = {**UA, "Accept": "application/vnd.github+json"}
+    tok = os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
+    if tok:
+        h["Authorization"] = f"Bearer {tok}"
+    with urllib.request.urlopen(urllib.request.Request(url, headers=h), timeout=25) as r:
+        return json.loads(r.read().decode("utf-8"))
+
+
+def md_url(f, path):
+    """repo 裡的 .md 路徑 → 網站網址（VitePress：index.md 是資料夾網址，其他加 .html）。"""
+    rel = path[len(f["path"]) + 1:-3]
+    if rel == "index":
+        return f["site"]
+    return f["site"] + (rel[:-5] if rel.endswith("/index") else rel + ".html")
+
+
+def md_meta(f, path):
+    """新頁面只讀 markdown 的 frontmatter 與第一個標題，不呼叫 AI。"""
+    try:
+        t = get(f"https://raw.githubusercontent.com/{f['repo']}/{f['branch']}/{path}")
+    except Exception as e:  # noqa: BLE001
+        return {"title": "", "summary": "", "date": "", "category": "", "error": str(e)[:80]}
+    fm = m.group(1) if (m := re.match(r"---\n(.*?)\n---", t, re.S)) else ""
+    pick = lambda k: (m.group(1).strip().strip("'\"") if (m := re.search(rf"^{k}:\s*(.+)$", fm, re.M)) else "")
+    title = pick("title") or (m.group(1).strip() if (m := re.search(r"^# (.+)$", t, re.M)) else "")
+    return {"title": title, "summary": pick("description")[:300], "date": "", "category": "", "path": path}
+
+
+def scan_github(d, f, db, known):
+    """沒有 blog feed 的課程 repo：只看指定資料夾的 commit。新頁面加進清單（status: new）；
+    要學或已做成課的頁面有改版，就標上 changed 日期並列出來。每次只花幾個 API 請求，不呼叫 AI。"""
+    w = db.setdefault("watch", {}).setdefault(f["name"], {"repo": f["repo"], "last": None, "checked": None})
+    q = f"https://api.github.com/repos/{f['repo']}/commits?sha={f['branch']}&path={f['path']}&per_page=100"
+    if w.get("checked"):
+        q += f"&since={w['checked']}T00:00:00Z"
+    commits = []
+    for c in gh_get(q):
+        if c["sha"] == w.get("last"):
+            break
+        commits.append(c)
+    found, changed = [], {}
+    if commits:
+        tree = gh_get(f"https://api.github.com/repos/{f['repo']}/git/trees/{f['branch']}?recursive=1")["tree"]
+        for t in tree:
+            p = t["path"]
+            if t["type"] == "blob" and p.startswith(f["path"] + "/") and p.endswith(".md") and "/public/" not in p:
+                u = md_url(f, p)
+                if u.rstrip("/") not in known:
+                    found.append((f["name"], u, p))
+                    known.add(u.rstrip("/"))
+        by_path = {i.get("path"): i for i in db["items"] if i.get("path")}
+        for c in commits[:30]:  # 一週通常不到 30 個；超過的只看最新的
+            day = c["commit"]["committer"]["date"][:10]
+            msg = c["commit"]["message"].splitlines()[0][:80]
+            for fl in gh_get(c["url"]).get("files", []):
+                i = by_path.get(fl["filename"])
+                if i and i["status"] in ("todo", "done") and fl["filename"] not in changed:
+                    i["changed"] = day
+                    changed[fl["filename"]] = (day, i, msg)
+        w["last"] = commits[0]["sha"]
+    w["checked"] = dt.date.today().isoformat()
+    print(f"## {d}／{f['name']}：{len(commits)} 個 commit 動到 {f['path']}")
+    return found, list(changed.values())
+
+
 def scan(domain=None):
     targets = [domain] if domain else list(feeds())
     for d in targets:
         db = load(d)
         known = {i["url"].rstrip("/") for i in db["items"]}
-        found = []
+        found, changed, md = [], [], {}
         for f in feeds().get(d, []):
+            if f.get("type") == "github":
+                try:
+                    fd, ch = scan_github(d, f, db, known)
+                except Exception as e:  # noqa: BLE001
+                    print(f"⚠️ [{d}] 讀不到 GitHub {f['repo']}：{e}")
+                    continue
+                found += [(fn, u) for fn, u, _ in fd]
+                md.update({u: (f, p) for _, u, p in fd})
+                changed += ch
+                continue
             try:
                 xml = get(f["sitemap"])
             except Exception as e:  # noqa: BLE001
@@ -105,14 +183,18 @@ def scan(domain=None):
                 if re.match(f["match"], loc) and loc.rstrip("/") not in known:
                     found.append((f["name"], loc))
                     known.add(loc.rstrip("/"))
+        one = lambda x: md_meta(*md[x[1]]) if x[1] in md else meta(x[1])
         with cf.ThreadPoolExecutor(max_workers=8) as ex:
-            metas = list(ex.map(lambda x: meta(x[1]), found))
+            metas = list(ex.map(one, found))
         db["items"] += [item(u, fn, m) for (fn, u), m in zip(found, metas)]
         db["updated"] = dt.date.today().isoformat()
         save(d, db)
         print(f"## {d}：新文章 {len(found)} 篇")
         for (fn, u), m in zip(found, metas):
             print(f"- [{d}] {m.get('date', '')} {m.get('title') or u}  {u}")
+        for day, i, msg in changed:
+            tag = f"已做成課：{i['lesson']}" if i["status"] == "done" else "要學"
+            print(f"- [{d}] 改版 {day} {i.get('title') or i['url']}（{tag}；{msg}）  {i['url']}")
 
 
 def add(domain, url):

@@ -1,5 +1,6 @@
-# 每週檢查各領域的新文章：只比對 sitemap 與 data/sources/，不呼叫任何 AI，不耗 Claude 額度。
+# 每週檢查各領域的新文章：只比對 sitemap（或課程 repo 的 commit）與 data/sources/，不呼叫任何 AI，不耗 Claude 額度。
 # 掃描 data/feeds.json 裡所有有設定 feed 的領域；有新文章時以 status=new 寫進 data/sources/<領域>.json 並 commit，再開一個 issue 通知。
+# type: github 的來源（例如 Easy-Vibe）沒有 blog feed，改看指定資料夾的 commit：新頁面同樣加進清單，要學或已做成課的頁面改版時也會列在 issue 裡。
 name: weekly-sources
 
 on:
@@ -20,6 +21,8 @@ jobs:
         with:
           python-version: "3.12"
       - name: 找新文章
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: python3 tools/sources.py scan | tee scan.txt
       - name: 有新文章就 commit 並開 issue
         env:
@@ -31,8 +34,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/sources
-          git commit -m "新文章 $(date +%F)"
+          git commit -m "新文章 $(date +%F)" || { echo "清單沒有變動"; exit 0; }
           git push
           n=$(grep -c '^- ' scan.txt || true)
-          { echo "本週有 ${n} 篇新文章，已加進 data/sources/<領域>.json（status: new）。"; echo; grep '^- ' scan.txt; echo; echo "回對應領域的研究夥伴說「分類新文章」即可。"; } > body.md
-          gh issue create --title "新文章 $(date +%F)：${n} 篇" --body-file body.md
+          { echo "本週有 ${n} 筆新文章或改版。新文章已加進 data/sources/<領域>.json（status: new）；標「改版」的是已在清單裡、原文有更新的頁面。"; echo; grep '^- ' scan.txt; echo; echo "回對應領域的研究夥伴說「分類新文章」即可。"; } > body.md
+          gh issue create --title "新文章 $(date +%F)：${n} 筆" --body-file body.md

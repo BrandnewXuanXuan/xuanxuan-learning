@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../../assets/style.css?v=20261018b">
+<link rel="stylesheet" href="../../assets/style.css?v=20261025a">
 <style>
   /* 3：context 視窗 */
   .win { border: 1.5px dashed var(--rule); border-radius: 14px; padding: 10px; display: grid; gap: 6px; }
@@ -27,14 +27,14 @@
 </head>
 <body class="lesson">
 <header class="bar"><div class="bar-in">
-  <a class="back" href="../../index.html#/t/claude/context" aria-label="回到主題"><svg class="i"><use href="../../assets/icons.svg?v=20261018b#back"/></svg></a>
+  <a class="back" href="../../index.html#/t/claude/context" aria-label="回到主題"><svg class="i"><use href="../../assets/icons.svg?v=20261025a#back"/></svg></a>
   <span class="bar-title">context 與額度</span>
 </div></header>
 
 <main class="wrap">
   <h1>一次對話的帳單</h1>
   <p class="lead">為什麼同一句話，早上問很便宜，聊到晚上問就很貴？答案藏在每次送出時，Claude 實際讀了什麼。</p>
-  <div class="note"><svg><use href="../../assets/icons.svg?v=20261018b#info"/></svg><span>圖裡的「格」是示意單位，用來比大小，不是實際的 token 數。</span></div>
+  <div class="note"><svg><use href="../../assets/icons.svg?v=20261025a#info"/></svg><span>圖裡的「格」是示意單位，用來比大小，不是實際的 token 數。</span></div>
 
   <section id="s1">
     <h2><span class="no">1</span>每次送出，整疊重寄一次</h2>
@@ -42,9 +42,9 @@
     <div class="fig">
       <svg id="stackSvg" viewBox="0 0 360 262" role="img" aria-label="左邊是這次寄出的一疊內容，右邊是每次請求讀了多少"></svg>
       <div class="ctl">
-        <button class="btn pri" data-act="ask"><svg><use href="../../assets/icons.svg?v=20261018b#chat"/></svg>問一句</button>
-        <button class="btn" data-act="read"><svg><use href="../../assets/icons.svg?v=20261018b#file"/></svg>讀大檔案</button>
-        <button class="btn" data-act="clear"><svg><use href="../../assets/icons.svg?v=20261018b#eraser"/></svg>/clear</button>
+        <button class="btn pri" data-act="ask"><svg><use href="../../assets/icons.svg?v=20261025a#chat"/></svg>問一句</button>
+        <button class="btn" data-act="read"><svg><use href="../../assets/icons.svg?v=20261025a#file"/></svg>讀大檔案</button>
+        <button class="btn" data-act="clear"><svg><use href="../../assets/icons.svg?v=20261025a#eraser"/></svg>/clear</button>
       </div>
       <div class="read" id="stackOut">按「問一句」，看左邊越疊越高、右邊越長越高。</div>
     </div>
@@ -69,11 +69,11 @@
     <h2><span class="no">3</span>誰常駐、誰用到才進來</h2>
     <p>不是所有設定一開始就塞進去。點下面的按鈕，看哪些東西用到時才進來。</p>
     <div class="fig">
-      <div class="win" id="win"><div class="win-title"><svg><use href="../../assets/icons.svg?v=20261018b#context"/></svg>context 視窗</div></div>
+      <div class="win" id="win"><div class="win-title"><svg><use href="../../assets/icons.svg?v=20261025a#context"/></svg>context 視窗</div></div>
       <div class="ctl" id="winBtns">
-        <button class="btn" data-k="skill"><svg><use href="../../assets/icons.svg?v=20261018b#skills"/></svg>用一個 skill</button>
-        <button class="btn" data-k="mcp"><svg><use href="../../assets/icons.svg?v=20261018b#mcp"/></svg>用 MCP 工具</button>
-        <button class="btn" data-k="sub"><svg><use href="../../assets/icons.svg?v=20261018b#memory"/></svg>碰子資料夾</button>
+        <button class="btn" data-k="skill"><svg><use href="../../assets/icons.svg?v=20261025a#skills"/></svg>用一個 skill</button>
+        <button class="btn" data-k="mcp"><svg><use href="../../assets/icons.svg?v=20261025a#mcp"/></svg>用 MCP 工具</button>
+        <button class="btn" data-k="sub"><svg><use href="../../assets/icons.svg?v=20261025a#memory"/></svg>碰子資料夾</button>
       </div>
       <div class="read" id="winOut">灰色紙條每次都在；彩色紙條是用到才放進來的。</div>
     </div>
@@ -86,12 +86,12 @@
     <p>選一個情境，看該用哪一招。</p>
     <div class="fig">
       <div class="picks" id="picks">
-        <button class="pick" data-c="0"><svg><use href="../../assets/icons.svg?v=20261018b#eraser"/></svg>做完一件事，要換完全無關的事</button>
-        <button class="pick" data-c="1"><svg><use href="../../assets/icons.svg?v=20261018b#compress"/></svg>同一件事還沒做完，但對話已經很長</button>
-        <button class="pick" data-c="2"><svg><use href="../../assets/icons.svg?v=20261018b#agents"/></svg>要讀一大堆 log 或文件，只需要結論</button>
-        <button class="pick" data-c="3"><svg><use href="../../assets/icons.svg?v=20261018b#feather"/></svg>只是改個錯字、問個小問題</button>
+        <button class="pick" data-c="0"><svg><use href="../../assets/icons.svg?v=20261025a#eraser"/></svg>做完一件事，要換完全無關的事</button>
+        <button class="pick" data-c="1"><svg><use href="../../assets/icons.svg?v=20261025a#compress"/></svg>同一件事還沒做完，但對話已經很長</button>
+        <button class="pick" data-c="2"><svg><use href="../../assets/icons.svg?v=20261025a#agents"/></svg>要讀一大堆 log 或文件，只需要結論</button>
+        <button class="pick" data-c="3"><svg><use href="../../assets/icons.svg?v=20261025a#feather"/></svg>只是改個錯字、問個小問題</button>
       </div>
-      <div class="answer" id="answer"><span class="badge"><svg><use href="../../assets/icons.svg?v=20261018b#eraser"/></svg></span><div><h4></h4><p></p></div></div>
+      <div class="answer" id="answer"><span class="badge"><svg><use href="../../assets/icons.svg?v=20261025a#eraser"/></svg></span><div><h4></h4><p></p></div></div>
     </div>
     <div class="ask-hint">看不懂就回來說 <code>帳單 4</code></div>
   </section>
@@ -99,11 +99,11 @@
   <section id="s5">
     <h2><span class="no">5</span>看自己的帳</h2>
     <div class="tools">
-      <div class="tool" style="--c: var(--clay)"><span class="chip"><svg><use href="../../assets/icons.svg?v=20261018b#gauge"/></svg></span><div><b>/usage</b>
+      <div class="tool" style="--c: var(--clay)"><span class="chip"><svg><use href="../../assets/icons.svg?v=20261025a#gauge"/></svg></span><div><b>/usage</b>
         <p>看用量條，以及最近的用量被誰吃掉：哪個 skill、subagent、MCP 伺服器各佔多少。佔超過一成的耗量行為（例如長 context、快取沒命中）會被特別標出來。</p></div></div>
-      <div class="tool" style="--c: var(--slate)"><span class="chip"><svg><use href="../../assets/icons.svg?v=20261018b#lens"/></svg></span><div><b>/context</b>
+      <div class="tool" style="--c: var(--slate)"><span class="chip"><svg><use href="../../assets/icons.svg?v=20261025a#lens"/></svg></span><div><b>/context</b>
         <p>看這個 session 的空間現在被什麼佔掉。</p></div></div>
-      <div class="tool" style="--c: var(--ochre)"><span class="chip"><svg><use href="../../assets/icons.svg?v=20261018b#spark"/></svg></span><div><b>/insights</b>
+      <div class="tool" style="--c: var(--ochre)"><span class="chip"><svg><use href="../../assets/icons.svg?v=20261025a#spark"/></svg></span><div><b>/insights</b>
         <p>分析你最近的使用習慣，產出一份報告。注意：跑這個本身也會用到額度。</p></div></div>
     </div>
     <div class="ask-hint">看不懂就回來說 <code>帳單 5</code></div>
@@ -115,10 +115,10 @@
     <li><a href="https://code.claude.com/docs/en/memory" target="_blank" rel="noopener">How Claude remembers your project（Claude Code 文件）</a></li>
   </ul>
 
-  <div class="foot"><svg><use href="../../assets/icons.svg?v=20261018b#chat"/></svg><span>學完了，回研究夥伴說「學完帳單」。一起回顧、寫成筆記之後，這張卡才會蓋上「學完」章。</span></div>
+  <div class="foot"><svg><use href="../../assets/icons.svg?v=20261025a#chat"/></svg><span>學完了，回研究夥伴說「學完帳單」。一起回顧、寫成筆記之後，這張卡才會蓋上「學完」章。</span></div>
 </main>
 
-<script src="../../assets/iso.js?v=20261018b"></script>
+<script src="../../assets/iso.js?v=20261025a"></script>
 <script>
 (() => {
   const { mk, color, block, outline } = Iso;
@@ -234,10 +234,10 @@
   };
   function drawWin() {
     win.querySelectorAll('.slip').forEach((n) => n.remove());
-    RES.forEach(([ic, t]) => win.insertAdjacentHTML('beforeend', `<div class="slip"><svg><use href="../../assets/icons.svg?v=20261018b#${ic}"/></svg>${t}<small>常駐</small></div>`));
+    RES.forEach(([ic, t]) => win.insertAdjacentHTML('beforeend', `<div class="slip"><svg><use href="../../assets/icons.svg?v=20261025a#${ic}"/></svg>${t}<small>常駐</small></div>`));
     Object.keys(DEM).filter((k) => on[k]).forEach((k) => {
       const [ic, t, c] = DEM[k];
-      win.insertAdjacentHTML('beforeend', `<div class="slip dem" style="--c: var(--${c})"><svg><use href="../../assets/icons.svg?v=20261018b#${ic}"/></svg>${t}<small>用到才進來</small></div>`);
+      win.insertAdjacentHTML('beforeend', `<div class="slip dem" style="--c: var(--${c})"><svg><use href="../../assets/icons.svg?v=20261025a#${ic}"/></svg>${t}<small>用到才進來</small></div>`);
     });
   }
   document.querySelectorAll('#winBtns .btn').forEach((b) => b.addEventListener('click', () => {
@@ -258,7 +258,7 @@
   document.querySelectorAll('#picks .pick').forEach((b) => b.addEventListener('click', () => {
     document.querySelectorAll('#picks .pick').forEach((x) => x.classList.toggle('on', x === b));
     const [ic, t, p] = ANS[+b.dataset.c];
-    ans.querySelector('use').setAttribute('href', '../../assets/icons.svg?v=20261018b#' + ic);
+    ans.querySelector('use').setAttribute('href', '../../assets/icons.svg?v=20261025a#' + ic);
     ans.querySelector('h4').textContent = t; ans.querySelector('p').textContent = p;
     ans.classList.remove('show'); void ans.offsetWidth; ans.classList.add('show');
   }));

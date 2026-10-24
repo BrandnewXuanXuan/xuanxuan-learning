@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>卡住時，怎麼讓 AI 幫得上忙</title>
+<meta name="description" content="一則好的求救要有哪幾樣、怎麼讀報錯、怎麼用二分法把問題圍起來。">
+<meta name="theme-color" content="#f1f0eb">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="icon" href="../../icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css?v=20261025a">
+<style>
+.chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 2px; }
+.chips .btn { flex: 0 1 auto; min-height: 40px; font-size: 13px; padding: 0 12px; }
+.msg { margin-top: 10px; padding: 10px 12px; border-radius: 4px 14px 14px 14px; background: #f6f4ee; font-size: 13.5px; line-height: 1.65; }
+.msg p { margin: 0 0 4px; animation: drop .4s var(--ease) both; }
+.msg code { font-size: 11.5px; }
+.guess { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; padding: 0 2px; }
+.guess i { width: 20px; height: 20px; border-radius: 6px; background: var(--ochre); transition: opacity .35s, transform .35s var(--ease); }
+.guess i.off { opacity: .15; transform: scale(.7); }
+.errline { font: 500 12.5px/1.9 ui-monospace, "SF Mono", Menlo, monospace; background: #2f302d0d; border-radius: 10px; padding: 10px; word-break: break-all; }
+.errline button { font: inherit; border: 0; border-radius: 6px; padding: 1px 3px; cursor: pointer; background: color-mix(in srgb, var(--c) 22%, transparent); border-bottom: 2px solid var(--c); }
+.errline button.on { background: var(--c); color: #fff; }
+.cells { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; margin-top: 8px; }
+.cells i { aspect-ratio: 1; border-radius: 6px; background: #e6e2d8; display: grid; place-items: center; font: 500 11px var(--font); font-style: normal; color: var(--ink-3); transition: background .3s, opacity .3s; }
+.cells i.in { background: var(--slate); color: #fff; }
+.cells i.out { opacity: .25; }
+.cells i.bug { background: var(--stamp); color: #fff; }
+.steps { font-size: 13px; color: var(--ink-2); padding: 8px 4px 0; }
+.steps b { font: 18px var(--hand); color: var(--ink); }
+.btn:disabled { opacity: .45; }
+</style>
+</head>
+<body class="lesson">
+<header class="bar"><div class="bar-in">
+  <a class="back" href="../../index.html#/t/ai-dev/collab" aria-label="回到主題"><svg class="i"><use href="../../assets/icons.svg?v=20261025a#back"/></svg></a>
+  <span class="bar-title">和 AI 一起做</span>
+</div></header>
+
+<main class="wrap">
+<h1>卡住時，怎麼讓 AI 幫得上忙</h1>
+  <p class="lead">AI 除錯很強，但它看不到你的螢幕、主機和你剛做過什麼。資訊不夠，它只能猜；猜錯了，你們就來回繞圈。這一課講三件事：<b>求救要附什麼、報錯怎麼讀、問題怎麼圍起來</b>。</p>
+
+  <section id="s1">
+    <h2><span class="no">1</span>一則求救，五樣東西</h2>
+    <p>情境：輪值網站按「送出登記」後，畫面一片白。點下面的項目把它們加進訊息，看 AI 要猜的可能原因（黃色方塊）剩幾個。</p>
+    <div class="fig">
+      <div class="chips" id="chips">
+        <button class="btn" data-k="0"><svg><use href="../../assets/icons.svg?v=20261025a#eye"/></svg>現象</button>
+        <button class="btn" data-k="1"><svg><use href="../../assets/icons.svg?v=20261025a#target"/></svg>預期</button>
+        <button class="btn" data-k="2"><svg><use href="../../assets/icons.svg?v=20261025a#repeat"/></svg>做過什麼</button>
+        <button class="btn" data-k="3"><svg><use href="../../assets/icons.svg?v=20261025a#file"/></svg>完整報錯</button>
+        <button class="btn" data-k="4"><svg><use href="../../assets/icons.svg?v=20261025a#aidev-server"/></svg>環境</button>
+      </div>
+      <div class="msg" id="msg"></div>
+      <div class="guess" id="guess" aria-hidden="true"></div>
+      <div class="read" id="helpOut"></div>
+    </div>
+    <p>用 Claude Code 這類 agent 時，它能自己讀檔、跑指令，前兩樣仍然只有你知道；而主機上的錯誤訊息，它多半也拿不到，要你去複製回來。<b>完整報錯整段貼，不要自己摘要</b>，摘要時常把關鍵那一行漏掉。</p>
+    <div class="ask-hint">看不懂就回來說 <code>求救 1</code></div>
+  </section>
+
+  <section id="s2">
+    <h2><span class="no">2</span>報錯是一張地址條</h2>
+    <p>報錯看起來嚇人，其實就三樣：<b>什麼類型、在哪裡、怎麼了</b>。點下面這行 PHP 錯誤的每一段。</p>
+    <div class="fig">
+      <div class="errline" id="err">
+        <button data-k="type" style="--c:var(--stamp)">PHP Parse error:</button>
+        <button data-k="desc" style="--c:var(--ochre)">syntax error, unexpected '='</button>
+        in <button data-k="file" style="--c:var(--slate)">public_html/duty/index.php</button>
+        on <button data-k="line" style="--c:var(--sage)">line 23</button>
+      </div>
+      <div class="read" id="errOut">點任何一段。</div>
+    </div>
+    <div class="note"><svg><use href="../../assets/icons.svg?v=20261025a#info"/></svg><span>正式主機通常把錯誤訊息關起來不給訪客看，所以只看到白畫面或 500。這時去 cPanel 的「錯誤」頁，或網站資料夾裡的 <code>error_log</code> 檔找，訊息都記在那裡。</span></div>
+    <p>錯誤分三種：<b>語法錯</b>（程式根本跑不起來，像上面這行）、<b>執行時錯</b>（跑到一半出事，例如查詢的資料表不存在）、<b>邏輯錯</b>（不報錯，但結果不對，例如值班表少了週日）。最後一種最難抓，因為沒有地址條，要靠下一段的方法。</p>
+    <div class="ask-hint">看不懂就回來說 <code>求救 2</code></div>
+  </section>
+
+  <section id="s3">
+    <h2><span class="no">3</span>沒有報錯時，用二分法圍起來</h2>
+    <p>結果不對、又沒有報錯，就在中間放一個檢查點（印出變數、或請 AI 加一行記錄），看問題在前半還是後半。32 段程式裡藏了一個錯，按按看要幾步。</p>
+    <div class="fig">
+      <div class="cells" id="cells" aria-hidden="true"></div>
+      <div class="steps">已用 <b id="nSteps">0</b> 步・可疑範圍 <b id="nLeft">32</b> 段</div>
+      <div class="ctl">
+        <button class="btn pri" id="half"><svg><use href="../../assets/icons.svg?v=20261025a#lens"/></svg>在中間放檢查點</button>
+        <button class="btn" id="again"><svg><use href="../../assets/icons.svg?v=20261025a#repeat"/></svg>換一個錯</button>
+      </div>
+      <div class="read" id="binOut"></div>
+    </div>
+    <p>每一步砍掉一半：32 段 5 步、1000 行大約 10 步。同一招也能用在「之前好好的，某天開始壞」：在好的版本和壞的版本之間，對半挑一個版本測試，Git 甚至有 <code>git bisect</code> 幫你自動對半找。</p>
+    <div class="ask-hint">看不懂就回來說 <code>求救 3</code></div>
+  </section>
+
+  <section id="s4">
+    <h2><span class="no">4</span>假設、只改一處、驗證</h2>
+    <p>除錯是一個循環：先猜一個原因，<b>只改一個地方</b>，馬上驗證。一次改三處，就算好了，也不知道是哪一處修好的，另外兩處可能埋下新問題。選一個情境，看第一步該做什麼。</p>
+    <div class="fig" id="pick4">
+      <div class="picks">
+        <button class="pick" data-c="0"><svg><use href="../../assets/icons.svg?v=20261025a#clock"/></svg>上週還好好的，今天登記不了</button>
+        <button class="pick" data-c="1"><svg><use href="../../assets/icons.svg?v=20261025a#aidev-server"/></svg>自己電腦上正常，上傳主機就壞</button>
+        <button class="pick" data-c="2"><svg><use href="../../assets/icons.svg?v=20261025a#eye"/></svg>在瀏覽器 F12 裡改好了樣式，重新整理就不見</button>
+        <button class="pick" data-c="3"><svg><use href="../../assets/icons.svg?v=20261025a#chat"/></svg>AI 改了三輪，越改越亂</button>
+      </div>
+      <div class="answer"></div>
+    </div>
+    <div class="ask-hint">看不懂就回來說 <code>求救 4</code></div>
+  </section>
+
+  <h2>原文</h2>
+  <ul class="srcs">
+    <li><a href="https://datawhalechina.github.io/easy-vibe/zh-tw/stage-1/appendix-b-common-errors/" target="_blank" rel="noopener">Easy-Vibe：寫程式碼時遇到錯誤怎麼辦</a></li>
+    <li><a href="https://datawhalechina.github.io/easy-vibe/zh-tw/appendix/2-development-tools/debugging-art.html" target="_blank" rel="noopener">Easy-Vibe 附錄：除錯原理與藝術</a></li>
+    <li><a href="https://datawhalechina.github.io/easy-vibe/zh-tw/appendix/2-development-tools/debugging-art/" target="_blank" rel="noopener">Easy-Vibe 附錄：瀏覽器除錯器（DevTools）基礎</a></li>
+  </ul>
+
+  <div class="foot"><svg><use href="../../assets/icons.svg?v=20261025a#chat"/></svg><span>學完了，回研究夥伴說「學完求救」。一起回顧、寫成筆記之後，這張卡才會蓋上「學完」章。</span></div>
+  <p class="lic" style="margin:18px 2px 0;font-size:12.5px;line-height:1.7;color:var(--ink-3)">原文出處：<a href="https://github.com/datawhalechina/easy-vibe" target="_blank" rel="noopener">Datawhale〈Easy-Vibe〉</a>（上方原文清單），以 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hant" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a> 授權。本頁是用自己的話改寫、並換成自己的例子，改寫內容同樣以 CC BY-NC-SA 4.0 授權。</p>
+</main>
+
+<script src="../../assets/iso.js?v=20261025a"></script>
+<script src="../../assets/kit.js?v=20261025a"></script>
+<script>
+(() => {
+const PARTS = [
+  ['現象', '按「送出登記」後整頁空白，網址停在 <code>save.php</code>。'],
+  ['預期', '應該跳回首頁，並顯示「登記成功」。'],
+  ['做過什麼', '剛剛請 AI 加了「每人每週最多兩班」的檢查，之前送出都正常。'],
+  ['完整報錯', '主機的 error_log：<code>PHP Parse error: syntax error, unexpected \'=\' in …/save.php on line 41</code>'],
+  ['環境', '共享主機 PHP 7.0、MySQL；本機預覽是 PHP 8。']
+];
+const KILL = [3, 1, 3, 3, 1];  // 每樣資訊大約排除幾個可能（示意）
+const on = new Set();
+const guess = document.getElementById('guess');
+guess.innerHTML = '<i></i>'.repeat(12);
+function drawHelp() {
+  document.querySelectorAll('#chips .btn').forEach((b) => b.classList.toggle('on', on.has(+b.dataset.k)));
+  document.getElementById('msg').innerHTML = on.size ? [...on].sort().map((k) => `<p><b>${PARTS[k][0]}：</b>${PARTS[k][1]}</p>`).join('') : '<p style="color:var(--ink-3)">「網站壞了，幫我修。」</p>';
+  const left = Math.max(1, 12 - [...on].reduce((a, k) => a + KILL[k], 0));
+  [...guess.children].forEach((d, i) => d.classList.toggle('off', i >= left));
+  document.getElementById('helpOut').innerHTML = on.size === 5
+    ? '<b>只剩一個方向</b>：剛加的程式在第 41 行用了 PHP 7.0 不認得的寫法。AI 可以直接修，不用猜。'
+    : on.size === 0
+      ? '只說「壞了」：資料庫連不上、檔案權限、語法、表單欄位……每一種都可能，AI 只能一個個問或亂猜。'
+      : `還剩 <b>${left}</b> 個可能。每補一樣，AI 就少猜一些。（方塊數是示意）`;
+}
+document.querySelectorAll('#chips .btn').forEach((b) => b.addEventListener('click', () => { const k = +b.dataset.k; on.has(k) ? on.delete(k) : on.add(k); drawHelp(); }));
+drawHelp();
+
+const ERR = {
+  type: '<b>類型：Parse error（語法錯）</b>。PHP 連讀都讀不懂這個檔案，所以一行都沒執行。看到 Parse error，問題一定在「寫法」，不是資料。',
+  desc: '<b>描述：遇到了沒預期的「=」</b>。PHP 7.0 讀到 <code>??=</code> 時，認得 <code>??</code>，卻不懂後面為什麼接 <code>=</code>，因為這個寫法 7.4 才有。',
+  file: '<b>檔案</b>：出事的是哪個檔。注意它可能是被引入（include）的檔案，不一定是你打開的那頁。',
+  line: '<b>行號</b>：PHP 在第 23 行發現讀不下去。真正寫錯的地方常在這一行，或它的前一兩行（例如上一行少了分號）。'
+};
+document.querySelectorAll('#err button').forEach((b) => b.addEventListener('click', () => {
+  document.querySelectorAll('#err button').forEach((x) => x.classList.toggle('on', x === b));
+  document.getElementById('errOut').innerHTML = ERR[b.dataset.k];
+}));
+
+const cells = document.getElementById('cells');
+let bug, lo, hi, n, last = '';
+function newBug() { bug = Math.floor(Math.random() * 32); lo = 0; hi = 31; n = 0; last = ''; drawBin(); }
+function drawBin() {
+  const found = lo === hi;
+  cells.innerHTML = Array.from({ length: 32 }, (_, i) => `<i class="${found && i === bug ? 'bug' : i >= lo && i <= hi ? 'in' : 'out'}">${i + 1}</i>`).join('');
+  document.getElementById('nSteps').textContent = n;
+  document.getElementById('nLeft').textContent = hi - lo + 1;
+  document.getElementById('half').disabled = found;
+  document.getElementById('binOut').innerHTML = found
+    ? `找到了：第 <b>${bug + 1}</b> 段。不管錯藏在哪，32 段最多 5 步。`
+    : last || '藍色是可疑範圍。';
+}
+document.getElementById('half').addEventListener('click', () => {
+  const mid = Math.floor((lo + hi) / 2);
+  last = bug <= mid ? `檢查點放在第 ${mid + 1} 段之後：這裡已經不對，錯在<b>前半</b>，後半先不管。` : `檢查點放在第 ${mid + 1} 段之後：到這裡都正常，錯在<b>後半</b>。`;
+  if (bug <= mid) hi = mid; else lo = mid + 1;
+  n++; drawBin();
+});
+document.getElementById('again').addEventListener('click', newBug);
+newBug();
+
+Kit.picks(document.getElementById('pick4'), [
+  ['branch', '先看最近改了什麼', '用 Git 看上週到今天的改動（請 AI 跑 git log、git diff），嫌疑最大的就是最近的改動。範圍大時用二分法挑版本試。'],
+  ['aidev-server', '先找兩邊環境的差別', 'PHP 版本、資料庫裡的資料、設定檔、檔案權限。把主機的 error_log 貼給 AI，並告訴它兩邊的版本。'],
+  ['eye', '那只是瀏覽器裡的暫時副本', 'F12 裡的修改只存在你這次打開的頁面記憶體裡，重新整理就還原。滿意的數值要抄回 CSS 檔，或請 AI 照著改。'],
+  ['rewind', '退回最後一個好的版本', '別在亂掉的基礎上繼續補。回到最後能用的版本，把報錯和「已經試過、無效的做法」一起交代，請它一次只改一處。']
+]);
+})();
+</script>
+<script src="../../assets/lesson.js" data-root="../../"></script>
+</body>
+</html>

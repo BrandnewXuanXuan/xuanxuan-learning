@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../../assets/style.css?v=20261018b">
+<link rel="stylesheet" href="../../assets/style.css?v=20261025a">
 <style>
 .desk { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .desk > div { background: #f6f4ee; border-radius: 12px; padding: 10px; }
@@ -40,7 +40,7 @@
 </head>
 <body class="lesson">
 <header class="bar"><div class="bar-in">
-  <a class="back" href="../../index.html#/t/claude/agents" aria-label="回到主題"><svg class="i"><use href="../../assets/icons.svg?v=20261018b#back"/></svg></a>
+  <a class="back" href="../../index.html#/t/claude/agents" aria-label="回到主題"><svg class="i"><use href="../../assets/icons.svg?v=20261025a#back"/></svg></a>
   <span class="bar-title">Subagent 與角色</span>
 </div></header>
 
@@ -53,10 +53,10 @@
     <p>按「派出分身」，看兩張桌子各堆了什麼。</p>
     <div class="fig">
       <div class="desk">
-        <div><h5><svg><use href="../../assets/icons.svg?v=20261018b#chat"/></svg>主對話</h5><div class="pile" id="main"></div></div>
-        <div><h5><svg><use href="../../assets/icons.svg?v=20261018b#agents"/></svg>分身</h5><div class="pile" id="sub"></div></div>
+        <div><h5><svg><use href="../../assets/icons.svg?v=20261025a#chat"/></svg>主對話</h5><div class="pile" id="main"></div></div>
+        <div><h5><svg><use href="../../assets/icons.svg?v=20261025a#agents"/></svg>分身</h5><div class="pile" id="sub"></div></div>
       </div>
-      <div class="ctl"><button class="btn pri" id="send"><svg><use href="../../assets/icons.svg?v=20261018b#agents"/></svg>派出分身</button><button class="btn" id="self"><svg><use href="../../assets/icons.svg?v=20261018b#file"/></svg>自己讀</button></div>
+      <div class="ctl"><button class="btn pri" id="send"><svg><use href="../../assets/icons.svg?v=20261025a#agents"/></svg>派出分身</button><button class="btn" id="self"><svg><use href="../../assets/icons.svg?v=20261025a#file"/></svg>自己讀</button></div>
       <div class="read" id="out1">先比較看看：同一份工作，派分身做和自己讀，主對話各剩下什麼。</div>
     </div>
     <p>要記得：分身<b>從零開始</b>，不知道你們剛才聊過什麼，也不會沿用主對話已經打開的 skill。所以派它出去時，要把範圍、要做什麼、報告要長什麼樣子講清楚；需要「沒被先前討論影響」的眼光時，也可以直接說明。</p>
@@ -68,12 +68,12 @@
     <p>經驗法則：<b>要翻 10 個以上的檔案，或有 3 件以上互不相關的工作</b>，就考慮派分身。打開符合你情況的開關：</p>
     <div class="fig">
       <div class="toggles" id="tgs">
-        <button class="tg" data-k="many"><svg><use href="../../assets/icons.svg?v=20261018b#lens"/></svg>要翻十幾個檔案才能搞懂現況<span class="sw" style="margin-left:auto"></span></button>
-        <button class="tg" data-k="indep"><svg><use href="../../assets/icons.svg?v=20261018b#branch"/></svg>有好幾件互不相關的事可以同時做<span class="sw" style="margin-left:auto"></span></button>
-        <button class="tg" data-k="fresh"><svg><use href="../../assets/icons.svg?v=20261018b#eye"/></svg>需要沒被我們討論影響的審查<span class="sw" style="margin-left:auto"></span></button>
-        <button class="tg" data-k="seq"><svg><use href="../../assets/icons.svg?v=20261018b#workflow"/></svg>下一步要用到上一步的完整結果<span class="sw" style="margin-left:auto"></span></button>
-        <button class="tg" data-k="same"><svg><use href="../../assets/icons.svg?v=20261018b#file"/></svg>大家都要改同一個檔案<span class="sw" style="margin-left:auto"></span></button>
-        <button class="tg" data-k="tiny"><svg><use href="../../assets/icons.svg?v=20261018b#feather"/></svg>其實是很小的事<span class="sw" style="margin-left:auto"></span></button>
+        <button class="tg" data-k="many"><svg><use href="../../assets/icons.svg?v=20261025a#lens"/></svg>要翻十幾個檔案才能搞懂現況<span class="sw" style="margin-left:auto"></span></button>
+        <button class="tg" data-k="indep"><svg><use href="../../assets/icons.svg?v=20261025a#branch"/></svg>有好幾件互不相關的事可以同時做<span class="sw" style="margin-left:auto"></span></button>
+        <button class="tg" data-k="fresh"><svg><use href="../../assets/icons.svg?v=20261025a#eye"/></svg>需要沒被我們討論影響的審查<span class="sw" style="margin-left:auto"></span></button>
+        <button class="tg" data-k="seq"><svg><use href="../../assets/icons.svg?v=20261025a#workflow"/></svg>下一步要用到上一步的完整結果<span class="sw" style="margin-left:auto"></span></button>
+        <button class="tg" data-k="same"><svg><use href="../../assets/icons.svg?v=20261025a#file"/></svg>大家都要改同一個檔案<span class="sw" style="margin-left:auto"></span></button>
+        <button class="tg" data-k="tiny"><svg><use href="../../assets/icons.svg?v=20261025a#feather"/></svg>其實是很小的事<span class="sw" style="margin-left:auto"></span></button>
       </div>
       <div class="verdict meh" id="verdict"></div>
     </div>
@@ -114,11 +114,11 @@
     <li><a href="https://claude.dev/blog/a-harness-for-every-task-dynamic-workflows-in-claude-code/" target="_blank" rel="noopener">A harness for every task: dynamic workflows in Claude Code</a></li>
   </ul>
 
-  <div class="foot"><svg><use href="../../assets/icons.svg?v=20261018b#chat"/></svg><span>學完了，回研究夥伴說「學完分身」。一起回顧、寫成筆記之後，這張卡才會蓋上「學完」章。</span></div>
+  <div class="foot"><svg><use href="../../assets/icons.svg?v=20261025a#chat"/></svg><span>學完了，回研究夥伴說「學完分身」。一起回顧、寫成筆記之後，這張卡才會蓋上「學完」章。</span></div>
 </main>
 
-<script src="../../assets/iso.js?v=20261018b"></script>
-<script src="../../assets/kit.js?v=20261018b"></script>
+<script src="../../assets/iso.js?v=20261025a"></script>
+<script src="../../assets/kit.js?v=20261025a"></script>
 <script>
 (() => {
 const { mk, color } = Iso;
