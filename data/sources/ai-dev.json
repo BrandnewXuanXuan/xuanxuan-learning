@@ -1,6 +1,6 @@
 {
  "domain": "ai-dev",
- "updated": "2026-10-25",
+ "updated": "2026-10-26",
  "statuses": {
   "new": "剛加入、尚未分類",
   "todo": "要學（topic 主題、priority 1 核心／2 延伸）",
@@ -2759,7 +2759,7 @@
   "easy-vibe": {
    "repo": "datawhalechina/easy-vibe",
    "last": "f2239c67052b6ad9ae3e72bc6b7a76f3c903cf64",
-   "checked": "2026-10-24"
+   "checked": "2026-10-26"
   }
  }
 }
