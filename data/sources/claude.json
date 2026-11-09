@@ -1,6 +1,62 @@
 {
- "updated": "2026-11-02",
+ "updated": "2026-11-09",
  "items": [
+  {
+   "url": "https://claude.com/resources/articles/introducing-personal-finance-in-claude",
+   "feed": "claude-blog",
+   "seen": "2026-11-09",
+   "title": "Introducing Personal Finance in Claude",
+   "summary": "Ask Claude about your money and get straight answers from the accounts you connect.",
+   "date": "2026-11-05",
+   "category": "Insights",
+   "status": "new",
+   "topic": null,
+   "priority": null,
+   "lesson": null,
+   "reason": ""
+  },
+  {
+   "url": "https://claude.com/resources/articles/claude-enterprise-security-updates",
+   "feed": "claude-blog",
+   "seen": "2026-11-09",
+   "title": "More visibility and control over Claude Enterprise for security teams",
+   "summary": "Claude Enterprise has new security and admin features, including a security center, inference hooks, centralized management, and additional access controls.",
+   "date": "2026-11-05",
+   "category": "Insights",
+   "status": "new",
+   "topic": null,
+   "priority": null,
+   "lesson": null,
+   "reason": ""
+  },
+  {
+   "url": "https://claude.com/resources/articles/new-agents-and-products-claude-marketplace",
+   "feed": "claude-blog",
+   "seen": "2026-11-09",
+   "title": "New agents and products on Claude Marketplace",
+   "summary": "Explore new agents and products on Claude Marketplace that help teams with security, developer infrastructure, creative work, and productivity.",
+   "date": "2026-11-04",
+   "category": "Insights",
+   "status": "new",
+   "topic": null,
+   "priority": null,
+   "lesson": null,
+   "reason": ""
+  },
+  {
+   "url": "https://claude.com/resources/articles/message-threads",
+   "feed": "claude-blog",
+   "seen": "2026-11-09",
+   "title": "Make long-running agents faster with message threads",
+   "summary": "New in the Messages API, send your conversation once, and the API receives only what’s new with every turn.",
+   "date": "2026-11-02",
+   "category": "Insights",
+   "status": "new",
+   "topic": null,
+   "priority": null,
+   "lesson": null,
+   "reason": ""
+  },
   {
    "url": "https://claude.com/resources/articles/smart-reports-surveys-pooled-budgets",
    "feed": "claude-blog",
